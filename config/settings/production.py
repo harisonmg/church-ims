@@ -19,6 +19,8 @@ ADMIN_URL =  decouple.config('ADMIN_URL')
 
 GOOGLE_ANALYTICS_ID = decouple.config('GOOGLE_ANALYTICS_ID', default=None)
 
+MIDDLEWARE.append('django.middleware.common.BrokenLinkEmailsMiddleware')
+
 # TEMPLATES[0]['OPTIONS']['context_processors'].append(
 #     'core.context_processors.google_analytics'
 # )
