@@ -9,6 +9,7 @@ python-decouple = "*"
 dj-database-url = "*"
 psycopg2 = "*"
 gunicorn = "*"
+django-storages = {extras = ["google"], version = "*"}
 
 [dev-packages]
 coverage = "*"
