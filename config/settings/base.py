@@ -11,26 +11,37 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from typing import cast
+
+import decouple
+import dj_database_url
+
+# Django settings
+# ===============
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4bn5-^wetp4gz$bk9x&@s(!st&*pem@!arn4+0pwy7d&aklh^s'
+SECRET_KEY = decouple.config('DJANGO_SECRET_KEY',
+    default='django-insecure-4bn5-^wetp4gz$bk9x&@s(!st&*pem@!arn4+0pwy7d&aklh^s'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = decouple.config('DJANGO_DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = decouple.config('ALLOWED_HOSTS', cast=decouple.Csv(),
+    default='127.0.0.1, localhost'
+)
 
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +49,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+INSTALLED_APPS = DJANGO_APPS
+
+# https://docs.djangoproject.com/en/3.2/topics/http/middleware/
+# https://docs.djangoproject.com/en/3.2/ref/middleware/#middleware-ordering
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,7 +70,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,16 +87,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# Auth
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# AUTH_USER_MODEL = 'accounts.CustomUser'
 
 
 # Password validation
@@ -100,12 +112,39 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+DATABASES = {'default': dj_database_url.config(conn_max_age=600)}
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Email
+# https://docs.djangoproject.com/en/3.2/ref/settings/#email
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST =  decouple.config('DJANGO_EMAIL_HOST', default='smtp.gmail.com')
+
+EMAIL_PORT =  decouple.config('DJANGO_EMAIL_PORT', default=587)
+
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER =  decouple.config('DJANGO_EMAIL_HOST_USER')
+
+EMAIL_HOST_PASSWORD =  decouple.config('DJANGO_EMAIL_HOST_PASSWORD')
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Nairobi'
 
 USE_I18N = True
 
@@ -119,7 +158,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+
+# Project Specific Settings
+# =========================
+
+ADMIN_URL = 'admin/'
+
+HEADLESS_BROWSER_TESTS =  decouple.config('CI', cast=bool, default=False)
