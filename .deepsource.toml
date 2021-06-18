@@ -18,3 +18,11 @@ enabled = true
 [[analyzers]]
 name = "secrets"
 enabled = true
+
+[[transformers]]
+name = "isort"
+enabled = true
+
+[[transformers]]
+name = "black"
+enabled = true
