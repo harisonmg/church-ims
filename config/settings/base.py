@@ -52,7 +52,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'storages',
+    "storages",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
@@ -147,7 +147,7 @@ EMAIL_HOST_PASSWORD = decouple.config("DJANGO_EMAIL_HOST_PASSWORD")
 # Media (user uploaded files)
 # https://docs.djangoproject.com/en/3.2/ref/settings/#file-uploads
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / "media"
 
 MEDIA_URL = "/media/"
 
