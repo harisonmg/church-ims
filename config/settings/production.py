@@ -6,20 +6,19 @@ from .base import *
 # ===============
 
 # Email
-ADMINS =  decouple.config('ADMINS', cast=list_of_tuples)
+ADMINS = decouple.config("ADMINS", cast=list_of_tuples)
 
 MANAGERS = ADMINS
-
 
 
 # Project Specific Settings
 # =========================
 
-ADMIN_URL =  decouple.config('ADMIN_URL')
+ADMIN_URL = decouple.config("ADMIN_URL")
 
-GOOGLE_ANALYTICS_ID = decouple.config('GOOGLE_ANALYTICS_ID', default=None)
+GOOGLE_ANALYTICS_ID = decouple.config("GOOGLE_ANALYTICS_ID", default=None)
 
-MIDDLEWARE.append('django.middleware.common.BrokenLinkEmailsMiddleware')
+MIDDLEWARE.append("django.middleware.common.BrokenLinkEmailsMiddleware")
 
 # TEMPLATES[0]['OPTIONS']['context_processors'].append(
 #     'core.context_processors.google_analytics'
