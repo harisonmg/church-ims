@@ -55,7 +55,11 @@ THIRD_PARTY_APPS = [
     "storages",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
+LOCAL_APPS = [
+    'core',
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # https://docs.djangoproject.com/en/3.2/topics/http/middleware/
 # https://docs.djangoproject.com/en/3.2/ref/middleware/#middleware-ordering
