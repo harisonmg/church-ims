@@ -7,6 +7,7 @@ class IndexViewTestCase(SimpleTestCase):
     """
     Tests for the index view
     """
+
     def setUp(self):
         self.factory = RequestFactory()
 
