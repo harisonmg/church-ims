@@ -52,6 +52,8 @@ MIDDLEWARE.extend(
     ]
 )
 
-# TEMPLATES[0]['OPTIONS']['context_processors'].extend([
-#     'core.context_processors.google_analytics',
-# ])
+TEMPLATES[0]["OPTIONS"]["context_processors"].extend(
+    [
+        "core.context_processors.google_analytics",
+    ]
+)
