@@ -1,5 +1,13 @@
 version = 1
 
+test_patterns = ["tests/**, **/test*.py"]
+
+exclude_patterns = ["migrations/**"]
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true
+
 [[analyzers]]
 name = "python"
 enabled = true
@@ -8,9 +16,13 @@ enabled = true
   runtime_version = "3.x.x"
 
 [[analyzers]]
-name = "test-coverage"
+name = "secrets"
 enabled = true
 
-[[analyzers]]
-name = "secrets"
+[[transformers]]
+name = "isort"
+enabled = true
+
+[[transformers]]
+name = "black"
 enabled = true
