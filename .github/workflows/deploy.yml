@@ -7,6 +7,7 @@ on:
       - closed
 
   push:
+    branches: [main]
 
 jobs:
   deploy:
@@ -35,7 +36,7 @@ jobs:
         SECRET_FILE: ${{secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_FILE}}
         SECRET_FILE_PASSPHRASE: ${{secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_FILE_PASSPHRASE}}
 
-    - name: Deploy to App Engine Standard
+    - name: Deploy static files to Cloud Storage
       run: |
         pipenv run python manage.py collectstatic --no-input
       env:
