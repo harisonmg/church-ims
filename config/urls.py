@@ -17,12 +17,12 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-admin.site.site_header = 'StAnds Church School IMS administration'
-admin.site.site_title = 'StAnds Church School IMS admin'
-admin_url = settings.ADMIN_URL + '/'
+admin.site.site_header = "StAnds Church School IMS administration"
+admin.site.site_title = "StAnds Church School IMS admin"
+admin_url = settings.ADMIN_URL + "/"
 
 urlpatterns = [
-    path(admin_url + 'doc/', include('django.contrib.admindocs.urls')),
+    path(admin_url + "doc/", include("django.contrib.admindocs.urls")),
     path(admin_url, admin.site.urls),
     path("", include("core.urls")),
 ]
