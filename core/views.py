@@ -3,4 +3,8 @@ from django.views.generic import TemplateView
 
 
 class IndexView(TemplateView):
-    template_name = "index.html"
+    template_name = "core/index.html"
+
+
+class DashboardView(TemplateView):
+    template_name = "core/dashboard.html"

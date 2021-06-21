@@ -20,5 +20,26 @@ class IndexViewTestCase(SimpleTestCase):
         response = views.IndexView.as_view()(request)
         self.assertEqual(response.status_code, 200)
 
-        with self.assertTemplateUsed("index.html"):
+        with self.assertTemplateUsed("core/index.html"):
+            response.render()
+
+
+class DashboardViewTestCase(SimpleTestCase):
+    """
+    Tests for the dashboard view
+    """
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_dashboard_view_basic(self):
+        """
+        Test that dashboard view returns a 200 response and uses
+        the correct template
+        """
+        request = self.factory.get("/dashboard/")
+        response = views.DashboardView.as_view()(request)
+        self.assertEqual(response.status_code, 200)
+
+        with self.assertTemplateUsed("core/dashboard.html"):
             response.render()
