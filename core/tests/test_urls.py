@@ -3,14 +3,11 @@ from django.urls import resolve
 
 
 class CoreURLsTestCase(SimpleTestCase):
-    """
-    Test URL configuration of core
-    """
 
-    def test_root_url_uses_index_view(self):
-        """
-        Test that the root of the site resolves to the
-        correct view function
-        """
+    def test_index_url(self):
         root = resolve("/")
         self.assertEqual(root.func.__name__, "IndexView")
+
+    def test_dashboard_url(self):
+        dashboard = resolve("/dashboard/")
+        self.assertEqual(dashboard.func.__name__, "DashboardView")

@@ -1,17 +1,15 @@
-from django.test import RequestFactory, SimpleTestCase
+from django.contrib.auth import get_user_model
+from django.test import RequestFactory, SimpleTestCase, TestCase
 
 from core import views
 
 
 class IndexViewTestCase(SimpleTestCase):
-    """
-    Tests for the index view
-    """
 
     def setUp(self):
         self.factory = RequestFactory()
 
-    def test_index_view_basic(self):
+    def test_index_view(self):
         """
         Test that index view returns a 200 response and uses
         the correct template
@@ -24,22 +22,36 @@ class IndexViewTestCase(SimpleTestCase):
             response.render()
 
 
-class DashboardViewTestCase(SimpleTestCase):
-    """
-    Tests for the dashboard view
-    """
+class DashboardViewTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
+        self.User = get_user_model()
 
-    def test_dashboard_view_basic(self):
+        self.test_user = self.User.objects.create_user(
+            username = 'testuser',
+            password='testing4321'
+        )
+
+    def test_redirect_if_not_logged_in(self):
         """
-        Test that dashboard view returns a 200 response and uses
-        the correct template
+        Test that the dashboard view redirects to the login page
+        first when a user is not logged in
         """
-        request = self.factory.get("/dashboard/")
-        response = views.DashboardView.as_view()(request)
+        response = self.client.get('/dashboard/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+            '/accounts/login/?next=/dashboard/')
+
+    def test_dashboard_view_if_logged_in(self):
+        """
+        Test that the dashboard view returns a 200 response
+        and uses the correct template when a user is logged in
+        """
+        self.client.login(
+            username = 'testuser',
+            password = 'testing4321'
+        )
+        response = self.client.get('/dashboard/')
         self.assertEqual(response.status_code, 200)
-
-        with self.assertTemplateUsed("core/dashboard.html"):
-            response.render()
+        self.assertTemplateUsed('core/dashboard.html')
