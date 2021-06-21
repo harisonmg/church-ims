@@ -1,13 +1,9 @@
-from django.shortcuts import render
-
-from django.contrib import messages
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 
 from .forms import CustomUserCreationForm
+
 
 class LoginView(auth_views.LoginView):
     template_name = 'accounts/login.html'
