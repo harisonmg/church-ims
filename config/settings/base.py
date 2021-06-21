@@ -52,11 +52,13 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "crispy_forms",
     "storages",
 ]
 
 LOCAL_APPS = [
     "core",
+    "accounts",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -99,7 +101,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Auth
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth
 
-# AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+LOGIN_REDIRECT_URL = 'core:dashboard'
+
+LOGOUT_REDIRECT_URL = 'core:index'
 
 
 # Password validation
@@ -182,9 +188,16 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Third Party Apps Settings
+# =========================
+
+# https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
 # Project Specific Settings
 # =========================
 
-ADMIN_URL = "admin/"
+ADMIN_URL = "admin"
 
 HEADLESS_BROWSER_TESTS = decouple.config("CI", cast=bool, default=False)
