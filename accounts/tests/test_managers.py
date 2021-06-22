@@ -14,7 +14,7 @@ class CustomUserModelManagerTestCase(TestCase):
         cls.user = cls.User.objects.create_user(
             username='normaluser',
             email='normal@user.com',
-            # phone_number='+2540110234567',
+            phone_number='+2540110234567',
             password='foo'
         )
 
@@ -47,7 +47,7 @@ class CustomUserModelManagerTestCase(TestCase):
 
         with self.assertRaises(TypeError):
             self.User.objects.create_user(
-                # phone_number='+2540110234567'
+                phone_number='+2540110234567'
             )
 
         with self.assertRaises(TypeError):
@@ -56,7 +56,7 @@ class CustomUserModelManagerTestCase(TestCase):
         # with self.assertRaises(TypeError):
         #     self.User.objects.create_user(
         #         username='test-normaluser',
-        #         # phone_number='+2540110234567'
+        #         phone_number='+2540110234567'
         #     )
 
         with self.assertRaises(TypeError):
@@ -68,7 +68,7 @@ class CustomUserModelManagerTestCase(TestCase):
         with self.assertRaises(TypeError):
             self.User.objects.create_user(
                 first_name='Normal',
-                # phone_number='+2540110234567'
+                phone_number='+2540110234567'
             )
 
         with self.assertRaises(TypeError):
@@ -80,7 +80,7 @@ class CustomUserModelManagerTestCase(TestCase):
         with self.assertRaises(TypeError):
             self.User.objects.create_user(
                 last_name='User',
-                # phone_number='+2540110234567'
+                phone_number='+2540110234567'
             )
 
         with self.assertRaises(TypeError):
@@ -91,35 +91,35 @@ class CustomUserModelManagerTestCase(TestCase):
 
         with self.assertRaises(TypeError):
             self.User.objects.create_user(
-                # phone_number='+2540110234567',
-                password='foo'
-            )
-
-        with self.assertRaises(TypeError):
-            self.User.objects.create_user(
-                first_name='Normal',
-                last_name='User',
-                # phone_number='+2540110234567'
-            )
-
-        with self.assertRaises(TypeError):
-            self.User.objects.create_user(
-                first_name='Normal',
-                last_name='User',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
         with self.assertRaises(TypeError):
             self.User.objects.create_user(
                 first_name='Normal',
-                # phone_number='+2540110234567',
+                last_name='User',
+                phone_number='+2540110234567'
+            )
+
+        with self.assertRaises(TypeError):
+            self.User.objects.create_user(
+                first_name='Normal',
+                last_name='User',
+                password='foo'
+            )
+
+        with self.assertRaises(TypeError):
+            self.User.objects.create_user(
+                first_name='Normal',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
         with self.assertRaises(TypeError):
             self.User.objects.create_user(
                 last_name='User',
-                # phone_number='+2540110234567',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
@@ -128,7 +128,7 @@ class CustomUserModelManagerTestCase(TestCase):
             self.User.objects.create_user(
                 first_name='Normal',
                 last_name='User',
-                # phone_number='+2540110234567',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
@@ -156,7 +156,7 @@ class CustomUserModelManagerTestCase(TestCase):
         with self.assertRaises(ValueError):
             self.User.objects.create_user(
                 username='',
-                # phone_number='+2540110234567',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
@@ -172,7 +172,7 @@ class CustomUserModelManagerTestCase(TestCase):
             self.User.objects.create_user(
                 username='',
                 first_name='Normal',
-                # phone_number='+2540110234567',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
@@ -181,7 +181,7 @@ class CustomUserModelManagerTestCase(TestCase):
                 username='',
                 first_name='Normal',
                 last_name='User',
-                # phone_number='+2540110234567',
+                phone_number='+2540110234567',
                 password='foo'
             )
 
