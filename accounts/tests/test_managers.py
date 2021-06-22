@@ -46,12 +46,6 @@ class CustomUserModelManagerTestCase(TestCase):
         with self.assertRaises(TypeError):
             self.User.objects.create_user(password="foo")
 
-        # with self.assertRaises(TypeError):
-        #     self.User.objects.create_user(
-        #         username='test-normaluser',
-        #         phone_number='+2540110234567'
-        #     )
-
         with self.assertRaises(TypeError):
             self.User.objects.create_user(first_name="Normal", last_name="User")
 

@@ -12,12 +12,12 @@ class AccountsURLsTestCase(SimpleTestCase):
         self.assertEqual(login.func.__name__, "LogoutView")
 
     def test_password_change_url(self):
-        password_reset = resolve(reverse("accounts:password_change"))
-        self.assertEqual(password_reset.func.__name__, "PasswordChangeView")
+        password_change = resolve(reverse("accounts:password_change"))
+        self.assertEqual(password_change.func.__name__, "PasswordChangeView")
 
     def test_password_change_done_url(self):
-        password_reset_done = resolve(reverse("accounts:password_change_done"))
-        self.assertEqual(password_reset_done.func.__name__, "PasswordChangeDoneView")
+        password_change_done = resolve(reverse("accounts:password_change_done"))
+        self.assertEqual(password_change_done.func.__name__, "PasswordChangeDoneView")
 
     def test_password_reset_url(self):
         password_reset = resolve(reverse("accounts:password_reset"))
