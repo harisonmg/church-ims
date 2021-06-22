@@ -191,3 +191,148 @@ class AdminTestCase(FunctionalTestCase):
                 '.field-is_staff img').get_attribute('alt'),
             'True'
         )
+
+
+class MemberTestCase(FunctionalTestCase):
+    """Tests the functionality of the accounts feature to members
+    and unregistered users
+    """
+    def setUp(self):
+        self.browser = webdriver.Firefox(options=self.browser_options)
+
+    def test_that_a_user_can_register_and_login(self):
+        # Alex would like to attend a service at StAnds.
+        # He visits the home page of StAnds IMS
+        self.browser.get(self.live_server_url + '/')
+
+        # He knows he's in the right place because he can see the
+        # name of the site in the navbar, as well as calls-to-action
+        # in the heading and adjacent paragraph.
+        self.assertEqual(
+            self.browser.find_element_by_css_selector(
+                '#mainNavigation h3').text,
+            'StAnds Church School'
+        )
+
+        # He sees two call-to-action buttons, which are links for
+        # the register and login pages.
+        cta_buttons =self.browser.\
+            find_elements_by_css_selector('p.lead .btn')
+        self.assertEqual(len(cta_buttons), 2)
+
+        register_link, login_link = cta_buttons
+
+        self.assertEqual('Register', register_link.text)
+        self.assertEqual('Log in', login_link.text)
+        self.assertEqual(register_link.get_attribute('href'),
+            self.live_server_url + '/accounts/register/'
+        )
+        self.assertEqual(login_link.get_attribute('href'),
+            self.live_server_url + '/accounts/login/'
+        )
+
+        # He doesn't have an account and therefore decides to
+        # register. He clinks on the register link and is redirected
+        # to the register page, where he sees the inputs of the
+        # register form, including labels and placeholders.
+        register_link.click()
+
+        register_form = self.browser.find_element_by_id('register_form')
+        self.assertEqual(register_form.\
+                find_element_by_css_selector('h1').text,
+            'Register'
+        )
+
+        username_input = register_form.\
+            find_element_by_css_selector('input#id_username')
+        self.assertEqual(
+            register_form.find_element_by_css_selector(
+                'label[for="id_username"]').text,
+            'Username*'
+        )
+
+        email_input = register_form.\
+            find_element_by_css_selector('input#id_email')
+        self.assertEqual(register_form.find_element_by_css_selector(
+            'label[for="id_email"]').text,
+            'Email address*'
+        )
+
+        phone_number_input = register_form.\
+            find_element_by_css_selector('input#id_phone_number')
+        self.assertEqual(register_form.find_element_by_css_selector(
+            'label[for="id_phone_number"]').text,
+            'Phone number*'
+        )
+        self.assertEqual(register_form.find_element_by_css_selector(
+                'small#hint_id_phone_number').text,
+            'Enter a valid phone number'
+        )
+
+        password_input = register_form.\
+            find_element_by_css_selector('input#id_password1')
+        self.assertEqual(register_form.find_element_by_css_selector(
+            'label[for="id_password1"]').text,
+            'Password*'
+        )
+        password_input_help_text_list = register_form.\
+            find_elements_by_css_selector('small#hint_id_password1 li')
+        self.assertEqual(len(password_input_help_text_list), 4)
+
+        password_confirmation_input = register_form.\
+            find_element_by_css_selector('input#id_password2')
+        self.assertEqual(register_form.find_element_by_css_selector(
+                'label[for="id_password2"]').text,
+            'Password confirmation*'
+        )
+
+        register_button = register_form.\
+            find_element_by_css_selector('button[type="submit"]')
+        self.assertEqual(register_button.text, 'Register')
+
+        # He keys in his first name, last name, email, phone number
+        # and password and clicks register button to send the form.
+        username_input.send_keys('AlexanderGithinji')
+        email_input.send_keys('alex@githinji.com')
+        phone_number_input.send_keys('+254 745 678 901')
+        password_input.send_keys('alexpassword')
+        password_confirmation_input.send_keys('alexpassword')
+        register_form.find_element_by_css_selector(
+            'button[type="submit"]').click()
+
+        # He is redirected to the login page, where he sees the inputs
+        # of the login form, including labels and placeholders
+        login_form = self.browser.\
+            find_element_by_id('login_form')
+        self.assertEqual(login_form.\
+                find_element_by_css_selector('h1').text,
+            'Login'
+        )
+
+        username_input = login_form.\
+            find_element_by_css_selector('input#id_username')
+        self.assertEqual(login_form.find_element_by_css_selector(
+            'label[for="id_username"]').text,
+            'Username*'
+        )
+
+        password_input = login_form.\
+            find_element_by_css_selector('input#id_password')
+        self.assertEqual(login_form.find_element_by_css_selector(
+            'label[for="id_password"]').text,
+            'Password*'
+        )
+
+        # He enters his email and password and clicks the login button
+        # to log in to the resource center.
+        username_input.send_keys('AlexanderGithinji')
+        password_input.send_keys('alexpassword')
+        login_form.find_element_by_css_selector(
+            'button[type="submit"]').click()
+
+        # The login was successful and he is redirected to his dashboard,
+        # where he can add his personal details and family members
+        self.assertEqual(
+            self.browser.current_url,
+            self.live_server_url + '/dashboard/'
+        )
