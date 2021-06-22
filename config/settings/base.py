@@ -102,11 +102,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Auth
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = "accounts.CustomUser"
 
-LOGIN_REDIRECT_URL = 'core:dashboard'
+LOGIN_REDIRECT_URL = "core:dashboard"
 
-LOGOUT_REDIRECT_URL = 'core:index'
+LOGOUT_REDIRECT_URL = "core:index"
 
 
 # Password validation
@@ -193,7 +193,7 @@ USE_TZ = True
 # =========================
 
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 
 # Project Specific Settings

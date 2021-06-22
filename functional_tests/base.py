@@ -2,11 +2,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import tag
-
 from selenium import webdriver
 
 
-@tag('functional')
+@tag("functional")
 class FunctionalTestCase(StaticLiveServerTestCase):
     """Sets up data to be shared across all functional tests
 
@@ -14,6 +13,7 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         StaticLiveServerTestCase (object): A subclass of
         django.test.LiveServerTestCase
     """
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -30,7 +30,7 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         Returns:
             string: The link to the homepage of the admin site
         """
-        return f'{self.live_server_url}/{settings.ADMIN_URL}/'
+        return f"{self.live_server_url}/{settings.ADMIN_URL}/"
 
     def tearDown(self):
         self.browser.quit()
