@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en" class="h-100">
   <head>
-    <title>{% block title %}{% endblock title %}</title>
+    <title>{% block title %} PCEA St. Andrew's Church School {% endblock title %}</title>
 
     {% comment %} Required meta tags {% endcomment %}
     <meta charset="utf-8">
@@ -26,10 +26,12 @@
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
   </head>
 
-  <body class="d-flex h-100 text-center text-white bg-blue">
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <body class="d-flex h-100 {% block body_classes %} text-center text-white bg-blue {% endblock body_classes %}">
+    <div class="cover-container d-flex w-100 h-100
+     {% block body_div_classes %} mx-auto flex-column p-3 {% endblock body_div_classes %}">
+
       {% comment %} Navigation bar {% endcomment %}
-      {% include "navbar.html" %}
+      {% include "navigation.html" %}
 
       {% comment %} Content {% endcomment %}
       {% block content %}{% endblock content %}
