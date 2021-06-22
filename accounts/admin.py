@@ -9,4 +9,6 @@ from .models import CustomUser
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    model = CustomUser
+    model = CustomUser    
+    list_display = ('username', 'email', 'phone_number', 'is_staff')    
+    ordering = ('username',)
