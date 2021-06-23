@@ -5,21 +5,23 @@ from people.models import Person, RelationshipType, FamilyMemberRelationship
 
 
 class PersonModelTestCase(TestCase):
-    def setUp(self):
-        self.User = get_user_model()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.User = get_user_model()
 
-        self.admin_user = self.User.objects.create_superuser(
+        cls.admin_user = cls.User.objects.create_superuser(
             username="Kelvin",
             email="kelvin@murage.com",
             password="kelvinpassword"
         )
 
-        self.person = Person.objects.create(
+        cls.person = Person.objects.create(
             username="Kelvin",
             full_name="Kelvin Murage",
             dob="1995-06-05",
             gender="M",
-            created_by=self.admin_user
+            created_by=cls.admin_user
         )
 
     def test_person_basic(self):
@@ -123,8 +125,10 @@ class PersonModelTestCase(TestCase):
 
 
 class RelationshipTypeTestCase(TestCase):
-    def setUp(self):
-        self.son = RelationshipType.objects.create(name='son')
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.son = RelationshipType.objects.create(name='son')
 
     def test_relationship_type_basic(self):
         self.assertEqual(self.son.name, 'son')
@@ -151,85 +155,87 @@ class RelationshipTypeTestCase(TestCase):
 
 
 class FamilyMemberRelationshipModelTestCase(TestCase):
-    def setUp(self):
-        self.User = get_user_model()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.User = get_user_model()
 
-        self.admin_user = self.User.objects.create_superuser(
+        cls.admin_user = cls.User.objects.create_superuser(
             username="Kelvin",
             email="kelvin@murage.com",
             password="kelvinpassword"
         )
 
-        self.alvin_user = self.User.objects.create_user(
+        cls.alvin_user = cls.User.objects.create_user(
             username="AlvinMukuna",
             email="alvin@mukuna.com",
             phone_number="+254 701 234 567",
             password="alvinpassword"
         )
 
-        self.christine_user = self.User.objects.create_user(
+        cls.christine_user = cls.User.objects.create_user(
             username="ChristineKyalo",
             email="christine@kyalo.com",
             phone_number="+254 723 456 789",
             password="christinepassword"
         )
 
-        self.kelvin_person = Person.objects.create(
+        cls.kelvin_person = Person.objects.create(
             username="Kelvin",
             full_name="Kelvin Murage",
             dob="1995-06-05",
             gender="M",
-            created_by=self.admin_user,
+            created_by=cls.admin_user,
         )
 
-        self.alvin_person = Person.objects.create(
+        cls.alvin_person = Person.objects.create(
             username="AlvinMukuna",
             full_name="Alvin Mukuna",
             dob="1984-12-12",
             gender="M",
-            created_by=self.alvin_user,
+            created_by=cls.alvin_user,
         )
 
-        self.abigael_person = Person.objects.create(
+        cls.abigael_person = Person.objects.create(
             username="AbigaelAuma",
             full_name="Abigael Auma",
             dob="2015-05-14",
             gender="F",
-            created_by=self.alvin_user,
+            created_by=cls.alvin_user,
         )
 
-        self.christine_person = Person.objects.create(
+        cls.christine_person = Person.objects.create(
             username="ChristineKyalo",
             full_name="Christine Kyalo",
             dob="1992-03-21",
             gender="F",
-            created_by=self.christine_user,
+            created_by=cls.christine_user,
         )
 
-        self.brian_person = Person.objects.create(
+        cls.brian_person = Person.objects.create(
             username="BrianKimani",
             full_name="Brian Kimani",
             dob="2018-09-23",
             gender="M",
-            created_by=self.christine_user,
+            created_by=cls.christine_user,
         )
 
-        self.son = RelationshipType.objects.create(name='son')
-        self.daughter = RelationshipType.objects.create(name='daughter')
+        cls.son = RelationshipType.objects.create(name='son')
+        cls.daughter = RelationshipType.objects.create(name='daughter')
 
-        self.alvin_daughter = FamilyMemberRelationship(
-            person=self.alvin_person,
-            relative=self.abigael_person,
-            relationship_type=self.daughter
+        cls.alvin_daughter = FamilyMemberRelationship(
+            person=cls.alvin_person,
+            relative=cls.abigael_person,
+            relationship_type=cls.daughter
         )
-        self.alvin_daughter.save()
+        cls.alvin_daughter.save()
 
-        self.christine_son = FamilyMemberRelationship(
-            person=self.christine_person,
-            relative=self.brian_person,
-            relationship_type=self.son
+        cls.christine_son = FamilyMemberRelationship(
+            person=cls.christine_person,
+            relative=cls.brian_person,
+            relationship_type=cls.son
         )
-        self.christine_son.save()
+        cls.christine_son.save()
 
     def test_family_member_relationship_type_object_name(self):
         self.assertEqual(
