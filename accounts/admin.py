@@ -7,8 +7,6 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
-    form = CustomUserChangeForm
     model = CustomUser
     list_display = ("username", "email", "phone_number", "is_staff")
     ordering = ("username",)
@@ -24,13 +22,14 @@ class CustomUserAdmin(UserAdmin):
                     "phone_number",
                     "password1",
                     "password2",
+                    "profile"
                 ),
             },
         ),
     )
     fieldsets = (
         ("Credentials", {"fields": ("username", "password")}),
-        ("Personal info", {"fields": ("email", "phone_number")}),
+        ("Personal info", {"fields": ("email", "phone_number", "profile")}),
         (
             "Permissions",
             {
