@@ -44,7 +44,7 @@ class AdminTestCase(FunctionalTestCase):
         self.browser.get(self.get_admin_url())
 
         # He can tell he's in the right place because of the title
-        self.assertEqual(self.browser.title, "Log in | StAnds Church School IMS admin")
+        self.assertEqual(self.browser.title, "Log in | StAnds IMS admin")
 
         # He enters his email and password and submits the form to
         # log in
@@ -193,7 +193,7 @@ class MemberTestCase(FunctionalTestCase):
         # in the heading and adjacent paragraph.
         self.assertEqual(
             self.browser.find_element_by_css_selector("#mainNavigation h3").text,
-            "StAnds Church School",
+            "StAnds IMS",
         )
 
         # He sees two call-to-action buttons, which are links for

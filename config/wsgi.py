@@ -1,5 +1,5 @@
 """
-WSGI config for Church School IMS project.
+WSGI config for the Church IMS project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

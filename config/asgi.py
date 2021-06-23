@@ -1,5 +1,5 @@
 """
-ASGI config for Church School IMS project.
+ASGI config for the Church IMS project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
