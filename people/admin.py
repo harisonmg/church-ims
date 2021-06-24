@@ -11,7 +11,7 @@ class FamilyMembersInline(admin.TabularInline):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('username', 'full_name', 'age')
+    list_display = ('slug', 'full_name', 'age')
     inlines = (FamilyMembersInline,)
 
 

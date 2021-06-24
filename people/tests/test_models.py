@@ -17,7 +17,7 @@ class PersonModelTestCase(TestCase):
         )
 
         cls.person = Person.objects.create(
-            username="Kelvin",
+            slug="Kelvin",
             full_name="Kelvin Murage",
             dob="1995-06-05",
             gender="M",
@@ -25,7 +25,7 @@ class PersonModelTestCase(TestCase):
         )
 
     def test_person_basic(self):
-        self.assertEqual(self.person.username, "Kelvin")
+        self.assertEqual(self.person.slug, "Kelvin")
         self.assertEqual(self.person.full_name, "Kelvin Murage")
         self.assertEqual(self.person.dob,"1995-06-05")
         self.assertEqual(self.person.gender, "M")
@@ -35,25 +35,25 @@ class PersonModelTestCase(TestCase):
         )
 
     # class methods
-    def test_person_object_name_is_username(self):
-        self.assertEqual(self.person.username, str(self.person))
+    def test_person_object_name_is_slug(self):
+        self.assertEqual(self.person.slug, str(self.person))
 
-    # username
-    def test_username_label(self):
-        username__meta = self.person._meta.get_field('username')
-        self.assertEqual(username__meta.verbose_name, 'username')
+    # slug
+    def test_slug_label(self):
+        slug__meta = self.person._meta.get_field('slug')
+        self.assertEqual(slug__meta.verbose_name, 'username')
 
-    def test_username_max_length(self):
-        username__meta = self.person._meta.get_field('username')
-        self.assertEqual(username__meta.max_length, 150)
+    def test_slug_max_length(self):
+        slug__meta = self.person._meta.get_field('slug')
+        self.assertEqual(slug__meta.max_length, 50)
 
-    def test_username_is_not_null(self):
-        username__meta = self.person._meta.get_field('username')
-        self.assertEqual(username__meta.null, False)
+    def test_slug_is_not_null(self):
+        slug__meta = self.person._meta.get_field('slug')
+        self.assertEqual(slug__meta.null, False)
 
-    def test_username_is_not_blank(self):
-        username__meta = self.person._meta.get_field('username')
-        self.assertEqual(username__meta.blank, False)
+    def test_slug_is_not_blank(self):
+        slug__meta = self.person._meta.get_field('slug')
+        self.assertEqual(slug__meta.blank, False)
 
     # full name
     def test_full_name_label(self):
@@ -181,7 +181,7 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         )
 
         cls.kelvin_person = Person.objects.create(
-            username="Kelvin",
+            slug="Kelvin",
             full_name="Kelvin Murage",
             dob="1995-06-05",
             gender="M",
@@ -189,7 +189,7 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         )
 
         cls.alvin_person = Person.objects.create(
-            username="AlvinMukuna",
+            slug="AlvinMukuna",
             full_name="Alvin Mukuna",
             dob="1984-12-12",
             gender="M",
@@ -197,7 +197,7 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         )
 
         cls.abigael_person = Person.objects.create(
-            username="AbigaelAuma",
+            slug="AbigaelAuma",
             full_name="Abigael Auma",
             dob="2015-05-14",
             gender="F",
@@ -205,7 +205,7 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         )
 
         cls.christine_person = Person.objects.create(
-            username="ChristineKyalo",
+            slug="ChristineKyalo",
             full_name="Christine Kyalo",
             dob="1992-03-21",
             gender="F",
@@ -213,7 +213,7 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         )
 
         cls.brian_person = Person.objects.create(
-            username="BrianKimani",
+            slug="BrianKimani",
             full_name="Brian Kimani",
             dob="2018-09-23",
             gender="M",

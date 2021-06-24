@@ -1,8 +1,10 @@
 from datetime import date
+import uuid
 
 from django.conf import settings
 from django.contrib.auth import validators
 from django.db import models
+from django.urls import reverse
 
 from core.models import TimeStampedModel
 
@@ -14,12 +16,11 @@ class Person(TimeStampedModel):
         ('C', 'Custom'),
         ('P', 'Prefer not to say'),
     ]
-    username = models.CharField(
+    slug = models.SlugField(
+        verbose_name="username",
+        help_text='Enter a URL-friendly name',
         error_messages={"unique": "A user with that username already exists."},
-        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-        max_length=150,
-        unique=True,
-        validators=[validators.UnicodeUsernameValidator()]
+        unique=True
     )
     full_name = models.CharField(max_length=300)
     dob = models.DateField(verbose_name='date of birth')
@@ -31,12 +32,16 @@ class Person(TimeStampedModel):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
     class Meta:
-        ordering = ['username']
+        ordering = ['slug']
         verbose_name_plural = 'people'
 
     def __str__(self):
-        return self.username
+        return self.slug
 
+    def get_absolute_url(self):
+        return reverse('people:detail', kwargs={"slug": self.slug})
+
+    @property
     def age(self):
         today = date.today()
         age = today.year - self.dob.year
@@ -45,6 +50,7 @@ class Person(TimeStampedModel):
 
 
 class FamilyMemberRelationship(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationships')
     relative = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='reverse_relationships')
     relationship_type = models.ForeignKey('RelationshipType', on_delete=models.PROTECT)

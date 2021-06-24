@@ -20,7 +20,7 @@ class CustomUserModelTestCase(TestCase):
         )
 
         cls.person = Person.objects.create(
-            username="AlvinMukuna",
+            slug="AlvinMukuna",
             full_name="Alvin Mukuna",
             dob="1984-12-12",
             gender="M",

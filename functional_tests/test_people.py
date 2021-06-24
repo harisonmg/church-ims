@@ -35,7 +35,7 @@ class AdminTestCase(FunctionalTestCase):
         )
 
         self.kelvin_person = Person.objects.create(
-            username="Kelvin",
+            slug="Kelvin",
             full_name="Kelvin Murage",
             dob="1995-06-05",
             gender="M",
@@ -43,7 +43,7 @@ class AdminTestCase(FunctionalTestCase):
         )
 
         self.alvin_person = Person.objects.create(
-            username="AlvinMukuna",
+            slug="AlvinMukuna",
             full_name="Alvin Mukuna",
             dob="1984-12-12",
             gender="M",
@@ -51,7 +51,7 @@ class AdminTestCase(FunctionalTestCase):
         )
 
         self.abigael_person = Person.objects.create(
-            username="AbigaelAuma",
+            slug="AbigaelAuma",
             full_name="Abigael Auma",
             dob="2015-05-14",
             gender="F",
@@ -59,7 +59,7 @@ class AdminTestCase(FunctionalTestCase):
         )
 
         self.christine_person = Person.objects.create(
-            username="ChristineKyalo",
+            slug="ChristineKyalo",
             full_name="Christine Kyalo",
             dob="1992-03-21",
             gender="F",
@@ -67,7 +67,7 @@ class AdminTestCase(FunctionalTestCase):
         )
 
         self.brian_person = Person.objects.create(
-            username="BrianKimani",
+            slug="BrianKimani",
             full_name="Brian Kimani",
             dob="2018-09-23",
             gender="M",
@@ -178,7 +178,7 @@ class AdminTestCase(FunctionalTestCase):
 
         import time; time.sleep(0.5)
         person_form = self.browser.find_element_by_id('person_form')
-        person_form.find_element_by_name('username').send_keys('DavidKamau')
+        person_form.find_element_by_name('slug').send_keys('DavidKamau')
         person_form.find_element_by_name('full_name').send_keys('David Kamau')
         person_form.find_element_by_name('dob').send_keys('25/06/2012')
         person_form.find_element_by_name('gender').find_elements_by_tag_name('option')[1].click()
@@ -196,7 +196,7 @@ class AdminTestCase(FunctionalTestCase):
         self.browser.find_element_by_link_text('ADD PERSON').click()
 
         person_form = self.browser.find_element_by_id('person_form')
-        person_form.find_element_by_name('username').send_keys('SheilaMwakitawa')
+        person_form.find_element_by_name('slug').send_keys('SheilaMwakitawa')
         person_form.find_element_by_name('full_name').send_keys('Sheila Mwakitawa')
         person_form.find_element_by_name('dob').send_keys('29/11/1987')
         person_form.find_element_by_name('gender').find_elements_by_tag_name('option')[2].click()
@@ -209,7 +209,7 @@ class AdminTestCase(FunctionalTestCase):
 
         import time; time.sleep(0.5)
         person_form = self.browser.find_element_by_id('person_form')
-        person_form.find_element_by_name('username').send_keys('FauziaAmani')
+        person_form.find_element_by_name('slug').send_keys('FauziaAmani')
         person_form.find_element_by_name('full_name').send_keys('Fauzia Amani')
         person_form.find_element_by_name('dob').send_keys('25/06/2012')
         person_form.find_element_by_name('gender').find_elements_by_tag_name('option')[2].click()
@@ -229,7 +229,7 @@ class AdminTestCase(FunctionalTestCase):
 
         import time; time.sleep(0.5)
         person_form = self.browser.find_element_by_id('person_form')
-        person_form.find_element_by_name('username').send_keys('SwalehHassan')
+        person_form.find_element_by_name('slug').send_keys('SwalehHassan')
         person_form.find_element_by_name('full_name').send_keys('Swaleh Hassan')
         person_form.find_element_by_name('dob').send_keys('02/01/2019')
         person_form.find_element_by_name('gender').find_elements_by_tag_name('option')[1].click()
