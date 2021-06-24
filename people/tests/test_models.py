@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from people.models import Person, RelationshipType, FamilyMemberRelationship
+from people.models import Person, RelationshipType, FamilyRelationship
 
 
 class PersonModelTestCase(TestCase):
@@ -47,13 +47,13 @@ class PersonModelTestCase(TestCase):
         slug__meta = self.person._meta.get_field('slug')
         self.assertEqual(slug__meta.max_length, 50)
 
-    def test_slug_is_not_null(self):
+    def test_slug_is_null(self):
         slug__meta = self.person._meta.get_field('slug')
-        self.assertEqual(slug__meta.null, False)
+        self.assertFalse(slug__meta.null)
 
-    def test_slug_is_not_blank(self):
+    def test_slug_is_blank(self):
         slug__meta = self.person._meta.get_field('slug')
-        self.assertEqual(slug__meta.blank, False)
+        self.assertFalse(slug__meta.blank)
 
     # full name
     def test_full_name_label(self):
@@ -64,13 +64,13 @@ class PersonModelTestCase(TestCase):
         full_name__meta = self.person._meta.get_field('full_name')
         self.assertEqual(full_name__meta.max_length, 300)
 
-    def test_full_name_is_not_null(self):
+    def test_full_name_is_null(self):
         full_name__meta = self.person._meta.get_field('full_name')
-        self.assertEqual(full_name__meta.null, False)
+        self.assertFalse(full_name__meta.null)
 
-    def test_full_name_is_not_blank(self):
+    def test_full_name_is_blank(self):
         full_name__meta = self.person._meta.get_field('full_name')
-        self.assertEqual(full_name__meta.blank, False)
+        self.assertFalse(full_name__meta.blank)
 
     # date of birth
     def test_dob_label(self):
@@ -81,13 +81,13 @@ class PersonModelTestCase(TestCase):
         dob__meta = self.person._meta.get_field('dob')
         self.assertIsNone(dob__meta.max_length)
 
-    def test_dob_is_not_null(self):
+    def test_dob_is_null(self):
         dob__meta = self.person._meta.get_field('dob')
-        self.assertEqual(dob__meta.null, False)
+        self.assertFalse(dob__meta.null)
 
-    def test_dob_is_not_blank(self):
+    def test_dob_is_blank(self):
         dob__meta = self.person._meta.get_field('dob')
-        self.assertEqual(dob__meta.blank, False)
+        self.assertFalse(dob__meta.blank)
 
     # gender
     def test_gender_label(self):
@@ -98,13 +98,13 @@ class PersonModelTestCase(TestCase):
         gender__meta = self.person._meta.get_field('gender')
         self.assertTrue(gender__meta.max_length, 2)
 
-    def test_gender_is_not_null(self):
+    def test_gender_is_null(self):
         gender__meta = self.person._meta.get_field('gender')
-        self.assertEqual(gender__meta.null, False)
+        self.assertFalse(gender__meta.null)
 
-    def test_gender_is_not_blank(self):
+    def test_gender_is_blank(self):
         gender__meta = self.person._meta.get_field('gender')
-        self.assertEqual(gender__meta.blank, False)
+        self.assertFalse(gender__meta.blank)
 
     # created by
     def test_created_by_label(self):
@@ -115,13 +115,30 @@ class PersonModelTestCase(TestCase):
         created_by__meta = self.person._meta.get_field('created_by')
         self.assertIsNone(created_by__meta.max_length)
 
-    def test_created_by_is_not_null(self):
+    def test_created_by_is_null(self):
         created_by__meta = self.person._meta.get_field('created_by')
-        self.assertEqual(created_by__meta.null, False)
+        self.assertTrue(created_by__meta.null)
 
-    def test_created_by_is_not_blank(self):
+    def test_created_by_is_blank(self):
         created_by__meta = self.person._meta.get_field('created_by')
-        self.assertEqual(created_by__meta.blank, False)
+        self.assertFalse(created_by__meta.blank)
+
+    # updated by
+    def test_updated_by_label(self):
+        updated_by__meta = self.person._meta.get_field('updated_by')
+        self.assertEqual(updated_by__meta.verbose_name, 'updated by')
+
+    def test_updated_by_max_length(self):
+        updated_by__meta = self.person._meta.get_field('updated_by')
+        self.assertIsNone(updated_by__meta.max_length)
+
+    def test_updated_by_is_null(self):
+        updated_by__meta = self.person._meta.get_field('updated_by')
+        self.assertTrue(updated_by__meta.null)
+
+    def test_updated_by_is_blank(self):
+        updated_by__meta = self.person._meta.get_field('updated_by')
+        self.assertTrue(updated_by__meta.blank)
 
 
 class RelationshipTypeTestCase(TestCase):
@@ -145,16 +162,16 @@ class RelationshipTypeTestCase(TestCase):
         name__meta = self.son._meta.get_field('name')
         self.assertEqual(name__meta.max_length, 50)
 
-    def test_name_is_not_null(self):
+    def test_name_is_null(self):
         name__meta = self.son._meta.get_field('name')
-        self.assertEqual(name__meta.null, False)
+        self.assertFalse(name__meta.null)
 
-    def test_name_is_not_blank(self):
+    def test_name_is_blank(self):
         name__meta = self.son._meta.get_field('name')
-        self.assertEqual(name__meta.blank, False)
+        self.assertFalse(name__meta.blank)
 
 
-class FamilyMemberRelationshipModelTestCase(TestCase):
+class FamilyRelationshipModelTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -223,17 +240,19 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         cls.son = RelationshipType.objects.create(name='son')
         cls.daughter = RelationshipType.objects.create(name='daughter')
 
-        cls.alvin_daughter = FamilyMemberRelationship(
+        cls.alvin_daughter = FamilyRelationship(
             person=cls.alvin_person,
             relative=cls.abigael_person,
-            relationship_type=cls.daughter
+            relationship_type=cls.daughter,
+            created_by=cls.alvin_user
         )
         cls.alvin_daughter.save()
 
-        cls.christine_son = FamilyMemberRelationship(
+        cls.christine_son = FamilyRelationship(
             person=cls.christine_person,
             relative=cls.brian_person,
-            relationship_type=cls.son
+            relationship_type=cls.son,
+            created_by=cls.christine_user
         )
         cls.christine_son.save()
 
@@ -252,13 +271,13 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         person__meta = self.alvin_daughter._meta.get_field('person')
         self.assertIsNone(person__meta.max_length)
 
-    def test_person_is_not_null(self):
+    def test_person_is_null(self):
         person__meta = self.alvin_daughter._meta.get_field('person')
-        self.assertEqual(person__meta.null, False)
+        self.assertFalse(person__meta.null)
 
-    def test_person_is_not_blank(self):
+    def test_person_is_blank(self):
         person__meta = self.alvin_daughter._meta.get_field('person')
-        self.assertEqual(person__meta.blank, False)
+        self.assertFalse(person__meta.blank)
 
     # relative
     def test_relative_label(self):
@@ -269,13 +288,13 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         relative__meta = self.alvin_daughter._meta.get_field('relative')
         self.assertIsNone(relative__meta.max_length)
 
-    def test_relative_is_not_null(self):
+    def test_relative_is_null(self):
         relative__meta = self.alvin_daughter._meta.get_field('relative')
-        self.assertEqual(relative__meta.null, False)
+        self.assertFalse(relative__meta.null)
 
-    def test_relative_is_not_blank(self):
+    def test_relative_is_blank(self):
         relative__meta = self.alvin_daughter._meta.get_field('relative')
-        self.assertEqual(relative__meta.blank, False)
+        self.assertFalse(relative__meta.blank)
 
     # relationship type
     def test_relationship_type_label(self):
@@ -286,10 +305,44 @@ class FamilyMemberRelationshipModelTestCase(TestCase):
         relationship_type__meta = self.alvin_daughter._meta.get_field('relationship_type')
         self.assertIsNone(relationship_type__meta.max_length)
 
-    def test_relationship_type_is_not_null(self):
+    def test_relationship_type_is_null(self):
         relationship_type__meta = self.alvin_daughter._meta.get_field('relationship_type')
-        self.assertEqual(relationship_type__meta.null, False)
+        self.assertFalse(relationship_type__meta.null)
 
-    def test_relationship_type_is_not_blank(self):
+    def test_relationship_type_is_blank(self):
         relationship_type__meta = self.alvin_daughter._meta.get_field('relationship_type')
-        self.assertEqual(relationship_type__meta.blank, False)
+        self.assertFalse(relationship_type__meta.blank)
+
+        # created by
+    def test_created_by_label(self):
+        created_by__meta = self.alvin_daughter._meta.get_field('created_by')
+        self.assertEqual(created_by__meta.verbose_name, 'created by')
+
+    def test_created_by_max_length(self):
+        created_by__meta = self.alvin_daughter._meta.get_field('created_by')
+        self.assertIsNone(created_by__meta.max_length)
+
+    def test_created_by_is_null(self):
+        created_by__meta = self.alvin_daughter._meta.get_field('created_by')
+        self.assertTrue(created_by__meta.null)
+
+    def test_created_by_is_blank(self):
+        created_by__meta = self.alvin_daughter._meta.get_field('created_by')
+        self.assertFalse(created_by__meta.blank)
+
+    # updated by
+    def test_updated_by_label(self):
+        updated_by__meta = self.alvin_daughter._meta.get_field('updated_by')
+        self.assertEqual(updated_by__meta.verbose_name, 'updated by')
+
+    def test_updated_by_max_length(self):
+        updated_by__meta = self.alvin_daughter._meta.get_field('updated_by')
+        self.assertIsNone(updated_by__meta.max_length)
+
+    def test_updated_by_is_null(self):
+        updated_by__meta = self.alvin_daughter._meta.get_field('updated_by')
+        self.assertTrue(updated_by__meta.null)
+
+    def test_updated_by_is_blank(self):
+        updated_by__meta = self.alvin_daughter._meta.get_field('updated_by')
+        self.assertTrue(updated_by__meta.blank)

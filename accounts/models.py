@@ -19,7 +19,7 @@ class CustomUser(AbstractUser):
     profile = models.ForeignKey(
         Person,
         verbose_name="personal details",
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )

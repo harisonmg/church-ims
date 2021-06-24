@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import Person, FamilyMemberRelationship, RelationshipType
+from .models import Person, FamilyRelationship, RelationshipType
 
 
 class FamilyMembersInline(admin.TabularInline):
-    model = FamilyMemberRelationship
+    model = FamilyRelationship
     fk_name = 'person'
     extra = 1
 
@@ -20,6 +20,6 @@ class RelationshipTypeAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(FamilyMemberRelationship)
-class FamilyMemberRelationshipAdmin(admin.ModelAdmin):
+@admin.register(FamilyRelationship)
+class FamilyRelationshipAdmin(admin.ModelAdmin):
     list_display = ('person', 'relative', 'relationship_type',)

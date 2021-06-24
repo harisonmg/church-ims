@@ -2,7 +2,7 @@ import time
 
 from selenium import webdriver
 
-from people.models import Person, RelationshipType, FamilyMemberRelationship
+from people.models import Person, RelationshipType, FamilyRelationship
 
 from .base import FunctionalTestCase
 
@@ -77,26 +77,28 @@ class AdminTestCase(FunctionalTestCase):
         self.son = RelationshipType.objects.create(name='son')
         self.daughter = RelationshipType.objects.create(name='daughter')
 
-        self.alvin_daughter = FamilyMemberRelationship(
+        self.alvin_daughter = FamilyRelationship(
             person=self.alvin_person,
             relative=self.abigael_person,
-            relationship_type=self.daughter
+            relationship_type=self.daughter,
+            created_by=self.alvin_user
         )
         self.alvin_daughter.save()
 
-        self.christine_son = FamilyMemberRelationship(
+        self.christine_son = FamilyRelationship(
             person=self.christine_person,
             relative=self.brian_person,
-            relationship_type=self.son
+            relationship_type=self.son,
+            created_by=self.christine_user
         )
         self.christine_son.save()
 
     def find_relationships_inline(self):
         return self.browser.find_element_by_id('relationships-group')
 
-    def add_family_member_relationship(self):
+    def add_family_relationship(self):
         self.browser.find_element_by_link_text(
-            'Add another Family member relationship'
+            'Add another Family relationship'
         ).click()
 
     def test_that_a_staff_can_manage_people(self):
@@ -133,8 +135,8 @@ class AdminTestCase(FunctionalTestCase):
         )
 
         self.assertEqual(
-            self.browser.find_element_by_link_text('Family member relationships').get_attribute('href'),
-            self.get_admin_url() + 'people/familymemberrelationship/'
+            self.browser.find_element_by_link_text('Family relationships').get_attribute('href'),
+            self.get_admin_url() + 'people/familyrelationship/'
         )
 
         # Kelvin wants to add and update people's details and those
@@ -188,8 +190,10 @@ class AdminTestCase(FunctionalTestCase):
 
         relationships_inline = self.find_relationships_inline()
         relationship_types = relationships_inline.find_elements_by_css_selector('.field-relationship_type')
-
         relationship_types[-2].find_elements_by_tag_name('option')[1].click()
+        
+        created_by_fields = relationships_inline.find_elements_by_css_selector('.field-created_by')
+        created_by_fields[-2].find_elements_by_tag_name('option')[1].click()
         self.browser.find_elements_by_css_selector('.submit-row input')[0].click()
 
         # He then adds children's records to a parent that doesn't exist
@@ -221,7 +225,10 @@ class AdminTestCase(FunctionalTestCase):
         relationship_types = relationships_inline.find_elements_by_css_selector('.field-relationship_type')
         relationship_types[-2].find_elements_by_tag_name('option')[2].click()
 
-        self.add_family_member_relationship()
+        created_by_fields = relationships_inline.find_elements_by_css_selector('.field-created_by')
+        created_by_fields[-2].find_elements_by_tag_name('option')[-1].click()
+
+        self.add_family_relationship()
         relationships_inline = self.find_relationships_inline()
         relatives = relationships_inline.find_elements_by_css_selector('.field-relative')
         relatives[-2].find_element_by_css_selector('.add-related').click()
@@ -239,8 +246,10 @@ class AdminTestCase(FunctionalTestCase):
 
         relationships_inline = self.find_relationships_inline()
         relationship_types = relationships_inline.find_elements_by_css_selector('.field-relationship_type')
-
         relationship_types[-2].find_elements_by_tag_name('option')[1].click()
+
+        created_by_fields = relationships_inline.find_elements_by_css_selector('.field-created_by')
+        created_by_fields[-2].find_elements_by_tag_name('option')[-1].click()
         self.browser.find_elements_by_css_selector('.submit-row input')[0].click()
 
         # He creates a new family relationship

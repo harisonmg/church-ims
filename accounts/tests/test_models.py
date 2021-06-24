@@ -45,13 +45,13 @@ class CustomUserModelTestCase(TestCase):
         email__meta = self.user._meta.get_field("email")
         self.assertEqual(email__meta.verbose_name, "email address")
 
-    def test_email_can_not_save_NULL_in_the_database(self):
+    def test_email_is_null(self):
         email__meta = self.user._meta.get_field("email")
-        self.assertEqual(email__meta.null, False)
+        self.assertFalse(email__meta.null)
 
-    def test_email_is_not_allowed_to_be_blank(self):
+    def test_email_is_blank(self):
         email__meta = self.user._meta.get_field("email")
-        self.assertEqual(email__meta.blank, False)
+        self.assertFalse(email__meta.blank)
 
     # first name
     def test_first_name_label(self):
@@ -62,13 +62,13 @@ class CustomUserModelTestCase(TestCase):
         first_name__meta = self.user._meta.get_field("first_name")
         self.assertEqual(first_name__meta.max_length, 150)
 
-    def test_first_name_can_not_save_NULL_in_the_database(self):
+    def test_first_name_is_null(self):
         first_name__meta = self.user._meta.get_field("first_name")
-        self.assertEqual(first_name__meta.null, False)
+        self.assertFalse(first_name__meta.null)
 
-    def test_first_name_is_allowed_to_be_blank(self):
+    def test_first_name_is_blank(self):
         first_name__meta = self.user._meta.get_field("first_name")
-        self.assertEqual(first_name__meta.blank, True)
+        self.assertTrue(first_name__meta.blank)
 
     # last name
     def test_last_name_label(self):
@@ -79,13 +79,13 @@ class CustomUserModelTestCase(TestCase):
         last_name__meta = self.user._meta.get_field("last_name")
         self.assertEqual(last_name__meta.max_length, 150)
 
-    def test_last_name_can_not_save_NULL_in_the_database(self):
+    def test_last_name_is_null(self):
         last_name__meta = self.user._meta.get_field("last_name")
-        self.assertEqual(last_name__meta.null, False)
+        self.assertFalse(last_name__meta.null)
 
-    def test_last_name_is_allowed_to_be_blank(self):
+    def test_last_name_is_blank(self):
         last_name__meta = self.user._meta.get_field("last_name")
-        self.assertEqual(last_name__meta.blank, True)
+        self.assertTrue(last_name__meta.blank)
 
     # phone number
     def test_phone_number_label(self):
@@ -100,13 +100,13 @@ class CustomUserModelTestCase(TestCase):
         phone_number__meta = self.user._meta.get_field("phone_number")
         self.assertEqual(phone_number__meta.help_text, "Enter a valid phone number")
 
-    def test_phone_number_can_not_save_NULL_in_the_database(self):
+    def test_phone_number_is_null(self):
         phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertEqual(phone_number__meta.null, False)
+        self.assertFalse(phone_number__meta.null)
 
-    def test_phone_number_is_not_allowed_to_be_blank(self):
+    def test_phone_number_is_blank(self):
         phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertEqual(phone_number__meta.blank, False)
+        self.assertFalse(phone_number__meta.blank)
 
     # profile
     def test_profile_label(self):
@@ -117,10 +117,10 @@ class CustomUserModelTestCase(TestCase):
         profile__meta = self.user._meta.get_field("profile")
         self.assertIsNone(profile__meta.max_length)
 
-    def test_profile_can_save_NULL_in_the_database(self):
+    def test_profile_is_null(self):
         profile__meta = self.user._meta.get_field("profile")
-        self.assertEqual(profile__meta.null, True)
+        self.assertTrue(profile__meta.null)
 
-    def test_profile_is_allowed_to_be_blank(self):
+    def test_profile_is_blank(self):
         profile__meta = self.user._meta.get_field("profile")
-        self.assertEqual(profile__meta.blank, True)
+        self.assertTrue(profile__meta.blank)
