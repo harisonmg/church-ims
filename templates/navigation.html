@@ -8,14 +8,20 @@
     </h3>
     <nav class="nav nav-masthead justify-content-center float-md-end">
       {% if user.is_authenticated %}
-        <a class="nav-link active" aria-current="page" href="{% url 'core:dashboard' %}">Home</a>
-
-        
-        {% if user.is_staff %}
-          <a class="nav-link dropdown-toggle" href="#" id="childrenDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Children
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="childrenDropdownMenuLink">          
+        <a class="nav-link" href="{% url 'core:dashboard' %}">Home</a>        
+        <a class="nav-link dropdown-toggle" href="#" id="childrenDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Children
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="childrenDropdownMenuLink"> 
+          <li>
+            <a class="dropdown-item" href="{% url 'children:by_user_list' %}">Your children</a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="{% url 'children:relationship_by_user_list' %}">
+              Your relationships
+            </a>
+          </li>
+          {% if user.is_staff %}         
             {% comment %} 
             <li>
               <a class="dropdown-item" href="{% url 'children:child_relationship_create' %}">
@@ -29,14 +35,15 @@
               </a>
             </li>
             {% endcomment %}
-              <li><a class="dropdown-item" href="{% url 'children:list' %}">All children</a></li>
-              <li>
-                <a class="dropdown-item" href="{% url 'children:relationship_list' %}">
-                  All children relationships
-                </a>
-              </li>
-          </ul>
-
+            <li><a class="dropdown-item" href="{% url 'children:list' %}">All children</a></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'children:relationship_list' %}">
+                All children relationships
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+        {% if user.is_staff %}
           <a class="nav-link dropdown-toggle" href="#" id="temperatureRecordsDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Temperature records
           </a>
@@ -61,8 +68,6 @@
           <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}">Change password</a></li>
           <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
         </ul>
-      {% else %}
-        <a class="nav-link active" aria-current="page" href="{% url 'core:index' %}">Home</a>
       {% endif %}
     </nav>
   </div>

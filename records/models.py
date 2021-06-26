@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 from children.models import Child
 from core.models import TimeStampedModel
@@ -43,3 +44,6 @@ class ChildTemperature(TemperatureRecord):
         return "{}'s temperature at {}".format(
             self.child, self.created_at.strftime("%d %b %Y %H:%M:%S")
         )
+
+    def get_absolute_url(self):
+        return reverse("child_temperature_detail", kwargs={"pk": self.pk})

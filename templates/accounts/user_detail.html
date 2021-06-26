@@ -12,8 +12,11 @@
     <p class="lead"><strong>Phone number:</strong> {{ user_information.phone_number }}</p>
 
     {% if request.user  == user_information %}
+      <a class="btn btn-outline-light fw-bold" href="{% url 'children:create' %}">
+        Add a child
+      </a>
       <a href="{% url 'accounts:user_update' user_information.username %}" class="btn btn-secondary fw-bold border-white bg-white">
-        Edit
+        Edit profile
       </a>
     {% endif %}
   </div>

@@ -26,7 +26,7 @@
               <td>{{ record.temp }}&#8451;</td>
               <td>{{ record.created_at }}</td>
               <td>
-                {% if user.is_staff %}
+                {% if record.created_by == user %}
                   <a href="{% url 'records:child_temperature_update' record.pk %}"
                     class="btn btn-sm btn-outline-primary fw-bold">
                     update

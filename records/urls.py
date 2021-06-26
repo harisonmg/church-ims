@@ -5,14 +5,14 @@ from . import views
 app_name = "records"
 urlpatterns = [
     path(
-        "temperature/children/add/",
-        views.ChildTemperatureCreateView.as_view(),
-        name="child_temperature_create",
-    ),
-    path(
         "temperature/children/all/",
         views.ChildTemperatureListView.as_view(),
         name="child_temperature_list",
+    ),
+    path(
+        "temperature/children/",
+        views.ChildTemperatureByUserListView.as_view(),
+        name="child_temperature_by_user_list",
     ),
     path(
         "temperature/children/<uuid:pk>/update/",
@@ -25,8 +25,8 @@ urlpatterns = [
         name="child_temperature_detail",
     ),
     path(
-        "temperature/children/",
-        views.ChildTemperatureByUserListView.as_view(),
-        name="child_temperature_by_user_list",
+        "temperature/children/<slug:slug>/add/",
+        views.ChildTemperatureCreateView.as_view(),
+        name="child_temperature_create",
     ),
 ]
