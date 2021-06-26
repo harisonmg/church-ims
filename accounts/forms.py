@@ -27,11 +27,3 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ("slug", "full_name", "dob", "gender")
-
-
-# UserFormSet = forms.inlineformset_factory(
-#     CustomUser,
-#     Person,
-#     fk_name='created_by',
-#     fields=("username", "email", "phone_number", "slug", "full_name", "dob", "gender")
-# )
