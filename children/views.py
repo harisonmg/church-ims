@@ -35,7 +35,7 @@ class ChildRelationshipCreateView(CreateWithInlinesView):
     #     return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("children:relationship_by_user_list")
+        return reverse_lazy("children:relationship_by_user_list")
 
 
 class ChildRelationshipUpdateView(UpdateWithInlinesView):
@@ -76,7 +76,7 @@ class ChildCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("children:relationship_create")
+        return reverse_lazy("children:relationship_create")
 
 
 class ChildUpdateView(LoginRequiredMixin, UpdateView):
@@ -127,7 +127,7 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("children:relationship_by_user_list")
+        return reverse_lazy("children:relationship_by_user_list")
 
 
 class RelationshipUpdateView(LoginRequiredMixin, UpdateView):
