@@ -1,6 +1,7 @@
-# Create your views here.
+import datetime
+
 from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        PermissionRequiredMixin)
+                                        UserPassesTestMixin)
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
@@ -30,13 +31,18 @@ class ChildTemperatureDetailView(LoginRequiredMixin, DetailView):
     template_name = "records/child_temperature_detail.html"
 
 
-class ChildTemperatureCreateView(LoginRequiredMixin, CreateView):
+class ChildTemperatureCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ChildTemperature
     fields = (
         "child",
         "temp",
     )
     template_name = "records/child_temperature_form.html"
+
+    def test_func(self):
+        if self.request.user.is_staff:
+            return True
+        return False
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -46,7 +52,7 @@ class ChildTemperatureCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy("records:child_temperature_list")
 
 
-class ChildTemperatureUpdateView(LoginRequiredMixin, UpdateView):
+class ChildTemperatureUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = ChildTemperature
     fields = (
         "child",
@@ -54,6 +60,12 @@ class ChildTemperatureUpdateView(LoginRequiredMixin, UpdateView):
     )
     template_name = "records/child_temperature_form.html"
     context_object_name = "child_temperature"
+
+    def test_func(self):
+        temp_record = self.get_object()
+        if self.request.user == temp_record.created_by:
+            return True
+        return False
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user
