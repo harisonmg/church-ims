@@ -3,7 +3,6 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -29,21 +28,15 @@ class Profile(models.Model):
         ("P", "Prefer not to say"),
     ]
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    slug = models.SlugField(
-        help_text="Enter a URL-friendly name",
-        error_messages={"unique": "A user with that username already exists."},
-        unique=True,
-        null=True,
-    )
     full_name = models.CharField(max_length=300, null=True)
     dob = models.DateField(verbose_name="date of birth", null=True)
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, null=True)
 
     class Meta:
-        ordering = ["slug"]
+        ordering = ["full_name"]
 
     def __str__(self):
-        return self.slug
+        return self.full_name
 
     @property
     def age(self):

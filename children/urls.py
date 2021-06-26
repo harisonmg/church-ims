@@ -4,8 +4,12 @@ from . import views
 
 app_name = "children"
 urlpatterns = [
-    # path("children/<uuid:pk>/update/", views.UpdateWithInlinesView.as_view(), name="children_update"),
-    # path("children/add/", views.CreateChildrenView.as_view(), name="children_create"),
+    # path("child_relationship/<uuid:pk>/update/", views.ChildRelationshipUpdateView.as_view(), name="child_relationship_update"),
+    path(
+        "child_relationship/add/",
+        views.ChildRelationshipCreateView.as_view(),
+        name="child_relationship_create",
+    ),
     path(
         "relationships/add/",
         views.RelationshipCreateView.as_view(),

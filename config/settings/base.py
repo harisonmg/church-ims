@@ -107,7 +107,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
-LOGIN_REDIRECT_URL = "accounts:profile"
+LOGIN_REDIRECT_URL = "core:dashboard"
 
 LOGOUT_REDIRECT_URL = "core:index"
 

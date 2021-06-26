@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-  {% if family_relationship %} Update {% else %} Add {% endif %} family members | {{ block.super }}
+  {% if relationship %} Update {% else %} Add {% endif %} your child's information | {{ block.super }}
 {% endblock title %}
 {% load crispy_forms_tags %}
 
@@ -11,21 +11,22 @@
 
       <fieldset>
         <h1>
-          {% if family_relationship %} Update {% else %} Add {% endif %} family members
+          {% if relationship %} Update {% else %} Add {% endif %} your child's information
         </h1>
 
         <div class="text-start">
           {{ form|crispy }}
-
           {% for formset in inlines %}
-            {{ formset }}
+            {% for form in formset %}
+                {% crispy form %}
+            {% endfor %}
           {% endfor %}
         </div>
       </fieldset>
 
       <div class="form-group py-3">
         <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">
-          {% if family_relationship %} Update {% else %} Add {% endif %}
+          {% if relationship %} Update {% else %} Add {% endif %}
         </button>
       </div>
     </form>

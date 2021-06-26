@@ -23,7 +23,7 @@
             <tr>
               <th scope="row">{{ forloop.counter }}</th>
               <td>
-                <a href="{{ relationship.parent }}">
+                <a href="{% url 'accounts:user_detail' relationship.parent.username %}">
                   {{ relationship.parent }}
                 </a>
               </td>

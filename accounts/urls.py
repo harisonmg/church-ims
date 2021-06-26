@@ -33,5 +33,6 @@ urlpatterns = [
     ),
     # custom
     path("register/", views.RegisterView.as_view(), name="register"),
-    path("profile/", views.profile, name="profile"),
+    path("<str:username>/update/", views.profile_update, name="user_update"),
+    path("<str:username>/", views.UserDetailView.as_view(), name="user_detail"),
 ]
