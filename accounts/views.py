@@ -106,7 +106,6 @@ def profile_update(request, username):
         user = get_user_model().objects.get(username=username)
         user_form = UserUpdateForm(request.POST, instance=user)
         profile_form = UserProfileForm(request.POST, instance=user.profile)
-        
 
         # save the data from both forms only when both inputs are valid
         if user_form.is_valid() and profile_form.is_valid():
@@ -115,8 +114,7 @@ def profile_update(request, username):
             messages.success(request, f"Your profile has been updated")
             # avoid the redirect alert from browser when one reloads the page
             return redirect(
-                "accounts:user_detail",
-                username=user_form.cleaned_data.get('username')
+                "accounts:user_detail", username=user_form.cleaned_data.get("username")
             )
 
     else:
