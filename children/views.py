@@ -4,8 +4,8 @@ from django.urls import reverse, reverse_lazy
 from django.urls.base import reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-
-from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
+from extra_views import (CreateWithInlinesView, InlineFormSetFactory,
+                         UpdateWithInlinesView)
 
 from .models import Child, ParentChildRelationship
 
@@ -13,8 +13,8 @@ from .models import Child, ParentChildRelationship
 class ParentChildRelationshipInline(InlineFormSetFactory):
     model = ParentChildRelationship
     fields = ("child", "relationship_type")
-    fk_name = "child"    
-    factory_kwargs = {'extra': 1}
+    fk_name = "child"
+    factory_kwargs = {"extra": 1}
 
     # def get_queryset(self):
     #     return ParentChildRelationship.objects.filter(parent=self.request.user)
@@ -22,9 +22,11 @@ class ParentChildRelationshipInline(InlineFormSetFactory):
 
 class ChildRelationshipCreateView(CreateWithInlinesView):
     model = Child
-    inlines = [ParentChildRelationshipInline,]
+    inlines = [
+        ParentChildRelationshipInline,
+    ]
     fields = ("slug", "full_name", "dob", "gender")
-    template_name = 'children/child_relationship_form.html'
+    template_name = "children/child_relationship_form.html"
 
     # def form_valid(self, form):
     #     form.instance.created_by = self.request.user
@@ -38,9 +40,11 @@ class ChildRelationshipCreateView(CreateWithInlinesView):
 
 class ChildRelationshipUpdateView(UpdateWithInlinesView):
     model = Child
-    inlines = [ParentChildRelationshipInline,]
+    inlines = [
+        ParentChildRelationshipInline,
+    ]
     fields = ("slug", "full_name", "dob", "gender")
-    template_name = 'children/child_relationship_form.html'
+    template_name = "children/child_relationship_form.html"
 
     def get_success_url(self):
         return reverse("children:relationship_by_user_list")

@@ -320,5 +320,6 @@ class MemberTestCase(FunctionalTestCase):
         # The login was successful and he is redirected to his dashboard,
         # where he can add his personal details and family members
         self.assertEqual(
-            self.browser.current_url, self.live_server_url + "/accounts/AlexanderGithinji/update/"
+            self.browser.current_url,
+            self.live_server_url + "/accounts/AlexanderGithinji/update/",
         )

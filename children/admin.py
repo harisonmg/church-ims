@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Child, ParentChildRelationship, RelationshipType
 
+
 class ParentChildRelationshipInline(admin.StackedInline):
     model = ParentChildRelationship
     fk_name = "child"
@@ -11,7 +12,9 @@ class ParentChildRelationshipInline(admin.StackedInline):
 @admin.register(Child)
 class ChildAdmin(admin.ModelAdmin):
     list_display = ("slug", "full_name", "age", "gender")
-    inlines = [ParentChildRelationshipInline,]
+    inlines = [
+        ParentChildRelationshipInline,
+    ]
 
 
 @admin.register(RelationshipType)

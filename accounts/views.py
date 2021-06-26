@@ -1,15 +1,16 @@
-from accounts.models import CustomUser
 from django.contrib import messages
-from django.contrib.auth import get_user_model, views as auth_views
+from django.contrib.auth import get_user_model
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
+from extra_views import InlineFormSetFactory, UpdateWithInlinesView
+
+from accounts.models import CustomUser
 
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
 from .models import Profile
-
-from extra_views import UpdateWithInlinesView, InlineFormSetFactory
 
 
 class LoginView(auth_views.LoginView):
@@ -17,8 +18,7 @@ class LoginView(auth_views.LoginView):
 
     def get_success_url(self):
         return reverse(
-            "accounts:user_update",
-            kwargs={"username": self.request.user.username}
+            "accounts:user_update", kwargs={"username": self.request.user.username}
         )
 
 
@@ -66,19 +66,23 @@ class UserProfileInline(InlineFormSetFactory):
     extra = 0
 
     def get_factory_kwargs(self):
-        kwargs = super(UserProfileInline,self).get_factory_kwargs()
-        kwargs.update({
-            "min_num": 1,
-        })
+        kwargs = super(UserProfileInline, self).get_factory_kwargs()
+        kwargs.update(
+            {
+                "min_num": 1,
+            }
+        )
         return kwargs
 
 
 class ProfileUpdateView(UpdateWithInlinesView):
-    model=CustomUser
-    inlines = [UserProfileInline,]
-    form_class = UserUpdateForm    
+    model = CustomUser
+    inlines = [
+        UserProfileInline,
+    ]
+    form_class = UserUpdateForm
     slug_field = "username"
-    template_name = 'accounts/user_update.html'
+    template_name = "accounts/user_update.html"
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -91,11 +95,8 @@ class UserDetailView(generic.DetailView):
     queryset = get_user_model().objects.all()
 
     def get_object(self):
-        current_username = self.kwargs.get('username')
-        return get_object_or_404(
-            get_user_model(),
-            username=current_username
-        )
+        current_username = self.kwargs.get("username")
+        return get_object_or_404(get_user_model(), username=current_username)
 
 
 @login_required
