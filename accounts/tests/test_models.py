@@ -16,18 +16,17 @@ class CustomUserModelTestCase(TestCase):
             username="AlvinMukuna",
             email="alvin@mukuna.com",
             phone_number="+254 701 234 567",
-            password="alvinpassword"
+            password="alvinpassword",
         )
 
     def test_user_basic(self):
         self.assertEqual(self.user.username, "AlvinMukuna")
         self.assertEqual(self.user.email, "alvin@mukuna.com")
-        self.assertEqual(self.user.phone_number,"+254 701 234 567")
+        self.assertEqual(self.user.phone_number, "+254 701 234 567")
 
     # class methods
     def test_user_object_name_is_username(self):
         self.assertEqual(self.user.username, str(self.user))
-
 
     # email
     def test_email_label(self):
@@ -107,7 +106,7 @@ class ProfileModelTestCase(TestCase):
             username="AlvinMukuna",
             email="alvin@mukuna.com",
             phone_number="+254 701 234 567",
-            password="alvinpassword"
+            password="alvinpassword",
         )
 
         self.profile = Profile.objects.get(user=self.user)
@@ -115,7 +114,7 @@ class ProfileModelTestCase(TestCase):
     # class methods
     # def test_profile_object_name_is_slug(self):
     #     self.assertEqual(self.profile.slug, str(self.profile))
-    
+
     # user
     def test_user_label(self):
         user__meta = self.profile._meta.get_field("user")
@@ -135,68 +134,68 @@ class ProfileModelTestCase(TestCase):
 
     # slug
     def test_slug_label(self):
-        slug__meta = self.profile._meta.get_field('slug')
-        self.assertEqual(slug__meta.verbose_name, 'slug')
+        slug__meta = self.profile._meta.get_field("slug")
+        self.assertEqual(slug__meta.verbose_name, "slug")
 
     def test_slug_max_length(self):
-        slug__meta = self.profile._meta.get_field('slug')
+        slug__meta = self.profile._meta.get_field("slug")
         self.assertEqual(slug__meta.max_length, 50)
 
     def test_slug_is_null(self):
-        slug__meta = self.profile._meta.get_field('slug')
+        slug__meta = self.profile._meta.get_field("slug")
         self.assertTrue(slug__meta.null)
 
     def test_slug_is_blank(self):
-        slug__meta = self.profile._meta.get_field('slug')
+        slug__meta = self.profile._meta.get_field("slug")
         self.assertFalse(slug__meta.blank)
 
     # full name
     def test_full_name_label(self):
-        full_name__meta = self.profile._meta.get_field('full_name')
-        self.assertEqual(full_name__meta.verbose_name, 'full name')
+        full_name__meta = self.profile._meta.get_field("full_name")
+        self.assertEqual(full_name__meta.verbose_name, "full name")
 
     def test_full_name_max_length(self):
-        full_name__meta = self.profile._meta.get_field('full_name')
+        full_name__meta = self.profile._meta.get_field("full_name")
         self.assertEqual(full_name__meta.max_length, 300)
 
     def test_full_name_is_null(self):
-        full_name__meta = self.profile._meta.get_field('full_name')
+        full_name__meta = self.profile._meta.get_field("full_name")
         self.assertTrue(full_name__meta.null)
 
     def test_full_name_is_blank(self):
-        full_name__meta = self.profile._meta.get_field('full_name')
+        full_name__meta = self.profile._meta.get_field("full_name")
         self.assertFalse(full_name__meta.blank)
 
     # date of birth
     def test_dob_label(self):
-        dob__meta = self.profile._meta.get_field('dob')
-        self.assertEqual(dob__meta.verbose_name, 'date of birth')
+        dob__meta = self.profile._meta.get_field("dob")
+        self.assertEqual(dob__meta.verbose_name, "date of birth")
 
     def test_dob_max_length(self):
-        dob__meta = self.profile._meta.get_field('dob')
+        dob__meta = self.profile._meta.get_field("dob")
         self.assertIsNone(dob__meta.max_length)
 
     def test_dob_is_null(self):
-        dob__meta = self.profile._meta.get_field('dob')
+        dob__meta = self.profile._meta.get_field("dob")
         self.assertTrue(dob__meta.null)
 
     def test_dob_is_blank(self):
-        dob__meta = self.profile._meta.get_field('dob')
+        dob__meta = self.profile._meta.get_field("dob")
         self.assertFalse(dob__meta.blank)
 
     # gender
     def test_gender_label(self):
-        gender__meta = self.profile._meta.get_field('gender')
-        self.assertEqual(gender__meta.verbose_name, 'gender')
+        gender__meta = self.profile._meta.get_field("gender")
+        self.assertEqual(gender__meta.verbose_name, "gender")
 
     def test_gender_max_length(self):
-        gender__meta = self.profile._meta.get_field('gender')
+        gender__meta = self.profile._meta.get_field("gender")
         self.assertTrue(gender__meta.max_length, 2)
 
     def test_gender_is_null(self):
-        gender__meta = self.profile._meta.get_field('gender')
+        gender__meta = self.profile._meta.get_field("gender")
         self.assertTrue(gender__meta.null)
 
     def test_gender_is_blank(self):
-        gender__meta = self.profile._meta.get_field('gender')
+        gender__meta = self.profile._meta.get_field("gender")
         self.assertFalse(gender__meta.blank)

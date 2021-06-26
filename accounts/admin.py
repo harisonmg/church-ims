@@ -9,8 +9,9 @@ from .models import CustomUser, Profile
 
 class ChildrenInline(admin.TabularInline):
     model = ParentChildRelationship
-    fk_name = 'parent'
+    fk_name = "parent"
     extra = 1
+
 
 class ProfileInline(admin.StackedInline):
     model = Profile
@@ -56,6 +57,7 @@ class CustomUserAdmin(UserAdmin):
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
 
+
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('slug', 'full_name', 'age', 'gender')
+    list_display = ("slug", "full_name", "age", "gender")

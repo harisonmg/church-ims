@@ -1,13 +1,13 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 
-# from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
+from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
 
-from .forms import CustomUserCreationForm, UserUpdateForm, UserProfileForm
+# from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
 
 
 class LoginView(auth_views.LoginView):
@@ -93,9 +93,6 @@ def profile(request):
         user_form = UserUpdateForm(instance=request.user)
         profile_form = UserProfileForm(instance=request.user.profile)
 
-    context = {
-        'user_form': user_form,
-        'profile_form': profile_form
-    }
+    context = {"user_form": user_form, "profile_form": profile_form}
 
     return render(request, "accounts/profile.html", context)

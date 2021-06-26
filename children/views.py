@@ -1,12 +1,13 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.urls.base import reverse
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import (LoginRequiredMixin,
+                                        PermissionRequiredMixin)
 from django.urls import reverse, reverse_lazy
-
-# from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
+from django.urls.base import reverse
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from .models import Child, ParentChildRelationship
+
+# from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
 
 
 # class ParentChildRelationshipsInline(InlineFormSetFactory):
@@ -85,9 +86,7 @@ class RelationshipByUserListView(LoginRequiredMixin, ListView):
     template_name = "children/relationship_list.html"
 
     def get_queryset(self):
-        return ParentChildRelationship.objects.filter(
-            parent=self.request.user
-        )
+        return ParentChildRelationship.objects.filter(parent=self.request.user)
 
 
 class RelationshipDetailView(LoginRequiredMixin, DetailView):
@@ -103,7 +102,7 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['child'].queryset = Child.objects.filter(
+        context["form"].fields["child"].queryset = Child.objects.filter(
             created_by=self.request.user
         )
         return context
@@ -124,14 +123,12 @@ class RelationshipUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "children/relationship_form.html"
 
     def get_queryset(self):
-        return ParentChildRelationship.objects.filter(
-            parent=self.request.user
-        )
+        return ParentChildRelationship.objects.filter(parent=self.request.user)
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user
         return super().form_valid(form)
-    
+
     def get_success_url(self):
         return reverse("children:relationship_by_user_list")
 
@@ -141,6 +138,6 @@ class RelationshipDeleteView(LoginRequiredMixin, DeleteView):
     fields = ("child", "relationship_type")
     context_object_name = "relationship"
     template_name = "children/relationship_confirm_delete.html"
-    
+
     def get_success_url(self):
         return reverse_lazy("children:relationship_by_user_list")
