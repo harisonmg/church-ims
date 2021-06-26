@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        PermissionRequiredMixin)
+                                        UserPassesTestMixin)
 from django.urls import reverse, reverse_lazy
 from django.urls.base import reverse
 from django.views.generic import DetailView, ListView
@@ -130,7 +130,7 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy("children:relationship_by_user_list")
 
 
-class RelationshipUpdateView(LoginRequiredMixin, UpdateView):
+class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = ParentChildRelationship
     fields = ("child", "relationship_type")
     context_object_name = "relationship"
@@ -138,6 +138,12 @@ class RelationshipUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         return ParentChildRelationship.objects.filter(parent=self.request.user)
+    
+    def test_func(self):
+        relationship = self.get_object()
+        if self.request.user == relationship.parent:
+            return True
+        return False
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user

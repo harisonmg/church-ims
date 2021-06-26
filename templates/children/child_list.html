@@ -31,6 +31,8 @@
                     class="btn btn-sm btn-outline-primary fw-bold">
                     update
                   </a>
+                {% endif %}
+                {% if user.is_staff %}
                   <a href="{% url 'records:child_temperature_create' %}"
                     class="btn btn-sm btn-outline-success fw-bold">
                     add temp
