@@ -112,8 +112,8 @@ class ProfileModelTestCase(TestCase):
         self.profile = Profile.objects.get(user=self.user)
 
     # class methods
-    # def test_profile_object_name_is_slug(self):
-    #     self.assertEqual(self.profile.slug, str(self.profile))
+    # def test_profile_object_name_is_full_name(self):
+    #     self.assertEqual(self.profile.full_name, str(self.profile))
 
     # user
     def test_user_label(self):
@@ -131,23 +131,6 @@ class ProfileModelTestCase(TestCase):
     def test_user_is_blank(self):
         user__meta = self.profile._meta.get_field("user")
         self.assertFalse(user__meta.blank)
-
-    # slug
-    def test_slug_label(self):
-        slug__meta = self.profile._meta.get_field("slug")
-        self.assertEqual(slug__meta.verbose_name, "slug")
-
-    def test_slug_max_length(self):
-        slug__meta = self.profile._meta.get_field("slug")
-        self.assertEqual(slug__meta.max_length, 50)
-
-    def test_slug_is_null(self):
-        slug__meta = self.profile._meta.get_field("slug")
-        self.assertTrue(slug__meta.null)
-
-    def test_slug_is_blank(self):
-        slug__meta = self.profile._meta.get_field("slug")
-        self.assertFalse(slug__meta.blank)
 
     # full name
     def test_full_name_label(self):

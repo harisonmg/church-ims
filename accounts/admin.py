@@ -22,7 +22,7 @@ class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ("username", "email", "phone_number", "is_staff")
     ordering = ("username",)
-    inlines = [ProfileInline,]
+    # inlines = [ProfileInline,]
 
     add_fieldsets = (
         (
@@ -60,4 +60,4 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ("slug", "full_name", "age", "gender")
+    list_display = ("full_name", "gender")

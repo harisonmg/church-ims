@@ -1,3 +1,5 @@
+import time
+
 from selenium import webdriver
 
 from .base import FunctionalTestCase
@@ -150,7 +152,6 @@ class AdminTestCase(FunctionalTestCase):
         # He clicks on Christine's link to add her to the
         # editors group
         self.browser.find_element_by_link_text("ChristineKyalo").click()
-        import time
 
         time.sleep(1)
         user_form = self.browser.find_element_by_id("customuser_form")
@@ -319,5 +320,5 @@ class MemberTestCase(FunctionalTestCase):
         # The login was successful and he is redirected to his dashboard,
         # where he can add his personal details and family members
         self.assertEqual(
-            self.browser.current_url, self.live_server_url + "/accounts/profile/"
+            self.browser.current_url, self.live_server_url + "/accounts/AlexanderGithinji/update/"
         )
