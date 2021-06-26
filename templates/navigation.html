@@ -10,47 +10,33 @@
       {% if user.is_authenticated %}
         <a class="nav-link active" aria-current="page" href="{% url 'core:dashboard' %}">Home</a>
 
-        <a class="nav-link dropdown-toggle" href="#" id="childrenDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Children
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="childrenDropdownMenuLink">
-          <!-- <li>
-            <a class="dropdown-item" href="#">
-              {% comment %} {% url 'children:children_create' %} {% endcomment %}
-              Add children
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#">
-              {% comment %} {% url 'children:children_update' user.profile.slug %} {% endcomment %}
-              Update children
-            </a>
-          </li> -->
-          <li>
-            <a class="dropdown-item" href="{% url 'children:create' %}">
-              Add a child's information
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="{% url 'children:relationship_create' %}">
-              Add a relationship with your child
-            </a>
-          </li>
-          <li><a class="dropdown-item" href="{% url 'children:by_user_list' %}">Your children</a></li>
-          <li>
-            <a class="dropdown-item" href="{% url 'children:relationship_by_user_list' %}">
-              Relationships with your children
-            </a>
-          </li>
-          {% if user.is_staff %}
-            <li><a class="dropdown-item" href="{% url 'children:list' %}">All children</a></li>
+        
+        {% if user.is_staff %}
+          <a class="nav-link dropdown-toggle" href="#" id="childrenDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Children
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="childrenDropdownMenuLink">          
+            {% comment %} 
             <li>
-              <a class="dropdown-item" href="{% url 'children:relationship_list' %}">
-                All children relationships
+              <a class="dropdown-item" href="{% url 'children:child_relationship_create' %}">
+                Add a child's information and your relationship
               </a>
             </li>
-          {% endif %}
-        </ul>
+            <li>
+              <a class="dropdown-item" href="#">
+                <!-- {% url 'children:child_relationship_update' .slug %} -->
+                Update children
+              </a>
+            </li>
+            {% endcomment %}
+              <li><a class="dropdown-item" href="{% url 'children:list' %}">All children</a></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'children:relationship_list' %}">
+                  All children relationships
+                </a>
+              </li>
+          </ul>
+        {% endif %}
 
         <a class="nav-link dropdown-toggle" href="#" id="accountDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           Account
@@ -58,16 +44,37 @@
         <ul class="dropdown-menu" aria-labelledby="accountDropdownMenuLink">
           {% if user.is_staff %}
             <li><a class="dropdown-item" href="{% url 'admin:index' %}">Go to admin</a></li>
-          {% endif %}
+          {% endif %}          
+          <li><a class="dropdown-item" href="{% url 'accounts:user_detail' user.username %}">Profile</a></li>
           <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}">Change password</a></li>
           <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
         </ul>
       {% else %}
         <a class="nav-link active" aria-current="page" href="{% url 'core:index' %}">Home</a>
       {% endif %}
-
-      {% if user.is_authenticated %}
-      {% endif %}
     </nav>
   </div>
 </header>
+
+{% if user.is_authenticated %}
+  <ul class="nav nav-tabs mt-3">
+    <li class="nav-item">
+      <a class="nav-link active" href="{% url 'children:create' %}">
+        Add a child
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="{% url 'children:relationship_create' %}">
+        Add a relationship
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="{% url 'children:by_user_list' %}">Your children</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="{% url 'children:relationship_by_user_list' %}">
+        Your relationships
+      </a>
+    </li>
+  </ul>
+{% endif %}
