@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %} Children | {{ block.super }} {% endblock title %}
+
+{% block content %}
+  <div class="p-3">
+    <h1>Children</h1>
+    {% if not children %}
+      <p class="lead">There are no children yet!</p>
+    {% else %}
+      <table class="table table-light table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+            <th scope="col">Full name</th>
+            <th scope="col">Gender</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for child in children %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td><a href="{{ child.get_absolute_url }}">{{ child.slug }}</a></td>
+              <td>{{ child.full_name }}</td>
+              <td>{{ child.gender }}</td>
+              <td>
+                {% if user == child.created_by or user.is_staff %}
+                  <a href="{% url 'children:update' child.slug %}"
+                    class="btn btn-sm btn-outline-primary fw-bold">
+                    update
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+{% endblock content %}
