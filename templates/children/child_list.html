@@ -33,7 +33,7 @@
                   </a>
                 {% endif %}
                 {% if user.is_staff %}
-                  <a href="{% url 'records:child_temperature_create' %}"
+                  <a href="{% url 'records:child_temperature_create' child.slug %}"
                     class="btn btn-sm btn-outline-success fw-bold">
                     add temp
                   </a>
