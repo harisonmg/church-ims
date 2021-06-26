@@ -1,8 +1,7 @@
 import datetime
 
-from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        UserPassesTestMixin)
-from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
@@ -44,14 +43,14 @@ class ChildTemperatureCreateView(LoginRequiredMixin, UserPassesTestMixin, Create
         if self.request.user.is_staff:
             return True
         return False
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['child'] = get_object_or_404(Child, slug=self.kwargs['slug'])
+        context["child"] = get_object_or_404(Child, slug=self.kwargs["slug"])
         return context
 
     def form_valid(self, form):
-        form.instance.child = get_object_or_404(Child, slug=self.kwargs['slug'])
+        form.instance.child = get_object_or_404(Child, slug=self.kwargs["slug"])
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 

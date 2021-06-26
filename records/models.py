@@ -44,10 +44,6 @@ class ChildTemperature(TemperatureRecord):
         return "{}'s temperature at {}".format(
             self.child, self.created_at.strftime("%d %b %Y %H:%M:%S")
         )
-    
+
     def get_absolute_url(self):
-        return reverse(
-            "child_temperature_detail",
-            kwargs={"pk": self.pk}
-        )
-    
+        return reverse("child_temperature_detail", kwargs={"pk": self.pk})
