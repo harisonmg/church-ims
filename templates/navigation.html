@@ -36,6 +36,18 @@
                 </a>
               </li>
           </ul>
+
+          <a class="nav-link dropdown-toggle" href="#" id="temperatureRecordsDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Temperature records
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="temperatureRecordsDropdownMenuLink">          
+              <li><a class="dropdown-item" href="{% url 'records:child_temperature_list' %}">Children temperature records</a></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'records:child_temperature_by_user_list' %}">
+                  All children temperature records you've created
+                </a>
+              </li>
+          </ul>
         {% endif %}
 
         <a class="nav-link dropdown-toggle" href="#" id="accountDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -55,26 +67,3 @@
     </nav>
   </div>
 </header>
-
-{% if user.is_authenticated %}
-  <ul class="nav nav-tabs mt-3">
-    <li class="nav-item">
-      <a class="nav-link active" href="{% url 'children:create' %}">
-        Add a child
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'children:relationship_create' %}">
-        Add a relationship
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'children:by_user_list' %}">Your children</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'children:relationship_by_user_list' %}">
-        Your relationships
-      </a>
-    </li>
-  </ul>
-{% endif %}

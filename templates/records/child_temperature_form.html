@@ -1,32 +1,27 @@
-{% extends 'children/base.html' %}
+{% extends 'base.html' %}
 {% block title %}
-  {% if relationship %} Update {% else %} Add {% endif %} your child's information | {{ block.super }}
+  {% if child_temperature %} Update {% else %} Add {% endif %} a child's temperature record | {{ block.super }}
 {% endblock title %}
 {% load crispy_forms_tags %}
 
 {% block content %}
   <div class="p-3 col-md-8 mx-md-auto">
-    <form method="POST">
+    <form id="child_temperature_form" method="POST">
       {% csrf_token %}
 
       <fieldset>
         <h1>
-          {% if relationship %} Update {% else %} Add {% endif %} your child's information
+          {% if child_temperature %} Update {% else %} Add {% endif %} a child's temperature record
         </h1>
 
         <div class="text-start">
           {{ form|crispy }}
-          {% for formset in inlines %}
-            {% for form in formset %}
-                {% crispy form %}
-            {% endfor %}
-          {% endfor %}
         </div>
       </fieldset>
 
       <div class="form-group py-3">
         <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">
-          {% if relationship %} Update {% else %} Add {% endif %}
+          {% if child_temperature %} Update {% else %} Add {% endif %}
         </button>
       </div>
     </form>

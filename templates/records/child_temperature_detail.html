@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{ child_temperature }}'s temperature at {{ child_temperature.created_at }}  | {{ block.super }} 
+{% endblock title %}
+
+{% block content %}
+  <div class="p-3 col-md-8 mx-md-auto">
+    <h1>{{ child_temperature }}</h1>
+    <p class="lead"><strong>Name:</strong> {{ child_temperature.child.full_name }}</p>
+    <p class="lead"><strong>Temperature:</strong> {{ child_temperature.temp }}&#8451;</p>
+    <p class="lead"><strong>Created at:</strong> {{ child_temperature.created_at }}</p>
+    <p class="lead"><strong>Created by:</strong> {{ child_temperature.created_by.username }}</p>
+
+    <a href="{% url 'records:child_temperature_update' child_temperature.pk %}" class="btn btn-secondary fw-bold border-white bg-white">
+      Edit
+    </a>
+  </div>
+{% endblock content %}

@@ -49,6 +49,5 @@ urlpatterns = [
     ),
     path("<slug:slug>/update/", views.ChildUpdateView.as_view(), name="update"),
     path("<slug:slug>/", views.ChildDetailView.as_view(), name="detail"),
-    path("all/", views.ChildListView.as_view(), name="list"),
     path("", views.ChildrenByUserListView.as_view(), name="by_user_list"),
 ]
