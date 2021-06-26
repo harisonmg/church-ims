@@ -54,14 +54,15 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "crispy_forms",
+    "extra_views",
     "phonenumber_field",
     "storages",
 ]
 
 LOCAL_APPS = [
     "core",
-    "accounts",
-    "people",
+    "accounts.apps.AccountsConfig",
+    "children",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -106,7 +107,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
-LOGIN_REDIRECT_URL = "core:dashboard"
+LOGIN_REDIRECT_URL = "accounts:profile"
 
 LOGOUT_REDIRECT_URL = "core:index"
 
