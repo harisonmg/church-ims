@@ -1,13 +1,12 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %} Home | {{ block.super }} {% endblock title %}
 
 {% block content %}
   <main class="px-3">
-    <h1>StAnds Church School IMS</h1>
+    <h1>StAnds IMS</h1>
     <p class="lead">
-      This your one-stop shop for accessing church school materials for your kids.
+      Your one-stop shop for accessing church records.
     </p>
     <p class="lead">
       <a href="{% url 'accounts:register' %}" class="btn btn-lg btn-outline-secondary fw-bold border-white text-white mx-3">Register</a>

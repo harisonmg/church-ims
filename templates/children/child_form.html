@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}
+  {% if child %} Update {% else %} Add {% endif %} a child's information | {{ block.super }}
+{% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="p-3 col-md-8 mx-md-auto">
+    <form id="child_form" method="POST">
+      {% csrf_token %}
+
+      <fieldset>
+        <h1>
+          {% if child %} Update {% else %} Add {% endif %} a child's information
+        </h1>
+
+        <div class="text-start">
+          {{ form|crispy }}
+        </div>
+      </fieldset>
+
+      <div class="form-group py-3">
+        <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">
+          {% if child %} Update {% else %} Add {% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock content %}

@@ -24,6 +24,13 @@ class FunctionalTestCase(StaticLiveServerTestCase):
 
         cls.User = get_user_model()
 
+    def tearDown(self):
+        self.browser.quit()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+
     def get_admin_url(self):
         """Returns the admin URL from the `ADMIN_URL` configuration
 
@@ -31,10 +38,3 @@ class FunctionalTestCase(StaticLiveServerTestCase):
             string: The link to the homepage of the admin site
         """
         return f"{self.live_server_url}/{settings.ADMIN_URL}/"
-
-    def tearDown(self):
-        self.browser.quit()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()

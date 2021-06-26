@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f46a26375e0877b11f3d86e8e03236e022f5b5a64750904c2bf6545513a244e3"
+            "sha256": "e57cbeec80a2246656d29edd727b76bfffbfc4c319bc27a0bbfb7fc550ed8382"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -123,6 +123,13 @@
             "index": "pypi",
             "version": "==1.12.0"
         },
+        "django-extra-views": {
+            "hashes": [
+                "sha256:2b9daf99c79e91035aa3f269232afcb3ccf837f0f49f2dc6da6916fe34bc1e0a"
+            ],
+            "index": "pypi",
+            "version": "==0.14.0"
+        },
         "django-phonenumber-field": {
             "extras": [
                 "phonenumberslite"
@@ -171,10 +178,10 @@
         },
         "google-cloud-storage": {
             "hashes": [
-                "sha256:162011d66f64b8dc5d7936609a5daf0066cc521231546aea02c126a5559446c4",
-                "sha256:69499560ec8234339ce831704419a2288c409a422f6e9ed1facc9345412ee637"
+                "sha256:89a5f5290e61990a5ae138d8ba8895bc3fe1e00fbc2e3b6beb7fb8378ca7a2f1",
+                "sha256:e9ba9e0486b385fa0b9f16a0c3bfa4cbb7001a2285adb65374de4415588cdb2d"
             ],
-            "version": "==1.38.0"
+            "version": "==1.39.0"
         },
         "google-crc32c": {
             "hashes": [

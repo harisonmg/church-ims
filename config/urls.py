@@ -1,4 +1,4 @@
-"""Church School IMS URL Configuration
+"""Church IMS URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -17,13 +17,15 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-admin.site.site_header = "StAnds Church School IMS administration"
-admin.site.site_title = "StAnds Church School IMS admin"
+site_name = "StAnds IMS"
+admin.site.site_header = f"{site_name} administration"
+admin.site.site_title = f"{site_name} admin"
 admin_url = settings.ADMIN_URL + "/"
 
 urlpatterns = [
     path(admin_url + "doc/", include("django.contrib.admindocs.urls")),
     path(admin_url, admin.site.urls),
     path("accounts/", include("accounts.urls")),
+    path("children/", include("children.urls")),
     path("", include("core.urls")),
 ]
