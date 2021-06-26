@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "children/base.html" %}
 
 {% block title %} Children | {{ block.super }} {% endblock title %}
 
@@ -30,6 +30,10 @@
                   <a href="{% url 'children:update' child.slug %}"
                     class="btn btn-sm btn-outline-primary fw-bold">
                     update
+                  </a>
+                  <a href="{% url 'records:child_temperature_create' %}"
+                    class="btn btn-sm btn-outline-success fw-bold">
+                    add temp
                   </a>
                 {% endif %}
               </td>
