@@ -16,12 +16,14 @@ class ChildTemperatureListView(LoginRequiredMixin, ListView):
     model = ChildTemperature
     context_object_name = "children_temperature"
     template_name = "records/child_temperature_list.html"
+    paginate_by = 10
 
 
 class ChildTemperatureByUserListView(LoginRequiredMixin, ListView):
     model = ChildTemperature
     context_object_name = "children_temperature"
     template_name = "records/child_temperature_list.html"
+    paginate_by = 10
 
     def get_queryset(self):
         return ChildTemperature.objects.filter(created_by=self.request.user)

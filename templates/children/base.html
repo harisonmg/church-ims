@@ -5,7 +5,7 @@
   {{ block.super }}
 
   {% if user.is_authenticated %}
-    <ul class="nav nav-tabs mt-3">
+    <ul class="nav nav-tabs">
       <li class="nav-item">
         <a class="nav-link" href="{% url 'children:create' %}">
           Add a child
@@ -16,14 +16,6 @@
           Add a relationship
         </a>
       </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'children:by_user_list' %}">Your children</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'children:relationship_by_user_list' %}">
-            Your relationships
-          </a>
-        </li>
     </ul>
   {% endif %}  
 {% endblock navigation %}

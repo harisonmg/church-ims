@@ -4,29 +4,30 @@ from django.urls import reverse, reverse_lazy
 from django.urls.base import reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from extra_views import (CreateWithInlinesView, InlineFormSetFactory,
-                         UpdateWithInlinesView)
+# from extra_views import (CreateWithInlinesView, InlineFormSetFactory,
+#                          UpdateWithInlinesView)
+from extra_views import SearchableListMixin
 
 from .models import Child, ParentChildRelationship
 
 
-class ParentChildRelationshipInline(InlineFormSetFactory):
-    model = ParentChildRelationship
-    fields = ("child", "relationship_type")
-    fk_name = "child"
-    factory_kwargs = {"extra": 1}
+# class ParentChildRelationshipInline(InlineFormSetFactory):
+#     model = ParentChildRelationship
+#     fields = ("child", "relationship_type")
+#     fk_name = "child"
+#     factory_kwargs = {"extra": 1}
 
     # def get_queryset(self):
     #     return ParentChildRelationship.objects.filter(parent=self.request.user)
 
 
-class ChildRelationshipCreateView(CreateWithInlinesView):
-    model = Child
-    inlines = [
-        ParentChildRelationshipInline,
-    ]
-    fields = ("slug", "full_name", "dob", "gender")
-    template_name = "children/child_relationship_form.html"
+# class ChildRelationshipCreateView(CreateWithInlinesView):
+#     model = Child
+#     inlines = [
+#         ParentChildRelationshipInline,
+#     ]
+#     fields = ("slug", "full_name", "dob", "gender")
+#     template_name = "children/child_relationship_form.html"
 
     # def form_valid(self, form):
     #     form.instance.created_by = self.request.user
@@ -34,30 +35,34 @@ class ChildRelationshipCreateView(CreateWithInlinesView):
     #     form.instance.updated_by = self.request.user
     #     return super().form_valid(form)
 
-    def get_success_url(self):
-        return reverse_lazy("children:relationship_by_user_list")
+    # def get_success_url(self):
+    #     return reverse_lazy("children:relationship_by_user_list")
 
 
-class ChildRelationshipUpdateView(UpdateWithInlinesView):
-    model = Child
-    inlines = [
-        ParentChildRelationshipInline,
-    ]
-    fields = ("slug", "full_name", "dob", "gender")
-    template_name = "children/child_relationship_form.html"
+# class ChildRelationshipUpdateView(UpdateWithInlinesView):
+#     model = Child
+#     inlines = [
+#         ParentChildRelationshipInline,
+#     ]
+#     fields = ("slug", "full_name", "dob", "gender")
+#     template_name = "children/child_relationship_form.html"
 
-    def get_success_url(self):
-        return reverse("children:relationship_by_user_list")
-
-
-class ChildListView(LoginRequiredMixin, ListView):
-    model = Child
-    context_object_name = "children"
+#     def get_success_url(self):
+#         return reverse("children:relationship_by_user_list")
 
 
-class ChildrenByUserListView(LoginRequiredMixin, ListView):
+class ChildListView(LoginRequiredMixin, SearchableListMixin, ListView):
     model = Child
     context_object_name = "children"
+    search_fields = ("slug", "full_name")
+    paginate_by = 10
+
+
+class ChildrenByUserListView(LoginRequiredMixin, SearchableListMixin, ListView):
+    model = Child
+    context_object_name = "children"
+    search_fields = ("slug", "full_name")
+    paginate_by = 10
 
     def get_queryset(self):
         return Child.objects.filter(created_by=self.request.user)
