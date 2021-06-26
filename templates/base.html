@@ -31,7 +31,9 @@
      {% block body_div_classes %} mx-auto flex-column p-3 {% endblock body_div_classes %}">
 
       {% comment %} Navigation bar {% endcomment %}
-      {% include "navigation.html" %}
+      {% block navigation %}
+        {% include "navigation.html" %}
+      {% endblock navigation %}
 
       {% comment %} Content {% endcomment %}
       {% if messages %}
