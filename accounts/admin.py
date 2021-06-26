@@ -1,8 +1,19 @@
 from django.contrib import admin
+from django.contrib.auth import models
 from django.contrib.auth.admin import UserAdmin
 
-from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import CustomUser
+from children.models import ParentChildRelationship
+
+from .models import CustomUser, Profile
+
+
+class ChildrenInline(admin.TabularInline):
+    model = ParentChildRelationship
+    fk_name = 'parent'
+    extra = 1
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
 
 
 @admin.register(CustomUser)
@@ -10,6 +21,7 @@ class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ("username", "email", "phone_number", "is_staff")
     ordering = ("username",)
+    # inlines = [ProfileInline, ChildrenInline]
 
     add_fieldsets = (
         (
@@ -22,14 +34,13 @@ class CustomUserAdmin(UserAdmin):
                     "phone_number",
                     "password1",
                     "password2",
-                    "profile"
                 ),
             },
         ),
     )
     fieldsets = (
         ("Credentials", {"fields": ("username", "password")}),
-        ("Personal info", {"fields": ("email", "phone_number", "profile")}),
+        ("Personal info", {"fields": ("email", "phone_number")}),
         (
             "Permissions",
             {
@@ -44,3 +55,7 @@ class CustomUserAdmin(UserAdmin):
         ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('slug', 'full_name', 'age', 'gender')

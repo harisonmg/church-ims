@@ -150,6 +150,7 @@ class AdminTestCase(FunctionalTestCase):
         # He clicks on Christine's link to add her to the
         # editors group
         self.browser.find_element_by_link_text("ChristineKyalo").click()
+        import time; time.sleep(1)
         user_form = self.browser.find_element_by_id("customuser_form")
         user_form.find_element_by_name("is_staff").click()
         user_form.find_element_by_name("groups_old").find_elements_by_tag_name(
@@ -315,4 +316,4 @@ class MemberTestCase(FunctionalTestCase):
 
         # The login was successful and he is redirected to his dashboard,
         # where he can add his personal details and family members
-        self.assertEqual(self.browser.current_url, self.live_server_url + "/dashboard/")
+        self.assertEqual(self.browser.current_url, self.live_server_url + "/accounts/profile/")

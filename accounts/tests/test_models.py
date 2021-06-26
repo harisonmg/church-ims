@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from people.models import Person
+from accounts.models import Profile
 
 
 class CustomUserModelTestCase(TestCase):
@@ -19,21 +19,10 @@ class CustomUserModelTestCase(TestCase):
             password="alvinpassword"
         )
 
-        cls.person = Person.objects.create(
-            slug="AlvinMukuna",
-            full_name="Alvin Mukuna",
-            dob="1984-12-12",
-            gender="M",
-            created_by=cls.user,
-        )
-        cls.user.profile = cls.person
-        cls.user.save()
-
     def test_user_basic(self):
         self.assertEqual(self.user.username, "AlvinMukuna")
         self.assertEqual(self.user.email, "alvin@mukuna.com")
         self.assertEqual(self.user.phone_number,"+254 701 234 567")
-        self.assertEqual(self.user.profile, self.person)
 
     # class methods
     def test_user_object_name_is_username(self):
@@ -108,19 +97,106 @@ class CustomUserModelTestCase(TestCase):
         phone_number__meta = self.user._meta.get_field("phone_number")
         self.assertFalse(phone_number__meta.blank)
 
-    # profile
-    def test_profile_label(self):
-        profile__meta = self.user._meta.get_field("profile")
-        self.assertEqual(profile__meta.verbose_name, "personal details")
 
-    def test_profile_max_length(self):
-        profile__meta = self.user._meta.get_field("profile")
-        self.assertIsNone(profile__meta.max_length)
+class ProfileModelTestCase(TestCase):
+    def setUp(self):
+        self.User = get_user_model()
 
-    def test_profile_is_null(self):
-        profile__meta = self.user._meta.get_field("profile")
-        self.assertTrue(profile__meta.null)
+        # create a normal user
+        self.user = self.User.objects.create_user(
+            username="AlvinMukuna",
+            email="alvin@mukuna.com",
+            phone_number="+254 701 234 567",
+            password="alvinpassword"
+        )
 
-    def test_profile_is_blank(self):
-        profile__meta = self.user._meta.get_field("profile")
-        self.assertTrue(profile__meta.blank)
+        self.profile = Profile.objects.get(user=self.user)
+
+    # class methods
+    # def test_profile_object_name_is_slug(self):
+    #     self.assertEqual(self.profile.slug, str(self.profile))
+    
+    # user
+    def test_user_label(self):
+        user__meta = self.profile._meta.get_field("user")
+        self.assertEqual(user__meta.verbose_name, "user")
+
+    def test_user_max_length(self):
+        user__meta = self.profile._meta.get_field("user")
+        self.assertIsNone(user__meta.max_length)
+
+    def test_user_is_null(self):
+        user__meta = self.profile._meta.get_field("user")
+        self.assertFalse(user__meta.null)
+
+    def test_user_is_blank(self):
+        user__meta = self.profile._meta.get_field("user")
+        self.assertFalse(user__meta.blank)
+
+    # slug
+    def test_slug_label(self):
+        slug__meta = self.profile._meta.get_field('slug')
+        self.assertEqual(slug__meta.verbose_name, 'slug')
+
+    def test_slug_max_length(self):
+        slug__meta = self.profile._meta.get_field('slug')
+        self.assertEqual(slug__meta.max_length, 50)
+
+    def test_slug_is_null(self):
+        slug__meta = self.profile._meta.get_field('slug')
+        self.assertTrue(slug__meta.null)
+
+    def test_slug_is_blank(self):
+        slug__meta = self.profile._meta.get_field('slug')
+        self.assertFalse(slug__meta.blank)
+
+    # full name
+    def test_full_name_label(self):
+        full_name__meta = self.profile._meta.get_field('full_name')
+        self.assertEqual(full_name__meta.verbose_name, 'full name')
+
+    def test_full_name_max_length(self):
+        full_name__meta = self.profile._meta.get_field('full_name')
+        self.assertEqual(full_name__meta.max_length, 300)
+
+    def test_full_name_is_null(self):
+        full_name__meta = self.profile._meta.get_field('full_name')
+        self.assertTrue(full_name__meta.null)
+
+    def test_full_name_is_blank(self):
+        full_name__meta = self.profile._meta.get_field('full_name')
+        self.assertFalse(full_name__meta.blank)
+
+    # date of birth
+    def test_dob_label(self):
+        dob__meta = self.profile._meta.get_field('dob')
+        self.assertEqual(dob__meta.verbose_name, 'date of birth')
+
+    def test_dob_max_length(self):
+        dob__meta = self.profile._meta.get_field('dob')
+        self.assertIsNone(dob__meta.max_length)
+
+    def test_dob_is_null(self):
+        dob__meta = self.profile._meta.get_field('dob')
+        self.assertTrue(dob__meta.null)
+
+    def test_dob_is_blank(self):
+        dob__meta = self.profile._meta.get_field('dob')
+        self.assertFalse(dob__meta.blank)
+
+    # gender
+    def test_gender_label(self):
+        gender__meta = self.profile._meta.get_field('gender')
+        self.assertEqual(gender__meta.verbose_name, 'gender')
+
+    def test_gender_max_length(self):
+        gender__meta = self.profile._meta.get_field('gender')
+        self.assertTrue(gender__meta.max_length, 2)
+
+    def test_gender_is_null(self):
+        gender__meta = self.profile._meta.get_field('gender')
+        self.assertTrue(gender__meta.null)
+
+    def test_gender_is_blank(self):
+        gender__meta = self.profile._meta.get_field('gender')
+        self.assertFalse(gender__meta.blank)
