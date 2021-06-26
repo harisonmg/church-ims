@@ -113,11 +113,14 @@ def profile_update(request, username):
             profile_form.save()
             messages.success(request, f"Your profile has been updated")
             # avoid the redirect alert from browser when one reloads the page
-            return redirect("accounts:user_detail", username=request.user.username)
+            return redirect(
+                "accounts:user_detail", username=user_form.cleaned_data.get("username")
+            )
 
     else:
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = UserProfileForm(instance=request.user.profile)
+        user = get_user_model().objects.get(username=username)
+        user_form = UserUpdateForm(instance=user)
+        profile_form = UserProfileForm(instance=user.profile)
 
     context = {"user_form": user_form, "profile_form": profile_form}
 
