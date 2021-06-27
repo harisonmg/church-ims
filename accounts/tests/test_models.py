@@ -164,7 +164,7 @@ class ProfileModelTestCase(TestCase):
 
     def test_dob_is_blank(self):
         dob__meta = self.profile._meta.get_field("dob")
-        self.assertFalse(dob__meta.blank)
+        self.assertTrue(dob__meta.blank)
 
     # gender
     def test_gender_label(self):

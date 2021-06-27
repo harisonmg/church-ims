@@ -29,7 +29,7 @@ class Profile(models.Model):
     ]
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=300, null=True)
-    dob = models.DateField(verbose_name="date of birth", null=True)
+    dob = models.DateField(verbose_name="date of birth", help_text="The format should be DD/MM/YYYY", null=True, blank=True)
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES, null=True)
 
     class Meta:

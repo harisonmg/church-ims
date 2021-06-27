@@ -18,12 +18,12 @@ class Child(TimeStampedModel):
     ]
     slug = models.SlugField(
         verbose_name="username",
-        help_text="Enter a URL-friendly name",
+        help_text="Enter a unique username for your child. Don't use full-stops/periods",
         error_messages={"unique": "A child with that username already exists."},
         unique=True,
     )
     full_name = models.CharField(max_length=300)
-    dob = models.DateField(verbose_name="date of birth")
+    dob = models.DateField(verbose_name="date of birth", help_text="The format should be DD/MM/YYYY")
     gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -67,7 +67,7 @@ class ParentChildRelationship(TimeStampedModel):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parents"
     )
     child = models.ForeignKey(Child, on_delete=models.CASCADE, related_name="children")
-    relationship_type = models.ForeignKey("RelationshipType", on_delete=models.PROTECT)
+    relationship_type = models.ForeignKey("RelationshipType", help_text="How are you related to the child?", on_delete=models.PROTECT)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
