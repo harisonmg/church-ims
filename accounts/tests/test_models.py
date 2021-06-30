@@ -110,10 +110,11 @@ class ProfileModelTestCase(TestCase):
         )
 
         self.profile = Profile.objects.get(user=self.user)
+        self.profile.full_name="Alvin Mukuna"
 
     # class methods
-    # def test_profile_object_name_is_full_name(self):
-    #     self.assertEqual(self.profile.full_name, str(self.profile))
+    def test_profile_object_name_is_full_name(self):
+        self.assertEqual(self.profile.full_name, str(self.profile))
 
     # user
     def test_user_label(self):

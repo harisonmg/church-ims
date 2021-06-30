@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} Profile | {{ block.super }} {% endblock title %}
+{% block title %} Update profile | {{ block.super }} {% endblock title %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -9,10 +9,9 @@
       {% csrf_token %}
 
       <fieldset>
-        <h1>Profile</h1>
+        <h1>Update profile</h1>
         <div class="text-start">
-          {{ user_form|crispy }}
-          {{ profile_form|crispy }}
+          {{ form|crispy }}
         </div>
 
         <div class="form-group py-3">

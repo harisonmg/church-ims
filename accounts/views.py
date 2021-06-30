@@ -1,25 +1,35 @@
+from accounts.models import CustomUser
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import generic
-from extra_views import InlineFormSetFactory, UpdateWithInlinesView
 
-from accounts.models import CustomUser
+from people.models import Person
 
-from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
-from .models import Profile
+from .forms import CustomUserCreationForm, CustomUserUpdateForm, UserProfileForm
 
 
 class LoginView(auth_views.LoginView):
     template_name = "accounts/login.html"
 
     def get_success_url(self):
-        return reverse(
-            "accounts:user_update", kwargs={"username": self.request.user.username}
+        """
+        Redirect to the user's dashboard if their profile is updated,
+        else, redirect to the profile update page
+        """
+        user_profile = get_object_or_404(
+            Person,
+            user=self.request.user
         )
+        if not user_profile.full_name:
+            return reverse(
+                "accounts:profile_update",
+                kwargs={"username": user_profile.username}
+            )
+        return reverse("core:dashboard")
 
 
 class LogoutView(auth_views.LogoutView):
@@ -60,68 +70,75 @@ class RegisterView(generic.CreateView):
     template_name = "accounts/register.html"
 
 
-class UserProfileInline(InlineFormSetFactory):
-    model = Profile
-    form = UserProfileForm
-    extra = 0
+class ProfileUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Person
+    form_class = UserProfileForm
+    slug_field = "username"
+    template_name = "accounts/profile_update.html"
 
-    def get_factory_kwargs(self):
-        kwargs = super(UserProfileInline, self).get_factory_kwargs()
-        kwargs.update(
-            {
-                "min_num": 1,
-            }
+    def get_object(self):
+        current_username = self.kwargs.get("username")
+        return get_object_or_404(Person, username=current_username)
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.user = self.request.user
+        current_username = form.cleaned_data["username"]
+        self.success_url = reverse(
+            "accounts:profile_detail",
+            kwargs={"username": current_username}
         )
-        return kwargs
+        return super().form_valid(form)
 
 
-class ProfileUpdateView(UpdateWithInlinesView):
-    model = CustomUser
-    inlines = [
-        UserProfileInline,
-    ]
-    form_class = UserUpdateForm
+class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
     slug_field = "username"
-    template_name = "accounts/user_update.html"
-
-    def get_success_url(self):
-        return self.object.get_absolute_url()
-
-
-class UserDetailView(generic.DetailView):
-    slug_field = "username"
-    template_name = "accounts/user_detail.html"
-    context_object_name = "user_information"
+    template_name = "accounts/profile_detail.html"
+    context_object_name = "profile"
     queryset = get_user_model().objects.all()
 
     def get_object(self):
         current_username = self.kwargs.get("username")
-        return get_object_or_404(get_user_model(), username=current_username)
+        return get_object_or_404(Person, username=current_username)
 
 
-@login_required
-def profile_update(request, username):
-    if request.method == "POST":
-        # pass the current user's info to the form
-        user = get_user_model().objects.get(username=username)
-        user_form = UserUpdateForm(request.POST, instance=user)
-        profile_form = UserProfileForm(request.POST, instance=user.profile)
+class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin,  generic.UpdateView):
+    model = CustomUser
+    form_class = CustomUserUpdateForm
+    slug_field = "username"
+    template_name = "accounts/settings_update.html"
 
-        # save the data from both forms only when both inputs are valid
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, f"Your profile has been updated")
-            # avoid the redirect alert from browser when one reloads the page
-            return redirect(
-                "accounts:user_detail", username=user_form.cleaned_data.get("username")
-            )
+    def test_func(self):
+        current_user = self.get_object()
+        if self.request.user == current_user:
+            return True
+        return False
 
-    else:
-        user = get_user_model().objects.get(username=username)
-        user_form = UserUpdateForm(instance=user)
-        profile_form = UserProfileForm(instance=user.profile)
+    def get_object(self):
+        current_username = self.kwargs.get("username")
+        return get_object_or_404(CustomUser, username=current_username)
 
-    context = {"user_form": user_form, "profile_form": profile_form}
+    def form_valid(self, form):
+        current_username = form.cleaned_data["username"]
+        self.success_url = reverse(
+            "accounts:settings_detail",
+            kwargs={"username": current_username}
+        )
+        return super().form_valid(form)
 
-    return render(request, "accounts/profile.html", context)
+
+class SettingsDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
+    slug_field = "username"
+    template_name = "accounts/settings_detail.html"
+    context_object_name = "settings"
+    queryset = get_user_model().objects.all()
+
+    def test_func(self):
+        current_user = self.get_object()
+        if self.request.user == current_user:
+            return True
+        return False
+
+    def get_object(self):
+        current_username = self.kwargs.get("username")
+        return get_object_or_404(CustomUser, username=current_username)
