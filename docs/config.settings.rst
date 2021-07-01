@@ -28,6 +28,14 @@ config.settings.production module
    :undoc-members:
    :show-inheritance:
 
+config.settings.test module
+---------------------------
+
+.. automodule:: config.settings.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
