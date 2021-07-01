@@ -167,8 +167,6 @@ class AdminTestCase(FunctionalTestCase):
         relatives[-2].find_element_by_css_selector(".add-related").click()
         self.browser.switch_to.window(self.browser.window_handles[1])
 
-        import time
-
         time.sleep(0.5)
         person_form = self.browser.find_element_by_id("person_form")
         person_form.find_element_by_name("username").send_keys("DavidKamau")
@@ -216,8 +214,6 @@ class AdminTestCase(FunctionalTestCase):
         relatives[-2].find_element_by_css_selector(".add-related").click()
         self.browser.switch_to.window(self.browser.window_handles[1])
 
-        import time
-
         time.sleep(0.5)
         person_form = self.browser.find_element_by_id("person_form")
         person_form.find_element_by_name("username").send_keys("FauziaAmani")
@@ -250,8 +246,6 @@ class AdminTestCase(FunctionalTestCase):
         )
         relatives[-2].find_element_by_css_selector(".add-related").click()
         self.browser.switch_to.window(self.browser.window_handles[1])
-
-        import time
 
         time.sleep(0.5)
         person_form = self.browser.find_element_by_id("person_form")
