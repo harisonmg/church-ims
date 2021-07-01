@@ -1,5 +1,5 @@
-{% extends 'children/base.html' %}
-{% block title %} Delete a child relationship | {{ block.super }}{% endblock title %}
+{% extends 'base.html' %}
+{% block title %} Delete a family relationship | {{ block.super }}{% endblock title %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -9,18 +9,18 @@
 
       <fieldset>
         <h1>
-          Delete a relationship with a child
+          Delete a family relationship
         </h1>
         <p class="lead">
           Are you sure you want to delete the relationship
-          <a href="{% url 'children:relationship_detail' relationship.pk %}" class="text-white">
+          <a href="{% url 'people:relationship_detail' relationship.pk %}" class="text-white">
             {{ relationship }}
           </a>
         </p>
       </fieldset>
 
       <div class="form-group py-3">
-        <a href="{% url 'children:relationship_by_user_list' %}"
+        <a href="{% url 'people:relationship_by_user_list' %}"
          class="btn btn-outline-secondary fw-bold border-white text-white mx-3">
           Cancel
         </a>

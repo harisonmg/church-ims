@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} Profile | {{ block.super }} {% endblock title %}
+{% block title %} Update account settings | {{ block.super }} {% endblock title %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -9,7 +9,7 @@
       {% csrf_token %}
 
       <fieldset>
-        <h1>Profile</h1>
+        <h1>Update account settings</h1>
         <div class="text-start">
           {{ form|crispy }}
         </div>

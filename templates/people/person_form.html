@@ -1,17 +1,17 @@
-{% extends 'children/base.html' %}
+{% extends 'base.html' %}
 {% block title %}
-  {% if relationship %} Update {% else %} Create {% endif %} a child relationship | {{ block.super }}
+  {% if person %} Update {% else %} Add {% endif %} a person's information | {{ block.super }}
 {% endblock title %}
 {% load crispy_forms_tags %}
 
 {% block content %}
   <div class="p-3 col-md-8 mx-md-auto">
-    <form method="POST">
+    <form id="person_form" method="POST">
       {% csrf_token %}
 
       <fieldset>
         <h1>
-          {% if relationship %} Update {% else %} Add {% endif %} a relationship with a child
+          {% if person %} Update {% else %} Add {% endif %} a person's information
         </h1>
 
         <div class="text-start">
@@ -21,7 +21,7 @@
 
       <div class="form-group py-3">
         <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">
-          {% if relationship %} Update {% else %} Create {% endif %}
+          {% if person %} Update {% else %} Add {% endif %}
         </button>
       </div>
     </form>

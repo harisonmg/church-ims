@@ -1,40 +1,10 @@
-{% extends "children/base.html" %}
+{% extends "base.html" %}
 
 {% block title %} Dashboard | {{ block.super }} {% endblock title %}
 
 {% block content %}
   <div class="p-3 mx-md-auto">
     <h1>{{ user.username|title }}'s dashboard</h1>
-
-    {% if children %}
-      <h2>Your children</h2>
-      <table class="table table-light table-hover">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Username</th>
-            <th scope="col">Full name</th>
-            <th scope="col">Gender</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for child in children %}
-            <tr>
-              <th scope="row">{{ forloop.counter }}</th>
-              <td><a href="{{ child.get_absolute_url }}">{{ child.slug }}</a></td>
-              <td>{{ child.full_name }}</td>
-              <td>{{ child.gender }}</td>
-              <td>
-                <a href="{% url 'children:update' child.slug %}"
-                  class="btn btn-sm btn-outline-primary fw-bold">
-                  update
-                </a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
+    <p class="lead">We'll add some of your information here soon!</p>
   </div>
 {% endblock content %}

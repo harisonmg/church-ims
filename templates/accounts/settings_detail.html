@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %} {{ settings.username }}'s account settings | {{ block.super }} {% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="p-3 col-md-8 mx-md-auto">
+    <h1>{{ settings.username }}</h1>
+    <p class="lead"><strong>Email:</strong> {{ settings.email }}</p>
+    <p class="lead"><strong>Phone number:</strong> {{ settings.phone_number }}</p>
+
+    {% if request.user  == settings %}
+      <a class="btn btn-outline-light fw-bold" href="{% url 'people:relationship_create' %}">
+        Add a relative
+      </a>
+      <a href="{% url 'accounts:settings_update' %}" class="btn btn-secondary fw-bold border-white bg-white">
+        Update settings
+      </a>
+    {% endif %}
+  </div>
+{% endblock content %}

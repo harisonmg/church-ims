@@ -11,6 +11,7 @@ Welcome to the Church IMS documentation!
    :glob:
 
    modules
+   urls
 
 
 Indices and tables

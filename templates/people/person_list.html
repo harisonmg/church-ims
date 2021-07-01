@@ -1,14 +1,14 @@
-{% extends "children/base.html" %}
+{% extends "base.html" %}
 
-{% block title %} Children | {{ block.super }} {% endblock title %}
+{% block title %} People | {{ block.super }} {% endblock title %}
 
 {% block content %}
   <div class="p-3">
-    <h1>Children</h1>
-    {% if not children %}
-      <p class="lead">There are no children yet!</p>
+    <h1>People</h1>
+    {% if not people %}
+      <p class="lead">There are no people yet!</p>
     {% else %}
-      <div class="p-3 col-md-8 mx-md-auto">
+      <div class="p-3 mx-md-auto">
         <form id="search_form" class="d-flex">
           <input name="q" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-light fw-bold" type="submit">Search</button>
@@ -20,26 +20,26 @@
             <th scope="col">#</th>
             <th scope="col">Username</th>
             <th scope="col">Full name</th>
-            <th scope="col">Gender</th>
+            <th scope="col">Is Adult</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {% for child in children %}
+          {% for person in people %}
             <tr>
               <th scope="row">{{ forloop.counter }}</th>
-              <td><a href="{{ child.get_absolute_url }}">{{ child.slug }}</a></td>
-              <td>{{ child.full_name }}</td>
-              <td>{{ child.gender }}</td>
+              <td><a href="{{ person.get_absolute_url }}">{{ person.username }}</a></td>
+              <td>{{ person.full_name }}</td>
+              <td>{{ person.is_adult }}</td>
               <td>
-                {% if user == child.created_by or user.is_staff %}
-                  <a href="{% url 'children:update' child.slug %}"
+                {% if user == person.created_by or user.is_staff %}
+                  <a href="{% url 'people:person_update' person.username %}"
                     class="btn btn-sm btn-outline-primary fw-bold">
                     update
                   </a>
                 {% endif %}
                 {% if user.is_staff %}
-                  <a href="{% url 'records:child_temperature_create' child.slug %}"
+                  <a href="{% url 'records:body_temperature_create' person.username %}"
                     class="btn btn-sm btn-outline-success fw-bold">
                     add temp
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-thermometer-half" viewBox="0 0 16 16">

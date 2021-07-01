@@ -13,11 +13,15 @@ django-storages = {extras = ["google"], version = "*"}
 django-crispy-forms = "*"
 django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
 django-extra-views = "*"
+django-allauth = "*"
 
 [dev-packages]
 coverage = "*"
 selenium = "*"
 sphinx = "*"
 coveralls = "*"
+sphinx-rtd-theme = "*"
+recommonmark = "*"
+sphinx-markdown-tables = "*"
 
 [requires]

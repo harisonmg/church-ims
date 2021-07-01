@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %} {{ person.username }} | {{ block.super }} {% endblock title %}
+
+{% block content %}
+  <div class="p-3 col-md-8 mx-md-auto">
+    <h1>{{ person.username }}</h1>
+    <p class="lead"><strong>Full name:</strong> {{ person.full_name }}</p>
+    <p class="lead"><strong>Age:</strong> {{ person.age }}</p>
+
+    <a href="{% url 'people:person_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
+      Edit
+    </a>
+  </div>
+{% endblock content %}

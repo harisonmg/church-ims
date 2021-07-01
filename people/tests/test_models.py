@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+
 from people.models import FamilyRelationship, Person, RelationshipType
 
 
@@ -13,41 +14,40 @@ class PersonModelTestCase(TestCase):
             username="Kelvin", email="kelvin@murage.com", password="kelvinpassword"
         )
 
-        cls.person = Person.objects.create(
-            slug="Kelvin",
-            full_name="Kelvin Murage",
-            dob="1995-06-05",
-            gender="M",
-            created_by=cls.admin_user,
-        )
+        cls.person = Person.objects.get(user=cls.admin_user)
+        cls.person.username = "Kelvin"
+        cls.person.full_name = "Kelvin Murage"
+        cls.person.dob = "1995-06-05"
+        cls.person.gender = "M"
+        cls.person.created_by = cls.admin_user
 
     def test_person_basic(self):
-        self.assertEqual(self.person.slug, "Kelvin")
+        self.assertEqual(self.person.username, "Kelvin")
         self.assertEqual(self.person.full_name, "Kelvin Murage")
         self.assertEqual(self.person.dob, "1995-06-05")
         self.assertEqual(self.person.gender, "M")
         self.assertEqual(self.person.created_by, self.admin_user)
 
     # class methods
-    def test_person_object_name_is_slug(self):
-        self.assertEqual(self.person.slug, str(self.person))
+    def test_person_object_name_is_username(self):
+        self.assertEqual(self.person.username, str(self.person))
 
-    # slug
-    def test_slug_label(self):
-        slug__meta = self.person._meta.get_field("slug")
-        self.assertEqual(slug__meta.verbose_name, "username")
+    # username
+    def test_username_label(self):
+        username__meta = self.person._meta.get_field("username")
+        self.assertEqual(username__meta.verbose_name, "username")
 
-    def test_slug_max_length(self):
-        slug__meta = self.person._meta.get_field("slug")
-        self.assertEqual(slug__meta.max_length, 50)
+    def test_username_max_length(self):
+        username__meta = self.person._meta.get_field("username")
+        self.assertEqual(username__meta.max_length, 50)
 
-    def test_slug_is_null(self):
-        slug__meta = self.person._meta.get_field("slug")
-        self.assertFalse(slug__meta.null)
+    def test_username_is_null(self):
+        username__meta = self.person._meta.get_field("username")
+        self.assertFalse(username__meta.null)
 
-    def test_slug_is_blank(self):
-        slug__meta = self.person._meta.get_field("slug")
-        self.assertFalse(slug__meta.blank)
+    def test_username_is_blank(self):
+        username__meta = self.person._meta.get_field("username")
+        self.assertFalse(username__meta.blank)
 
     # full name
     def test_full_name_label(self):
@@ -60,7 +60,7 @@ class PersonModelTestCase(TestCase):
 
     def test_full_name_is_null(self):
         full_name__meta = self.person._meta.get_field("full_name")
-        self.assertFalse(full_name__meta.null)
+        self.assertTrue(full_name__meta.null)
 
     def test_full_name_is_blank(self):
         full_name__meta = self.person._meta.get_field("full_name")
@@ -77,7 +77,7 @@ class PersonModelTestCase(TestCase):
 
     def test_dob_is_null(self):
         dob__meta = self.person._meta.get_field("dob")
-        self.assertFalse(dob__meta.null)
+        self.assertTrue(dob__meta.null)
 
     def test_dob_is_blank(self):
         dob__meta = self.person._meta.get_field("dob")
@@ -94,7 +94,7 @@ class PersonModelTestCase(TestCase):
 
     def test_gender_is_null(self):
         gender__meta = self.person._meta.get_field("gender")
-        self.assertFalse(gender__meta.null)
+        self.assertTrue(gender__meta.null)
 
     def test_gender_is_blank(self):
         gender__meta = self.person._meta.get_field("gender")
@@ -190,7 +190,7 @@ class FamilyRelationshipModelTestCase(TestCase):
         )
 
         cls.kelvin_person = Person.objects.create(
-            slug="Kelvin",
+            username="Kelvin",
             full_name="Kelvin Murage",
             dob="1995-06-05",
             gender="M",
@@ -198,7 +198,7 @@ class FamilyRelationshipModelTestCase(TestCase):
         )
 
         cls.alvin_person = Person.objects.create(
-            slug="AlvinMukuna",
+            username="AlvinMukuna",
             full_name="Alvin Mukuna",
             dob="1984-12-12",
             gender="M",
@@ -206,7 +206,7 @@ class FamilyRelationshipModelTestCase(TestCase):
         )
 
         cls.abigael_person = Person.objects.create(
-            slug="AbigaelAuma",
+            username="AbigaelAuma",
             full_name="Abigael Auma",
             dob="2015-05-14",
             gender="F",
@@ -214,7 +214,7 @@ class FamilyRelationshipModelTestCase(TestCase):
         )
 
         cls.christine_person = Person.objects.create(
-            slug="ChristineKyalo",
+            username="ChristineKyalo",
             full_name="Christine Kyalo",
             dob="1992-03-21",
             gender="F",
@@ -222,7 +222,7 @@ class FamilyRelationshipModelTestCase(TestCase):
         )
 
         cls.brian_person = Person.objects.create(
-            slug="BrianKimani",
+            username="BrianKimani",
             full_name="Brian Kimani",
             dob="2018-09-23",
             gender="M",

@@ -1,4 +1,4 @@
-{% extends "children/base.html" %}
+{% extends "base.html" %}
 
 {% block title %} {{ relationship }} | {{ block.super }} {% endblock title %}
 
@@ -6,17 +6,17 @@
   <div class="mb-auto p-3 col-md-8 mx-md-auto">
     <h1>{{ relationship }}</h1>
     <p class="lead"><strong>
-      <a href="{{ relationship.child.get_absolute_url }}" class="text-white">
-        {{ relationship.child }}
+      <a href="{{ relationship.person.get_absolute_url }}" class="text-white">
+        {{ relationship.relative }}
       </a>
       is
-      <a href="{{ relationship.parent.profile.get_absolute_url }}" class="text-white">
-        {{ relationship.parent }}'s
+      <a href="{{ relationship.relative.get_absolute_url }}" class="text-white">
+        {{ relationship.person }}'s
       </a>
       {{ relationship.relationship_type }}
     </p>
 
-    <a href="{% url 'children:relationship_update' relationship.pk %}"
+    <a href="{% url 'people:relationship_update' relationship.pk %}"
      class="btn btn-secondary fw-bold border-white bg-white">
       Edit
     </a>
