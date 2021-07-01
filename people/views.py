@@ -1,17 +1,18 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse, reverse_lazy
-
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from extra_views import SearchableListMixin
 
 from .helpers import get_user_profile
-from .models import Person, FamilyRelationship
+from .models import FamilyRelationship, Person
 
 
-class PersonListView(LoginRequiredMixin, UserPassesTestMixin, SearchableListMixin, ListView):
+class PersonListView(
+    LoginRequiredMixin, UserPassesTestMixin, SearchableListMixin, ListView
+):
     model = Person
     context_object_name = "people"
     paginate_by = 10
@@ -23,9 +24,7 @@ class PersonListView(LoginRequiredMixin, UserPassesTestMixin, SearchableListMixi
         return False
 
     def get_queryset(self):
-        current_user = get_object_or_404(
-            get_user_model(), pk=self.request.user.pk
-        )
+        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
         return Person.objects.exclude(user=current_user)
 
 
@@ -54,9 +53,7 @@ class PersonDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return False
 
     def get_object(self):
-        return get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        return get_object_or_404(Person, username=self.kwargs.get("username"))
 
 
 class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -73,9 +70,7 @@ class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return False
 
     def get_object(self):
-        return get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        return get_object_or_404(Person, username=self.kwargs.get("username"))
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user
@@ -90,17 +85,13 @@ class PersonByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def test_func(self):
         current_user = self.request.user
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         if current_user.is_staff or (current_user == person.user):
             return True
         return False
 
     def get_queryset(self):
-        user = get_object_or_404(
-            get_user_model(), username=self.kwargs.get("username")
-        )
+        user = get_object_or_404(get_user_model(), username=self.kwargs.get("username"))
         return Person.objects.filter(created_by=user)
 
 
@@ -111,17 +102,13 @@ class RelationshipByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
 
     def test_func(self):
         current_user = self.request.user
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         if current_user.is_staff or (current_user.pk == person.pk):
             return True
         return False
 
     def get_queryset(self):
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         return FamilyRelationship.objects.filter(person=person)
 
 
@@ -160,7 +147,7 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse(
             "people:relationship_by_user_list",
-            kwargs={"username": get_user_profile(self.request).username}
+            kwargs={"username": get_user_profile(self.request).username},
         )
 
 
@@ -177,9 +164,7 @@ class RelationshipDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView
         return False
 
     def get_object(self):
-        return get_object_or_404(
-            FamilyRelationship, pk=self.kwargs.get("pk")
-        )
+        return get_object_or_404(FamilyRelationship, pk=self.kwargs.get("pk"))
 
 
 class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -196,9 +181,7 @@ class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
         return False
 
     def get_object(self):
-        return get_object_or_404(
-            FamilyRelationship, pk=self.kwargs.get("pk")
-        )
+        return get_object_or_404(FamilyRelationship, pk=self.kwargs.get("pk"))
 
     def form_valid(self, form):
         form.instance.updated_by = self.request.user
@@ -207,7 +190,7 @@ class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
     def get_success_url(self):
         return reverse(
             "people:relationship_by_user_list",
-            kwargs={"username": get_user_profile(self.request).username}
+            kwargs={"username": get_user_profile(self.request).username},
         )
 
 
@@ -225,9 +208,7 @@ class RelationshipDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         return False
 
     def get_object(self):
-        return get_object_or_404(
-            FamilyRelationship, pk=self.kwargs.get("pk")
-        )
+        return get_object_or_404(FamilyRelationship, pk=self.kwargs.get("pk"))
 
     def get_success_url(self):
         return reverse_lazy("people:relationship_by_user_list")

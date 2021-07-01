@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+
 from people.models import FamilyRelationship, Person, RelationshipType
 
 
@@ -14,11 +15,11 @@ class PersonModelTestCase(TestCase):
         )
 
         cls.person = Person.objects.get(user=cls.admin_user)
-        cls.person.username="Kelvin"
-        cls.person.full_name="Kelvin Murage"
-        cls.person.dob="1995-06-05"
-        cls.person.gender="M"
-        cls.person.created_by=cls.admin_user
+        cls.person.username = "Kelvin"
+        cls.person.full_name = "Kelvin Murage"
+        cls.person.dob = "1995-06-05"
+        cls.person.gender = "M"
+        cls.person.created_by = cls.admin_user
 
     def test_person_basic(self):
         self.assertEqual(self.person.username, "Kelvin")

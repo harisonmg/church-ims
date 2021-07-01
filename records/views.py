@@ -28,17 +28,13 @@ class BodyTemperatureCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateV
 
     def test_func(self):
         current_user = self.request.user
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         if current_user.is_staff and (current_user.pk != person.pk):
             return True
         return False
 
     def get_object(self):
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         return person
 
     def form_valid(self, form):
@@ -50,7 +46,9 @@ class BodyTemperatureCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateV
         return reverse_lazy("people:person_list")
 
 
-class BodyTemperatureByPersonListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class BodyTemperatureByPersonListView(
+    LoginRequiredMixin, UserPassesTestMixin, ListView
+):
     model = BodyTemperature
     context_object_name = "body_temperature"
     template_name = "records/body_temperature_list.html"
@@ -58,15 +56,11 @@ class BodyTemperatureByPersonListView(LoginRequiredMixin, UserPassesTestMixin, L
 
     def test_func(self):
         current_user = self.request.user
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         if current_user.is_staff or (current_user.pk == person.pk):
             return True
         return False
 
     def get_queryset(self):
-        person = get_object_or_404(
-            Person, username=self.kwargs.get("username")
-        )
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
         return BodyTemperature.objects.filter(person=person)

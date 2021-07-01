@@ -1,12 +1,12 @@
-from accounts.models import CustomUser
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 
+from accounts.models import CustomUser
 from people.models import Person
 
 from .forms import CustomUserCreationForm, CustomUserUpdateForm
@@ -20,14 +20,10 @@ class LoginView(auth_views.LoginView):
         Redirect to the user's dashboard if their profile is updated,
         else, redirect to the profile update page
         """
-        user_profile = get_object_or_404(
-            Person,
-            user=self.request.user
-        )
+        user_profile = get_object_or_404(Person, user=self.request.user)
         if not user_profile.full_name:
             return reverse(
-                "accounts:profile_update",
-                kwargs={"username": user_profile.username}
+                "accounts:profile_update", kwargs={"username": user_profile.username}
             )
         return reverse("core:dashboard")
 
@@ -85,8 +81,7 @@ class ProfileUpdateView(LoginRequiredMixin, generic.UpdateView):
         form.instance.user = self.request.user
         current_username = form.cleaned_data["username"]
         self.success_url = reverse(
-            "accounts:profile_detail",
-            kwargs={"username": current_username}
+            "accounts:profile_detail", kwargs={"username": current_username}
         )
         return super().form_valid(form)
 
@@ -102,7 +97,7 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
         return get_object_or_404(Person, username=current_username)
 
 
-class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin,  generic.UpdateView):
+class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     model = CustomUser
     form_class = CustomUserUpdateForm
     slug_field = "username"
@@ -120,8 +115,7 @@ class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin,  generic.Updat
     def form_valid(self, form):
         current_username = form.cleaned_data["username"]
         self.success_url = reverse(
-            "accounts:settings_detail",
-            kwargs={"username": current_username}
+            "accounts:settings_detail", kwargs={"username": current_username}
         )
         return super().form_valid(form)
 
@@ -137,6 +131,6 @@ class SettingsDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.Detail
         if self.request.user == current_user:
             return True
         return False
-    
+
     def get_object(self):
         return get_object_or_404(CustomUser, pk=self.request.user.pk)
