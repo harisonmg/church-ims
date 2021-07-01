@@ -33,8 +33,9 @@ urlpatterns = [
     ),
     # custom
     path("register/", views.RegisterView.as_view(), name="register"),
-    path("<str:username>/settings/update/", views.SettingsUpdateView.as_view(), name="settings_update"),
-    path("<str:username>/settings/", views.SettingsDetailView.as_view(), name="settings_detail"),
+    # TODO: remove username from settings URL
+    path("settings/update/", views.SettingsUpdateView.as_view(), name="settings_update"),
+    path("settings/", views.SettingsDetailView.as_view(), name="settings_detail"),
     path("<slug:username>/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
     path("<slug:username>/", views.ProfileDetailView.as_view(), name="profile_detail"),
 ]

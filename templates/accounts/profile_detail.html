@@ -10,11 +10,11 @@
     <p class="lead"><strong>Is adult:</strong> {{ profile.is_adult }}</p>
 
     {% if request.user.person == profile %}
-      <a class="btn btn-outline-light fw-bold" href="{% url 'children:create' %}">
-        Add a child
+      <a class="btn btn-outline-light fw-bold" href="{% url 'people:relationship_create' %}">
+        Add a relative
       </a>
       <a href="{% url 'accounts:profile_update' profile.username %}" class="btn btn-secondary fw-bold border-white bg-white">
-        Edit profile
+        Update profile
       </a>
     {% endif %}
   </div>

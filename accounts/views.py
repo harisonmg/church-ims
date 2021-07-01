@@ -115,8 +115,7 @@ class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin,  generic.Updat
         return False
 
     def get_object(self):
-        current_username = self.kwargs.get("username")
-        return get_object_or_404(CustomUser, username=current_username)
+        return get_object_or_404(CustomUser, pk=self.request.user.pk)
 
     def form_valid(self, form):
         current_username = form.cleaned_data["username"]
@@ -138,7 +137,6 @@ class SettingsDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.Detail
         if self.request.user == current_user:
             return True
         return False
-
+    
     def get_object(self):
-        current_username = self.kwargs.get("username")
-        return get_object_or_404(CustomUser, username=current_username)
+        return get_object_or_404(CustomUser, pk=self.request.user.pk)
