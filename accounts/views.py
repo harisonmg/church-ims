@@ -9,7 +9,7 @@ from django.views import generic
 
 from people.models import Person
 
-from .forms import CustomUserCreationForm, CustomUserUpdateForm, UserProfileForm
+from .forms import CustomUserCreationForm, CustomUserUpdateForm
 
 
 class LoginView(auth_views.LoginView):
@@ -72,7 +72,7 @@ class RegisterView(generic.CreateView):
 
 class ProfileUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Person
-    form_class = UserProfileForm
+    fields = ("username", "full_name", "dob", "gender")
     slug_field = "username"
     template_name = "accounts/profile_update.html"
 
