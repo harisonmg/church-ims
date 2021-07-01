@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 {% block title %}
-  {% if child_temperature %} Update {% else %} Add {% endif %} a child's temperature record | {{ block.super }}
+  {% if body_temperature %} Update {% else %} Add {% endif %} a person's temperature record | {{ block.super }}
 {% endblock title %}
 {% load crispy_forms_tags %}
 
 {% block content %}
   <div class="p-3 col-md-8 mx-md-auto">
-    <form id="child_temperature_form" method="POST">
+    <form id="body_temperature_form" method="POST">
       {% csrf_token %}
 
       <fieldset>
         <h1>
-          {% if child_temperature %} Update {% else %} Add {% endif %} a child's temperature record
+          {% if body_temperature %} Update {% else %} Add {% endif %} a person's temperature record
         </h1>
 
         <div class="text-start">
@@ -21,7 +21,7 @@
 
       <div class="form-group py-3">
         <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">
-          {% if child_temperature %} Update {% else %} Add {% endif %}
+          {% if body_temperature %} Update {% else %} Add {% endif %}
         </button>
       </div>
     </form>

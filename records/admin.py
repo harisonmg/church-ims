@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import ChildTemperature
+from .models import BodyTemperature
 
 
-@admin.register(ChildTemperature)
+@admin.register(BodyTemperature)
 class TemperatureRecordAdmin(admin.ModelAdmin):
-    list_display = ("child", "temp", "created_at")
+    list_display = ("person", "temp", "created_at")
