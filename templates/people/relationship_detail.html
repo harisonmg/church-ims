@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} {{ relationship }} | {{ block.super }} {% endblock title %}
+
+{% block content %}
+  <div class="mb-auto p-3 col-md-8 mx-md-auto">
+    <h1>{{ relationship }}</h1>
+    <p class="lead"><strong>
+      <a href="{{ relationship.person.get_absolute_url }}" class="text-white">
+        {{ relationship.relative }}
+      </a>
+      is
+      <a href="{{ relationship.relative.get_absolute_url }}" class="text-white">
+        {{ relationship.person }}'s
+      </a>
+      {{ relationship.relationship_type }}
+    </p>
+
+    <a href="{% url 'people:relationship_update' relationship.pk %}"
+     class="btn btn-secondary fw-bold border-white bg-white">
+      Edit
+    </a>
+  </div>
+{% endblock content %}
