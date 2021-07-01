@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-from typing import cast
 
 import decouple
 import dj_database_url
@@ -50,6 +49,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 ]
 
 THIRD_PARTY_APPS = [
@@ -62,7 +62,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "core",
     "accounts.apps.AccountsConfig",
-    "children",
+    "people",
     "records",
 ]
 
@@ -107,8 +107,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth
 
 AUTH_USER_MODEL = "accounts.CustomUser"
-
-LOGIN_REDIRECT_URL = "core:dashboard"
 
 LOGOUT_REDIRECT_URL = "core:index"
 
@@ -177,6 +175,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+# https://docs.djangoproject.com/en/3.2/ref/contrib/sites/#enabling-the-sites-framework
+
+SITE_ID = 1
 
 
 # Internationalization
