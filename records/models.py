@@ -25,7 +25,7 @@ class BodyTemperature(TimeStampedModel):
     )
 
     class Meta:
-        verbose_name_plural = "BodyTemperature"
+        verbose_name_plural = "body temperature"
         db_table = "body_temperature"
 
     def __str__(self):
