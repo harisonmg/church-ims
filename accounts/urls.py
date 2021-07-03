@@ -38,8 +38,10 @@ custom = [
     path("register/", views.RegisterView.as_view(), name="register"),
 ]
 
-urlpatterns = [    
-    path("login_success/", views.LoginSuccessRedirectView.as_view(), name="login_success"),    
+urlpatterns = [
+    path(
+        "login_success/", views.LoginSuccessRedirectView.as_view(), name="login_success"
+    ),
     path(
         "settings/update/", views.SettingsUpdateView.as_view(), name="settings_update"
     ),
@@ -49,11 +51,19 @@ urlpatterns = [
         views.ProfileUpdateView.as_view(),
         name="profile_update",
     ),
-    path("profile/<slug:username>/", views.ProfileDetailView.as_view(), name="profile_detail"),
+    path(
+        "profile/<slug:username>/",
+        views.ProfileDetailView.as_view(),
+        name="profile_detail",
+    ),
     path(
         "profile/<slug:username>/update/",
         views.ProfileUpdateView.as_view(),
         name="profile_update",
     ),
-    path("profile/<slug:username>/", views.ProfileDetailView.as_view(), name="profile_detail"),
+    path(
+        "profile/<slug:username>/",
+        views.ProfileDetailView.as_view(),
+        name="profile_detail",
+    ),
 ]

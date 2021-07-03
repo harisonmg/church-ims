@@ -1,7 +1,6 @@
+from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-
-from allauth.account.forms import SignupForm
 from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser
