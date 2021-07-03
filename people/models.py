@@ -27,7 +27,7 @@ class Person(TimeStampedModel):
     dob = models.DateField(
         verbose_name="date of birth",
         help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
-        null=True
+        null=True,
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     family_members = models.ManyToManyField(

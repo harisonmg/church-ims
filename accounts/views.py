@@ -124,7 +124,7 @@ class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.Update
 
     def get_object(self):
         return get_object_or_404(CustomUser, pk=self.request.user.pk)
-    
+
     def get_success_url(self):
         return reverse("accounts:settings_detail")
 

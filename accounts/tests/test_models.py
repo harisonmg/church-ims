@@ -86,7 +86,7 @@ class CustomUserModelTestCase(TestCase):
         phone_number__meta = self.user._meta.get_field("phone_number")
         self.assertEqual(
             phone_number__meta.help_text,
-            "Enter a valid phone number that starts with a country code."
+            "Enter a valid phone number that starts with a country code.",
         )
 
     def test_phone_number_is_null(self):

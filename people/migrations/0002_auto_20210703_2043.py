@@ -6,18 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('people', '0001_initial'),
+        ("people", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='person',
-            name='dob',
-            field=models.DateField(help_text='Please use the following format: <em>DD/MM/YYYY.</em>', null=True, verbose_name='date of birth'),
+            model_name="person",
+            name="dob",
+            field=models.DateField(
+                help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
+                null=True,
+                verbose_name="date of birth",
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='gender',
-            field=models.CharField(choices=[('M', 'Male'), ('F', 'Female')], max_length=1, null=True),
+            model_name="person",
+            name="gender",
+            field=models.CharField(
+                choices=[("M", "Male"), ("F", "Female")], max_length=1, null=True
+            ),
         ),
     ]
