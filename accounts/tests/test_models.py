@@ -80,11 +80,14 @@ class CustomUserModelTestCase(TestCase):
 
     def test_phone_number_max_length(self):
         phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertEqual(phone_number__meta.max_length, 20)
+        self.assertEqual(phone_number__meta.max_length, 50)
 
     def test_phone_number_help_text(self):
         phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertEqual(phone_number__meta.help_text, "Enter a valid phone number")
+        self.assertEqual(
+            phone_number__meta.help_text,
+            "Enter a valid phone number that starts with a country code.",
+        )
 
     def test_phone_number_is_null(self):
         phone_number__meta = self.user._meta.get_field("phone_number")

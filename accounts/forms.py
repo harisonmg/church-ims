@@ -21,7 +21,10 @@ class CustomUserChangeForm(UserChangeForm):
 class CustomUserUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ("phone_number",)
+        fields = (
+            "username",
+            "phone_number",
+        )
 
 
 class CustomSignupForm(SignupForm):

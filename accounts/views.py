@@ -125,12 +125,8 @@ class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.Update
     def get_object(self):
         return get_object_or_404(CustomUser, pk=self.request.user.pk)
 
-    def form_valid(self, form):
-        current_username = form.cleaned_data["username"]
-        self.success_url = reverse(
-            "accounts:settings_detail", kwargs={"username": current_username}
-        )
-        return super().form_valid(form)
+    def get_success_url(self):
+        return reverse("accounts:settings_detail")
 
 
 class SettingsDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):

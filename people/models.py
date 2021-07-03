@@ -13,8 +13,6 @@ class Person(TimeStampedModel):
     GENDER_CHOICES = [
         ("M", "Male"),
         ("F", "Female"),
-        ("C", "Custom"),
-        ("P", "Prefer not to say"),
     ]
     username = models.SlugField(
         default=uuid.uuid4,
@@ -26,8 +24,12 @@ class Person(TimeStampedModel):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
     full_name = models.CharField(max_length=300, null=True)
-    dob = models.DateField(verbose_name="date of birth", null=True)
-    gender = models.CharField(max_length=2, choices=GENDER_CHOICES, null=True)
+    dob = models.DateField(
+        verbose_name="date of birth",
+        help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
+        null=True,
+    )
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     family_members = models.ManyToManyField(
         "self",
         through="FamilyRelationship",
