@@ -73,7 +73,9 @@ class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PersonByUserListView(LoginRequiredMixin, UserPassesTestMixin, SearchableListMixin, ListView):
+class PersonByUserListView(
+    LoginRequiredMixin, UserPassesTestMixin, SearchableListMixin, ListView
+):
     model = Person
     context_object_name = "people"
     paginate_by = 10
@@ -99,9 +101,7 @@ class RelationshipByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
     template_name = "people/relationship_list.html"
 
     def test_func(self):
-        current_user = get_object_or_404(
-            get_user_model(), pk=self.request.user.pk
-        )
+        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
         if current_user.is_staff or (current_user == person.created_by):
             return True

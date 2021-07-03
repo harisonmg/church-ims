@@ -56,15 +56,13 @@ class BodyTemperatureByPersonListView(
     paginate_by = 10
 
     def test_func(self):
-        current_user = get_object_or_404(
-            get_user_model(), pk=self.request.user.pk
-        )
+        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
         if current_user.is_staff or (current_user.person == person):
             return True
         return False
 
-    def get_queryset(self):        
+    def get_queryset(self):
         queryset = super().get_queryset()
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
         return queryset.filter(person=person)
