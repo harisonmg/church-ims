@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -55,12 +56,13 @@ class BodyTemperatureByPersonListView(
     paginate_by = 10
 
     def test_func(self):
-        current_user = self.request.user
+        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        if current_user.is_staff or (current_user.pk == person.pk):
+        if current_user.is_staff or (current_user.person == person):
             return True
         return False
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        return BodyTemperature.objects.filter(person=person)
+        return queryset.filter(person=person)
