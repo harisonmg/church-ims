@@ -1,9 +1,9 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
 app_name = "accounts"
-urlpatterns = [
+contrib_auth = [
     # provided by Django
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
@@ -31,17 +31,39 @@ urlpatterns = [
         views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+]
+
+custom = [
     # custom
     path("register/", views.RegisterView.as_view(), name="register"),
-    # TODO: remove username from settings URL
+]
+
+urlpatterns = [
+    path(
+        "login_success/", views.LoginSuccessRedirectView.as_view(), name="login_success"
+    ),
     path(
         "settings/update/", views.SettingsUpdateView.as_view(), name="settings_update"
     ),
     path("settings/", views.SettingsDetailView.as_view(), name="settings_detail"),
     path(
-        "<slug:username>/update/",
+        "profile/<slug:username>/update/",
         views.ProfileUpdateView.as_view(),
         name="profile_update",
     ),
-    path("<slug:username>/", views.ProfileDetailView.as_view(), name="profile_detail"),
+    path(
+        "profile/<slug:username>/",
+        views.ProfileDetailView.as_view(),
+        name="profile_detail",
+    ),
+    path(
+        "profile/<slug:username>/update/",
+        views.ProfileUpdateView.as_view(),
+        name="profile_update",
+    ),
+    path(
+        "profile/<slug:username>/",
+        views.ProfileDetailView.as_view(),
+        name="profile_detail",
+    ),
 ]

@@ -7,12 +7,9 @@
     <h1>{{ profile.username }}</h1>
     <p class="lead"><strong>Full name:</strong> {{ profile.full_name }}</p>
     <p class="lead"><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
-    <p class="lead"><strong>Is adult:</strong> {{ profile.is_adult }}</p>
+    <p class="lead"><strong>Age:</strong> {{ profile.age }}</p>
 
     {% if request.user.person == profile %}
-      <a class="btn btn-outline-light fw-bold" href="{% url 'people:relationship_create' %}">
-        Add a relative
-      </a>
       <a href="{% url 'accounts:profile_update' profile.username %}" class="btn btn-secondary fw-bold border-white bg-white">
         Update profile
       </a>

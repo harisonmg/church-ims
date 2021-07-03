@@ -39,6 +39,11 @@ MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 DEFAULT_FILE_STORAGE = "utils.storages.MediaRootGoogleCloudStorage"
 
 
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+
 # Project Specific Settings
 # =========================
 

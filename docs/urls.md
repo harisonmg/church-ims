@@ -27,9 +27,9 @@
 | `/people/relationships/<uuid>/` | `people:relationship_detail` | relationship creator |
 | `/people/relationships/<uuid>/update/` | `people:relationship_update` | relationship creator, staff |
 | `/people/relationships/<uuid>/delete/` | `people:relationship_delete` | relationship creator, staff |
-| `/records/` | `records:list` | staff |
-| `/records/<username>/` | `records:list_by_user` | current logged-in user, staff |
-| `/records/<username>/add/` | `records:add` | staff |
+| `/records/temperature/` | `records:list` | staff |
+| `/records/temperature/<username>/` | `records:list_by_user` | current logged-in user, staff |
+| `/records/temperature/<username>/add/` | `records:add` | staff |
 
 ## Notes
 - _current logged-in user_ means the information displayed is specific to that user

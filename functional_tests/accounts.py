@@ -207,11 +207,11 @@ class MemberTestCase(FunctionalTestCase):
 
         register_link, login_link = cta_buttons
 
-        self.assertEqual("Register", register_link.text)
+        self.assertEqual("Sign up", register_link.text)
         self.assertEqual("Log in", login_link.text)
         self.assertEqual(
             register_link.get_attribute("href"),
-            self.live_server_url + "/accounts/register/",
+            self.live_server_url + "/accounts/signup/",
         )
         self.assertEqual(
             login_link.get_attribute("href"), self.live_server_url + "/accounts/login/"
