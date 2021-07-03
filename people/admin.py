@@ -12,7 +12,10 @@ class FamilyMembersInline(admin.TabularInline):
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ("username", "user", "age", "full_name", "gender")
-    list_filter = ("dob", "gender",)
+    list_filter = (
+        "dob",
+        "gender",
+    )
     inlines = (FamilyMembersInline,)
     search_fields = ("username", "user", "full_name")
 
