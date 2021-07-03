@@ -1,3 +1,4 @@
+from allauth.account import views as allauth_views
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -5,8 +6,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import generic
-
-from allauth.account import views as allauth_views
 
 from accounts.models import CustomUser
 from people.models import Person
@@ -20,15 +19,12 @@ class LoginView(auth_views.LoginView):
 
 class LoginSuccessRedirectView(generic.RedirectView):
     permanent = False
-    
-    def get_redirect_url(self, *args, **kwargs):        
-        user_profile = get_object_or_404(
-            Person, user=self.request.user
-        )
+
+    def get_redirect_url(self, *args, **kwargs):
+        user_profile = get_object_or_404(Person, user=self.request.user)
         if not user_profile.full_name:
             return reverse(
-                "accounts:profile_update",
-                kwargs={"username": user_profile.username}
+                "accounts:profile_update", kwargs={"username": user_profile.username}
             )
         return reverse("core:dashboard")
 

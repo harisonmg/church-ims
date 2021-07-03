@@ -207,19 +207,19 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-ACCOUNT_USERNAME_REQUIRED=False
+ACCOUNT_USERNAME_REQUIRED = False
 
-ACCOUNT_AUTHENTICATION_METHOD='email'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 
-ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_EMAIL_REQUIRED = True
 
-ACCOUNT_UNIQUE_EMAIL=True
+ACCOUNT_UNIQUE_EMAIL = True
 
 ACCOUNT_LOGOUT_REDIRECT_URL = "core:index"
 
-ACCOUNT_ADAPTER = 'accounts.adapters.UserAccountAdapter'
+ACCOUNT_ADAPTER = "accounts.adapters.UserAccountAdapter"
 
-ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomSignupForm'}
+ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 LOGIN_REDIRECT_URL = "accounts:login_success"
 
