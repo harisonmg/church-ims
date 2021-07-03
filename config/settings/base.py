@@ -57,6 +57,9 @@ THIRD_PARTY_APPS = [
     "extra_views",
     "phonenumber_field",
     "storages",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
 ]
 
 LOCAL_APPS = [
@@ -107,8 +110,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth
 
 AUTH_USER_MODEL = "accounts.CustomUser"
-
-LOGOUT_REDIRECT_URL = "core:index"
 
 
 # Password validation
@@ -199,7 +200,32 @@ USE_TZ = True
 # Third Party Apps Settings
 # =========================
 
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+ACCOUNT_USERNAME_REQUIRED=False
+
+ACCOUNT_AUTHENTICATION_METHOD='email'
+
+ACCOUNT_EMAIL_REQUIRED=True
+
+ACCOUNT_UNIQUE_EMAIL=True
+
+ACCOUNT_LOGOUT_REDIRECT_URL = "core:index"
+
+ACCOUNT_ADAPTER = 'accounts.adapters.UserAccountAdapter'
+
+ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomSignupForm'}
+
+LOGIN_REDIRECT_URL = "accounts:login_success"
+
+
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
+
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 
