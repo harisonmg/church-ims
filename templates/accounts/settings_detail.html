@@ -9,9 +9,6 @@
     <p class="lead"><strong>Phone number:</strong> {{ settings.phone_number }}</p>
 
     {% if request.user  == settings %}
-      <a class="btn btn-outline-light fw-bold" href="{% url 'people:relationship_create' %}">
-        Add a relative
-      </a>
       <a href="{% url 'accounts:settings_update' %}" class="btn btn-secondary fw-bold border-white bg-white">
         Update settings
       </a>

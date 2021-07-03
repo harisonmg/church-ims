@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 
+from allauth.account import views as allauth_views
+
 from accounts.models import CustomUser
 from people.models import Person
 
@@ -15,15 +17,18 @@ from .forms import CustomUserCreationForm, CustomUserUpdateForm
 class LoginView(auth_views.LoginView):
     template_name = "accounts/login.html"
 
-    def get_success_url(self):
-        """
-        Redirect to the user's dashboard if their profile is updated,
-        else, redirect to the profile update page
-        """
-        user_profile = get_object_or_404(Person, user=self.request.user)
+
+class LoginSuccessRedirectView(generic.RedirectView):
+    permanent = False
+    
+    def get_redirect_url(self, *args, **kwargs):        
+        user_profile = get_object_or_404(
+            Person, user=self.request.user
+        )
         if not user_profile.full_name:
             return reverse(
-                "accounts:profile_update", kwargs={"username": user_profile.username}
+                "accounts:profile_update",
+                kwargs={"username": user_profile.username}
             )
         return reverse("core:dashboard")
 
@@ -66,11 +71,17 @@ class RegisterView(generic.CreateView):
     template_name = "accounts/register.html"
 
 
-class ProfileUpdateView(LoginRequiredMixin, generic.UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     model = Person
     fields = ("username", "full_name", "dob", "gender")
     slug_field = "username"
     template_name = "accounts/profile_update.html"
+
+    def test_func(self):
+        person = self.get_object()
+        if self.request.user.person == person:
+            return True
+        return False
 
     def get_object(self):
         current_username = self.kwargs.get("username")
@@ -86,11 +97,17 @@ class ProfileUpdateView(LoginRequiredMixin, generic.UpdateView):
         return super().form_valid(form)
 
 
-class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
+class ProfileDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
+    model = Person
     slug_field = "username"
     template_name = "accounts/profile_detail.html"
     context_object_name = "profile"
-    queryset = get_user_model().objects.all()
+
+    def test_func(self):
+        person = self.get_object()
+        if self.request.user.person == person:
+            return True
+        return False
 
     def get_object(self):
         current_username = self.kwargs.get("username")
