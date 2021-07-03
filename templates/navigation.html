@@ -54,6 +54,16 @@
             <li><a class="dropdown-item" href="{% url 'records:body_temperature_list' %}">All temperature records</a></li>
           {% endif %}
         </ul>
+
+        {% comment %} Reports {% endcomment %}
+        {% if user.is_staff %}
+          <a class="nav-link dropdown-toggle" href="#" id="reportsDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Reports
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="reportsDropdownMenuLink">
+              <li><a class="dropdown-item" href="{% url 'reports:body_temperature_today' %}">Today's temperature records</a></li>
+          </ul>
+        {% endif %}
         
         {% comment %} Account {% endcomment %}
         <a class="nav-link dropdown-toggle" href="#" id="accountDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
