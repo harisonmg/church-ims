@@ -8,26 +8,28 @@
     {% if not body_temperature %}
       <p class="lead">There are no temperature records yet!</p>
     {% else %}
-      <table class="table table-light table-hover">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Username</th>
-            <th scope="col">Temperature</th>
-            <th scope="col">Created at</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for record in body_temperature %}
+      <div class="table-responsive">
+        <table class="table table-light table-hover">
+          <thead>
             <tr>
-              <th scope="row">{{ forloop.counter }}</th>
-              <td><a href="{{ record.person.get_absolute_url }}">{{ record.person.username }}</a></td>
-              <td>{{ record.temp }}&#8451;</td>
-              <td>{{ record.created_at }}</td>
+              <th scope="col">#</th>
+              <th scope="col">Username</th>
+              <th scope="col">Temperature</th>
+              <th scope="col">Created at</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for record in body_temperature %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td><a href="{{ record.person.get_absolute_url }}">{{ record.person.username }}</a></td>
+                <td>{{ record.temp }}&#8451;</td>
+                <td>{{ record.created_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% endif %}
   </div>
 {% endblock content %}

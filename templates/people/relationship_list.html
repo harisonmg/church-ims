@@ -8,47 +8,49 @@
     {% if not relationships %}
       <p class="lead">There are no family relationships yet!</p>
     {% else %}
-      <table class="table table-light table-hover">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Person</th>
-            <th scope="col">Relative</th>
-            <th scope="col">Relationship</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for relationship in relationships %}
+      <div class="table-responsive">
+        <table class="table table-light table-hover">
+          <thead>
             <tr>
-              <th scope="row">{{ forloop.counter }}</th>
-              <td>
-                <a href="{{ relationship.person.get_absolute_url }}">
-                  {{ relationship.person }}
-                </a>
-              </td>
-              <td>
-                <a href="{{ relationship.relative.get_absolute_url }}">
-                  {{ relationship.relative }}
-                </a>
-              </td>
-              <td>{{ relationship.relationship_type }}</td>
-              <td>
-                {% if user.person == relationship.person or user.is_staff %}
-                  <a href="{% url 'people:relationship_update' relationship.pk %}"
-                    class="btn btn-sm btn-outline-primary fw-bold">
-                    update
-                  </a>
-                  <a href="{% url 'people:relationship_confirm_delete' relationship.pk %}"
-                    class="btn btn-sm btn-outline-danger fw-bold">
-                    delete
-                  </a>
-                {% endif %}
-              </td>
+              <th scope="col">#</th>
+              <th scope="col">Person</th>
+              <th scope="col">Relative</th>
+              <th scope="col">Relationship</th>
+              <th scope="col">Actions</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for relationship in relationships %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>
+                  <a href="{{ relationship.person.get_absolute_url }}">
+                    {{ relationship.person }}
+                  </a>
+                </td>
+                <td>
+                  <a href="{{ relationship.relative.get_absolute_url }}">
+                    {{ relationship.relative }}
+                  </a>
+                </td>
+                <td>{{ relationship.relationship_type }}</td>
+                <td>
+                  {% if user.person == relationship.person or user.is_staff %}
+                    <a href="{% url 'people:relationship_update' relationship.pk %}"
+                      class="btn btn-sm btn-outline-primary fw-bold">
+                      update
+                    </a>
+                    <a href="{% url 'people:relationship_confirm_delete' relationship.pk %}"
+                      class="btn btn-sm btn-outline-danger fw-bold">
+                      delete
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% endif %}
   </div>
 {% endblock content %}

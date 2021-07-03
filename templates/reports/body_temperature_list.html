@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %} Temperature records for {{ day }} | {{ block.super }} {% endblock title %}
+
+{% block content %}
+  <div class="p-3">
+    <h1>Temperature records for {{ day }}</h1>
+    {% if not body_temperature %}
+      <p class="lead">There are no temperature records for {{ day }}!</p>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-light table-hover">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Age</th>
+              <th scope="col">Phone number</th>
+              <th scope="col">Temperature</th>
+              <th scope="col">Created at</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in body_temperature %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>
+                  <a href="{{ record.person.get_absolute_url }}">{{ record.person.full_name }}</a>
+                </td>
+                <td>{{ record.person.age }}</td>
+                <td>
+                  {% if record.person.user %}
+                    {{ record.person.user.phone_number }}
+                  {% else %}
+                    {% comment %} TODO: if created_by != parent {% endcomment %}
+                    {{ record.person.created_by.phone_number }}
+                  {% endif %}
+                </td>
+                <td>{{ record.temp }}&#8451;</td>
+                <td>{{ record.created_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>      
+    {% endif %}
+  </div>
+{% endblock content %}
