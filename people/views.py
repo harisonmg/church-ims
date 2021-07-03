@@ -22,6 +22,12 @@ class PersonListView(
         if self.request.user.is_staff:
             return True
         return False
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
+        return queryset.exclude(user=current_user)
+    
 
 
 class PersonCreateView(LoginRequiredMixin, CreateView):
