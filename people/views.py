@@ -24,8 +24,9 @@ class PersonListView(
         return False
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
-        return Person.objects.exclude(user=current_user)
+        return queryset.exclude(user=current_user)
 
 
 class PersonCreateView(LoginRequiredMixin, CreateView):
@@ -77,7 +78,9 @@ class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PersonByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class PersonByUserListView(
+    LoginRequiredMixin, UserPassesTestMixin, SearchableListMixin, ListView
+):
     model = Person
     context_object_name = "people"
     paginate_by = 10
@@ -91,8 +94,10 @@ class PersonByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return False
 
     def get_queryset(self):
-        user = get_object_or_404(get_user_model(), username=self.kwargs.get("username"))
-        return Person.objects.filter(created_by=user)
+        queryset = super().get_queryset()
+        person = get_object_or_404(Person, username=self.kwargs.get("username"))
+        user = get_object_or_404(get_user_model(), person=person)
+        return queryset.filter(created_by=user)
 
 
 class RelationshipByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -101,15 +106,16 @@ class RelationshipByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
     template_name = "people/relationship_list.html"
 
     def test_func(self):
-        current_user = self.request.user
+        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        if current_user.is_staff or (current_user.pk == person.pk):
+        if current_user.is_staff or (current_user == person.created_by):
             return True
         return False
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        return FamilyRelationship.objects.filter(person=person)
+        return queryset.filter(person=person)
 
 
 class RelationshipListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
