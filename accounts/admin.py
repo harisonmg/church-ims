@@ -15,7 +15,7 @@ class FamilyRelationshipInline(admin.TabularInline):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ("username", "email", "phone_number", "is_staff")
+    list_display = ("username", "person", "email", "phone_number", "is_staff")
     ordering = ("username",)
     # inlines = [FamilyRelationshipInline,]
 
