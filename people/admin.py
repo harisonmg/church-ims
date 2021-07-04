@@ -11,13 +11,13 @@ class FamilyMembersInline(admin.TabularInline):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ("username", "user", "age", "full_name", "gender")
+    list_display = ("username", "user", "created_by", "age", "full_name", "gender")
     list_filter = (
         "dob",
         "gender",
     )
     inlines = (FamilyMembersInline,)
-    search_fields = ("username", "user", "full_name")
+    search_fields = ("username", "full_name")
 
 
 @admin.register(RelationshipType)
