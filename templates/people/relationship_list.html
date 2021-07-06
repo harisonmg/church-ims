@@ -8,15 +8,15 @@
     {% if not relationships %}
       <p class="lead">There are no family relationships yet!</p>
     {% else %}
-      <div class="table-responsive">
-        <table class="table table-light table-hover">
+      <div class="table-responsive-lg">
+        <table class="table table-light table-striped">
           <thead>
             <tr>
               <th scope="col">#</th>
               <th scope="col">Person</th>
               <th scope="col">Relative</th>
               <th scope="col">Relationship</th>
-              <th scope="col">Actions</th>
+              <th scope="col" colspan="2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -34,18 +34,22 @@
                   </a>
                 </td>
                 <td>{{ relationship.relationship_type }}</td>
-                <td>
-                  {% if user.person == relationship.person or user.is_staff %}
+                {% if user.person == relationship.person or user.is_staff %}
+                  <td>
                     <a href="{% url 'people:relationship_update' relationship.pk %}"
                       class="btn btn-sm btn-outline-primary fw-bold">
                       update
                     </a>
+                  </td>
+                {% endif %}
+                {% if user.is_staff %}
+                  <td>
                     <a href="{% url 'people:relationship_confirm_delete' relationship.pk %}"
                       class="btn btn-sm btn-outline-danger fw-bold">
                       delete
                     </a>
-                  {% endif %}
-                </td>
+                  </td>
+                {% endif %}
               </tr>
             {% endfor %}
           </tbody>
