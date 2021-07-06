@@ -14,10 +14,10 @@
 | `/accounts/settings/` | `accounts:settings_detail` | current logged-in user |
 | `/accounts/settings/update/` | `accounts:settings_update` | current logged-in user |
 | `/accounts/<username>/` | `accounts:profile_detail` | current logged-in user |
-| `/accounts/<username>/update/` | `accounts:profile_update` | current logged-in user |
+| `/accounts/<username>/update/` | `accounts:profile_self_update` | current logged-in user |
 | `/dashboard/` | `core:dashboard` | current logged-in user |
 | `/people/` | `people:person_list` | staff |
-| `/people/add/` | `people:person_create` | any logged-in user |
+| `/people/add/` | `people:child_create` | any logged-in user |
 | `/people/<username>/` | `people:person_detail` | person creator, staff |
 | `/people/<username>/update/` | `people:person_update` | person creator, staff |
 | `/people/<username>/relatives/` | `people:person_by_user_list` | current logged-in user, staff |
