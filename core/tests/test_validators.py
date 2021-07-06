@@ -3,7 +3,8 @@ from datetime import date, timedelta
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 
-from core import validators, constants
+from core import constants, validators
+
 
 class CoreValidatorsTestCase(SimpleTestCase):
     def test_dob_not_in_future(self):
@@ -16,13 +17,13 @@ class CoreValidatorsTestCase(SimpleTestCase):
             days = 365.25 * (constants.MAX_HUMAN_LIFESPAN + 1)
             long_ago = date.today() - timedelta(days=round(days))
             validators.validate_date_of_birth(long_ago)
-    
+
     def test_adult_dob(self):
         with self.assertRaises(ValidationError):
             days = round(365.25 * constants.AGE_OF_MAJORITY)
             child_dob = date.today() - timedelta(days=round(days))
             validators.validate_adult(child_dob)
-    
+
     def test_child_dob(self):
         with self.assertRaises(ValidationError):
             days = round(365.25 * constants.AGE_OF_MAJORITY) + 1

@@ -9,6 +9,7 @@ from core.models import TimeStampedModel
 from core.utils import get_age
 from core.validators import validate_date_of_birth
 
+
 class Person(TimeStampedModel):
     GENDER_CHOICES = [
         ("M", "Male"),
@@ -29,7 +30,7 @@ class Person(TimeStampedModel):
         verbose_name="date of birth",
         help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
         null=True,
-        validators=[validate_date_of_birth]
+        validators=[validate_date_of_birth],
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     family_members = models.ManyToManyField(

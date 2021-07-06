@@ -17,7 +17,8 @@ class LoginSuccessRedirectView(RedirectView):
         user_profile = get_object_or_404(Person, user=self.request.user)
         if not user_profile.full_name:
             return reverse(
-                "accounts:profile_self_update", kwargs={"username": user_profile.username}
+                "accounts:profile_self_update",
+                kwargs={"username": user_profile.username},
             )
         return reverse("core:dashboard")
 

@@ -2,7 +2,7 @@ from allauth.account.forms import SignupForm
 from django import forms
 from phonenumber_field.formfields import PhoneNumberField
 
-from core.validators import validate_date_of_birth, validate_adult
+from core.validators import validate_adult, validate_date_of_birth
 from people.models import Person
 
 
@@ -20,7 +20,7 @@ class ProfileForm(forms.ModelForm):
     dob = forms.DateField(
         label="Date of birth",
         help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
-        validators=[validate_date_of_birth, validate_adult]
+        validators=[validate_date_of_birth, validate_adult],
     )
 
     class Meta:

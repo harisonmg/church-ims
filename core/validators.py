@@ -15,6 +15,7 @@ def validate_date_of_birth(value):
     elif age > MAX_HUMAN_LIFESPAN:
         raise ValidationError(_("Age can't be greater than the maximum human lifespan"))
 
+
 def validate_adult(value):
     """Raise a validation error if the current age is less than the
     age of majority
@@ -22,6 +23,7 @@ def validate_adult(value):
     age = get_age(value)
     if age < AGE_OF_MAJORITY:
         raise ValidationError(_("Must be an adult"))
+
 
 def validate_child(value):
     """Raise a validation error if the current age is greater
