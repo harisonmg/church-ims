@@ -10,8 +10,3 @@ from .models import CustomUser
 def create_person(sender, instance, created, **kwargs):
     if created:
         Person.objects.create(user=instance)
-
-
-@receiver(post_save, sender=CustomUser)
-def save_person(sender, instance, **kwargs):
-    instance.person.save()

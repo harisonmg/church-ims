@@ -1,20 +1,11 @@
-from allauth.account import views as allauth_views
-from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import generic
 
 from accounts.models import CustomUser
 from people.models import Person
-
-from .forms import CustomUserCreationForm, CustomUserUpdateForm
-
-
-class LoginView(auth_views.LoginView):
-    template_name = "accounts/login.html"
 
 
 class LoginSuccessRedirectView(generic.RedirectView):
@@ -27,44 +18,6 @@ class LoginSuccessRedirectView(generic.RedirectView):
                 "accounts:profile_update", kwargs={"username": user_profile.username}
             )
         return reverse("core:dashboard")
-
-
-class LogoutView(auth_views.LogoutView):
-    template_name = "accounts/logout.html"
-
-
-class PasswordChangeView(auth_views.PasswordChangeView):
-    success_url = reverse_lazy("accounts:password_change_done")
-    template_name = "accounts/password_change.html"
-
-
-class PasswordChangeDoneView(auth_views.PasswordChangeDoneView):
-    template_name = "accounts/password_change_done.html"
-
-
-class PasswordResetView(auth_views.PasswordResetView):
-    success_url = reverse_lazy("accounts:password_reset_done")
-    email_template_name = "accounts/password_reset_email.html"
-    template_name = "accounts/password_reset.html"
-
-
-class PasswordResetDoneView(auth_views.PasswordResetDoneView):
-    template_name = "accounts/password_reset_done.html"
-
-
-class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
-    success_url = reverse_lazy("accounts:password_reset_complete")
-    template_name = "accounts/password_reset_confirm.html"
-
-
-class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
-    template_name = "accounts/password_reset_complete.html"
-
-
-class RegisterView(generic.CreateView):
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy("accounts:login")
-    template_name = "accounts/register.html"
 
 
 class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
@@ -112,7 +65,7 @@ class ProfileDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailV
 
 class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     model = CustomUser
-    form_class = CustomUserUpdateForm
+    fields = ("username", "phone_number")
     slug_field = "username"
     template_name = "accounts/settings_update.html"
 
