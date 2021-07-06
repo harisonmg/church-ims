@@ -11,20 +11,15 @@ urlpatterns = [
         "settings/update/", views.SettingsUpdateView.as_view(), name="settings_update"
     ),
     path("settings/", views.SettingsDetailView.as_view(), name="settings_detail"),
-    path(
-        "profile/<slug:username>/update/",
-        views.ProfileUpdateView.as_view(),
-        name="profile_update",
-    ),
-    path(
-        "profile/<slug:username>/",
-        views.ProfileDetailView.as_view(),
-        name="profile_detail",
+        path(
+        "profile/<slug:username>/superuser_update/",
+        views.ProfileSuperuserUpdateView.as_view(),
+        name="profile_superuser_update",
     ),
     path(
         "profile/<slug:username>/update/",
-        views.ProfileUpdateView.as_view(),
-        name="profile_update",
+        views.ProfileSelfUpdateView.as_view(),
+        name="profile_self_update",
     ),
     path(
         "profile/<slug:username>/",

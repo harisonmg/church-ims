@@ -2,27 +2,28 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.views import generic
+from django.views.generic import DetailView, RedirectView, UpdateView
 
 from accounts.models import CustomUser
 from people.models import Person
 
+from .forms import ProfileForm
 
-class LoginSuccessRedirectView(generic.RedirectView):
+
+class LoginSuccessRedirectView(RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
         user_profile = get_object_or_404(Person, user=self.request.user)
         if not user_profile.full_name:
             return reverse(
-                "accounts:profile_update", kwargs={"username": user_profile.username}
+                "accounts:profile_self_update", kwargs={"username": user_profile.username}
             )
         return reverse("core:dashboard")
 
 
-class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
-    model = Person
-    fields = ("username", "full_name", "dob", "gender")
+class ProfileSelfUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = ProfileForm
     slug_field = "username"
     template_name = "accounts/profile_update.html"
 
@@ -46,15 +47,34 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateV
         return super().form_valid(form)
 
 
-class ProfileDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
+class ProfileSuperuserUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = ProfileForm
+    slug_field = "username"
+    template_name = "accounts/profile_update.html"
+
+    def test_func(self):
+        if self.request.user.is_superuser:
+            return True
+        return False
+
+    def get_object(self):
+        return get_object_or_404(Person, username=self.kwargs.get("username"))
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class ProfileDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Person
     slug_field = "username"
     template_name = "accounts/profile_detail.html"
     context_object_name = "profile"
 
     def test_func(self):
+        current_user = self.request.user
         person = self.get_object()
-        if self.request.user.person == person:
+        if current_user.is_superuser or (current_user.person == person):
             return True
         return False
 
@@ -63,7 +83,7 @@ class ProfileDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailV
         return get_object_or_404(Person, username=current_username)
 
 
-class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = CustomUser
     fields = ("username", "phone_number")
     slug_field = "username"
@@ -82,7 +102,7 @@ class SettingsUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.Update
         return reverse("accounts:settings_detail")
 
 
-class SettingsDetailView(LoginRequiredMixin, UserPassesTestMixin, generic.DetailView):
+class SettingsDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     slug_field = "username"
     template_name = "accounts/settings_detail.html"
     context_object_name = "settings"
