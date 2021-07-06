@@ -10,7 +10,7 @@
     <p class="lead"><strong>Age:</strong> {{ profile.age }}</p>
 
     {% if request.user.person == profile %}
-      <a href="{% url 'accounts:profile_update' profile.username %}" class="btn btn-secondary fw-bold border-white bg-white">
+      <a href="{% url 'accounts:profile_self_update' profile.username %}" class="btn btn-secondary fw-bold border-white bg-white">
         Update profile
       </a>
     {% endif %}

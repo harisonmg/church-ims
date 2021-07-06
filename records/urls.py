@@ -5,11 +5,6 @@ from . import views
 app_name = "records"
 urlpatterns = [
     path(
-        "temperature/people/",
-        views.BodyTemperatureListView.as_view(),
-        name="body_temperature_list",
-    ),
-    path(
         "temperature/<slug:username>/add/",
         views.BodyTemperatureCreateView.as_view(),
         name="body_temperature_create",

@@ -1,15 +1,16 @@
 import uuid
-from datetime import date
 
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
+from core.constants import AGE_OF_MAJORITY
 from core.models import TimeStampedModel
+from core.utils import get_age
+from core.validators import validate_date_of_birth
 
 
 class Person(TimeStampedModel):
-    AGE_OF_MAJORITY = 18
     GENDER_CHOICES = [
         ("M", "Male"),
         ("F", "Female"),
@@ -20,14 +21,16 @@ class Person(TimeStampedModel):
         help_text="Enter a unique username. Don't use full-stops/periods",
         unique=True,
     )
+    # TODO: remember to set blank=False after resolving the issues
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
     )
     full_name = models.CharField(max_length=300, null=True)
     dob = models.DateField(
         verbose_name="date of birth",
         help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
         null=True,
+        validators=[validate_date_of_birth],
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     family_members = models.ManyToManyField(
@@ -62,16 +65,13 @@ class Person(TimeStampedModel):
     @property
     def age(self):
         if self.dob is not None:
-            today = date.today()
-            age = today.year - self.dob.year
-            age -= (today.month, today.day) < (self.dob.month, self.dob.day)
-            return age
+            return get_age(self.dob)
         return None
 
     @property
     def is_adult(self):
         if self.age is not None:
-            return self.age >= self.AGE_OF_MAJORITY
+            return self.age >= AGE_OF_MAJORITY
         return "Undefined"
 
 

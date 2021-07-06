@@ -8,8 +8,14 @@
     <p class="lead"><strong>Full name:</strong> {{ person.full_name }}</p>
     <p class="lead"><strong>Age:</strong> {{ person.age }}</p>
 
-    <a href="{% url 'people:person_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
-      Edit
-    </a>
+    {% if not person.is_adult and user.is_staff %}
+      <a href="{% url 'people:child_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
+        Edit
+      </a>
+    {% elif person.is_adult and user.is_superuser %}
+      <a href="{% url 'accounts:profile_superuser_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
+        Edit
+      </a>
+    {% endif %}
   </div>
 {% endblock content %}

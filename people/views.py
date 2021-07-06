@@ -6,6 +6,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from extra_views import SearchableListMixin
 
+from .forms import ChildForm, FamilyRelationshipForm
 from .helpers import get_user_profile
 from .models import FamilyRelationship, Person
 
@@ -29,9 +30,9 @@ class PersonListView(
         return queryset.exclude(user=current_user)
 
 
-class PersonCreateView(LoginRequiredMixin, CreateView):
-    model = Person
-    fields = ("username", "full_name", "dob", "gender")
+class ChildCreateView(LoginRequiredMixin, CreateView):
+    form_class = ChildForm
+    template_name = "people/child_form.html"
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -39,6 +40,27 @@ class PersonCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy("people:relationship_create")
+
+
+class ChildUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = ChildForm
+    context_object_name = "child"
+    slug_field = "username"
+    template_name = "people/child_form.html"
+
+    def test_func(self):
+        current_user = self.request.user
+        person = self.get_object()
+        if current_user.is_staff or (person.created_by == current_user):
+            return True
+        return False
+
+    def get_object(self):
+        return get_object_or_404(Person, username=self.kwargs.get("username"))
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
 
 
 class PersonDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -55,27 +77,6 @@ class PersonDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
     def get_object(self):
         return get_object_or_404(Person, username=self.kwargs.get("username"))
-
-
-class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Person
-    context_object_name = "person"
-    fields = ("username", "full_name", "dob", "gender")
-    slug_field = "username"
-
-    def test_func(self):
-        current_user = self.request.user
-        person = self.get_object()
-        if current_user.is_staff or (person.created_by == current_user):
-            return True
-        return False
-
-    def get_object(self):
-        return get_object_or_404(Person, username=self.kwargs.get("username"))
-
-    def form_valid(self, form):
-        form.instance.updated_by = self.request.user
-        return super().form_valid(form)
 
 
 class PersonByUserListView(
@@ -130,8 +131,7 @@ class RelationshipListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 
 class RelationshipCreateView(LoginRequiredMixin, CreateView):
-    model = FamilyRelationship
-    fields = ("relative", "relationship_type")
+    form_class = FamilyRelationshipForm
     template_name = "people/relationship_form.html"
 
     def get_context_data(self, **kwargs):
@@ -157,26 +157,9 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
         )
 
 
-class RelationshipDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
-    model = FamilyRelationship
-    context_object_name = "relationship"
-    template_name = "people/relationship_detail.html"
-
-    def test_func(self):
-        current_user = self.request.user
-        relationship = self.get_object()
-        if current_user.is_staff or (current_user.pk == relationship.person.pk):
-            return True
-        return False
-
-    def get_object(self):
-        return get_object_or_404(FamilyRelationship, pk=self.kwargs.get("pk"))
-
-
 class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = FamilyRelationship
+    form_class = FamilyRelationshipForm
     context_object_name = "relationship"
-    fields = ("relative", "relationship_type")
     template_name = "people/relationship_form.html"
 
     def test_func(self):
@@ -200,6 +183,22 @@ class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
         )
 
 
+class RelationshipDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = FamilyRelationship
+    context_object_name = "relationship"
+    template_name = "people/relationship_detail.html"
+
+    def test_func(self):
+        current_user = self.request.user
+        relationship = self.get_object()
+        if current_user.is_staff or (current_user.pk == relationship.person.pk):
+            return True
+        return False
+
+    def get_object(self):
+        return get_object_or_404(FamilyRelationship, pk=self.kwargs.get("pk"))
+
+
 class RelationshipDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = FamilyRelationship
     context_object_name = "relationship"
@@ -207,9 +206,7 @@ class RelationshipDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
     template_name = "people/relationship_confirm_delete.html"
 
     def test_func(self):
-        current_user = self.request.user
-        relationship = self.get_object()
-        if current_user.is_staff or (current_user.pk == relationship.person.pk):
+        if self.request.user.is_staff:
             return True
         return False
 

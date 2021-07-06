@@ -10,18 +10,6 @@ from people.models import Person
 from .models import BodyTemperature
 
 
-class BodyTemperatureListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = BodyTemperature
-    context_object_name = "body_temperature"
-    template_name = "records/body_temperature_list.html"
-    paginate_by = 10
-
-    def test_func(self):
-        if self.request.user.is_staff:
-            return True
-        return False
-
-
 class BodyTemperatureCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = BodyTemperature
     fields = ("temp",)

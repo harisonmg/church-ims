@@ -1,30 +1,9 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from phonenumber_field.formfields import PhoneNumberField
 
-from .models import CustomUser
-
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = CustomUser
-        fields = ("username", "email", "phone_number")
-
-
-class CustomUserChangeForm(UserChangeForm):
-    class Meta:
-        model = CustomUser
-        fields = ("username", "email", "phone_number")
-
-
-class CustomUserUpdateForm(forms.ModelForm):
-    class Meta:
-        model = CustomUser
-        fields = (
-            "username",
-            "phone_number",
-        )
+from core.validators import validate_adult, validate_date_of_birth
+from people.models import Person
 
 
 class CustomSignupForm(SignupForm):
@@ -35,3 +14,15 @@ class CustomSignupForm(SignupForm):
     def save(self, request):
         user = super(CustomSignupForm, self).save(request)
         return user
+
+
+class ProfileForm(forms.ModelForm):
+    dob = forms.DateField(
+        label="Date of birth",
+        help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
+        validators=[validate_date_of_birth, validate_adult],
+    )
+
+    class Meta:
+        model = Person
+        fields = ("username", "full_name", "dob", "gender")
