@@ -15,7 +15,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="peopleDropdownMenuLink">
           <li>
-            <a class="dropdown-item" href="{% url 'people:person_create' %}">Add a child</a>
+            <a class="dropdown-item" href="{% url 'people:child_create' %}">Add a child</a>
           </li>
           <li>
             <a class="dropdown-item" href="{% url 'people:relationship_create' %}">
@@ -23,18 +23,18 @@
             </a>
           </li>
           <li>
-            <a class="dropdown-item" href="{% url 'people:person_by_user_list' user.person.username %}">Your children</a>
+            <a class="dropdown-item" href="{% url 'people:person_by_user_list' user.person.username %}">Your family members</a>
           </li>
           <li>
             <a class="dropdown-item" href="{% url 'people:relationship_by_user_list' user.person.username %}">
-              Your relationships
+              Your family relationships
             </a>
           </li>
           {% if user.is_staff %}
             <li><a class="dropdown-item" href="{% url 'people:person_list' %}">All people</a></li>
             <li>
               <a class="dropdown-item" href="{% url 'people:relationship_list' %}">
-                All relationships
+                All family relationships
               </a>
             </li>
           {% endif %}
@@ -50,9 +50,6 @@
               Your temperature records
             </a>
           </li>
-          {% if user.is_staff %}
-            <li><a class="dropdown-item" href="{% url 'records:body_temperature_list' %}">All temperature records</a></li>
-          {% endif %}
         </ul>
 
         {% comment %} Reports {% endcomment %}
@@ -61,7 +58,7 @@
             Reports
           </a>
           <ul class="dropdown-menu" aria-labelledby="reportsDropdownMenuLink">
-              <li><a class="dropdown-item" href="{% url 'reports:body_temperature_today' %}">Today's temperature records</a></li>
+            <li><a class="dropdown-item" href="{% url 'reports:body_temperature_today' %}">Today's temperature records</a></li>
           </ul>
         {% endif %}
         
