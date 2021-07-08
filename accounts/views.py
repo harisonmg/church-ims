@@ -10,7 +10,7 @@ from people.models import Person
 from .forms import ProfileForm
 
 
-class LoginSuccessRedirectView(RedirectView):
+class LoginSuccessRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
