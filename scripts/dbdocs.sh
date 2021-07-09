@@ -18,7 +18,10 @@ migrations_dbml_file="$DB_DOCS_DIR"/migrations.dbml
 comment="s/^/--/g"
 delete="d"
 sed "/BEGIN/${delete};/COMMIT/${delete};" -i "$migrations_sql_file"
-sed -e "/CREATE INDEX/${comment};/DROP COLUMN/${comment};" -i "$migrations_sql_file"
+sed "/INDEX/${comment};/CONSTRAINT/${comment};/SEQUENCE/${comment};" -i "$migrations_sql_file"
+sed "/USING/${comment}" -i "$migrations_sql_file"
+sed -e "/DROP COLUMN/${comment};" -i "$migrations_sql_file"
+
 
 # generate dbml from SQL
 sql2dbml "$migrations_sql_file" -o "$migrations_dbml_file"
