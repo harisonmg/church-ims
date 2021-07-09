@@ -7,10 +7,7 @@
     <h1 class="border-bottom pb-3">{{ user.username|title }}'s dashboard</h1>
     <p class="lead py-2">We'll add some of your information here soon!</p>
     <div class="col-md-8 mx-md-auto">
-      <a class="btn btn-outline-light fw-bold d-block my-2" href="{% url 'people:relationship_create' %}">
-        Add a relationship with a child
-      </a>
-      <a class="btn btn-secondary fw-bold border-white bg-white" href="{% url 'people:child_create' %}">
+      <a class="btn btn-secondary fw-bold border-white bg-white" data-bs-toggle="modal" href="#addChildModal" role="button">
         Add a child
       </a>
     </div>
