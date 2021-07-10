@@ -25,12 +25,12 @@
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>
                   <a href="{{ relationship.person.get_absolute_url }}">
-                    {{ relationship.person }}
+                    {{ relationship.person|truncatechars:15 }}
                   </a>
                 </td>
                 <td>
                   <a href="{{ relationship.relative.get_absolute_url }}">
-                    {{ relationship.relative }}
+                    {{ relationship.relative|truncatechars:15 }}
                   </a>
                 </td>
                 <td>{{ relationship.relationship_type }}</td>

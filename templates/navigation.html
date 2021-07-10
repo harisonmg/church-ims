@@ -24,9 +24,6 @@
           </li>
           <li>
           <li>
-            <a class="dropdown-item" href="{% url 'people:person_by_user_list' user.person.username %}">Your family members</a>
-          </li>
-          <li>
             <a class="dropdown-item" href="{% url 'people:relationship_by_user_list' user.person.username %}">
               Your family relationships
             </a>
@@ -62,7 +59,7 @@
             <li><a class="dropdown-item" href="{% url 'reports:body_temperature_today' %}">Today's temperature records</a></li>
           </ul>
         {% endif %}
-        
+
         {% comment %} Account {% endcomment %}
         <a class="nav-link dropdown-toggle" href="#" id="accountDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           Account
@@ -84,72 +81,71 @@
 {% comment %} Modals {% endcomment %}
 <div class="modal fade text-dark" id="addChildModal" data-bs-backdrop="static" data-bs-keyboard="false"
  aria-hidden="true" aria-labelledby="addChildModalLabel" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
-   <div class="modal-content">
-     <div class="modal-header">
-       <h5 class="modal-title" id="addChildModalLabel">Add a child</h5>
-       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     </div>
-     <div class="modal-body">
-       <p class="lead">Does the child's record exist in our database?</p>
-       <p class="lead">
-         <button class="btn btn-outline-success fw-bold" data-bs-target="#addRelationshipModal"
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addChildModalLabel">Add a child</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="lead">Does the child's record exist in our database?</p>
+        <p class="lead">
+          <button class="btn btn-outline-success fw-bold" data-bs-target="#addRelationshipModal"
           data-bs-toggle="modal" data-bs-dismiss="modal">
-           Yes
-         </button>
-         <a class="btn btn-outline-danger fw-bold" href="{% url 'people:child_create' %}">No</a>
-       </p>
-     </div>
-     <div class="modal-footer">
-       <button type="button" class="btn btn-secondary fw-bold text-white" data-bs-dismiss="modal">Close</button>
-     </div>
-   </div>
- </div>
+          Yes
+          </button>
+          <a class="btn btn-outline-danger fw-bold" href="{% url 'people:child_create' %}">No</a>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary fw-bold text-white" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade text-dark" id="addRelationshipModal" data-bs-backdrop="static" data-bs-keyboard="false"
  aria-hidden="true" aria-labelledby="addRelationshipModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
-   <div class="modal-content">
-     <div class="modal-header">
-       <h5 class="modal-title" id="addRelationshipModal">Add a relationship</h5>
-       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     </div>
-     <div class="modal-body">
-       <p class="lead">Are you the one who added the child?</p>
-       <p class="lead">            
-         <a class="btn btn-outline-success fw-bold" href="{% url 'people:relationship_create' %}">Yes</a>
-         <button class="btn btn-outline-danger fw-bold" data-bs-target="#comingSoonModal"
-          data-bs-toggle="modal" data-bs-dismiss="modal">
-           No
-         </button>
-       </p>
-     </div>
-     <div class="modal-footer">
-       <button type="button" class="btn btn-secondary fw-bold text-white" data-bs-dismiss="modal">Close</button>
-       <button class="btn btn-primary fw-bold" data-bs-target="#addChildModal" data-bs-toggle="modal" data-bs-dismiss="modal">Back</button>
-     </div>
-   </div>
- </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addRelationshipModal">Add a relationship</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="lead">Are you the one who added the child?</p>
+        <p class="lead">
+          <a class="btn btn-outline-success fw-bold" href="{% url 'people:relationship_create' %}">Yes</a>
+          <button class="btn btn-outline-danger fw-bold" data-bs-target="#comingSoonModal"
+            data-bs-toggle="modal" data-bs-dismiss="modal">
+            No
+          </button>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary fw-bold text-white" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary fw-bold" data-bs-target="#addChildModal" data-bs-toggle="modal" data-bs-dismiss="modal">Back</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade text-dark" id="comingSoonModal" data-bs-backdrop="static" data-bs-keyboard="false"
  aria-hidden="true" aria-labelledby="comingSoonModal" tabindex="-1">
- <div class="modal-dialog modal-dialog-centered">
-   <div class="modal-content">
-     <div class="modal-header">
-       <h5 class="modal-title" id="comingSoonModal">Coming soon!</h5>
-       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     </div>
-     <div class="modal-body">
-       <p class="lead">
-         We are working on this feature at the moment and it will be available soon.
-       </p>
-     </div>
-     <div class="modal-footer">
-       <button type="button" class="btn btn-secondary fw-bold text-white" data-bs-dismiss="modal">Close</button>
-       <button class="btn btn-primary fw-bold" data-bs-target="#addRelationshipModal" data-bs-toggle="modal" data-bs-dismiss="modal">Back</button>
-     </div>
-   </div>
- </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="comingSoonModal">Coming soon!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="lead">
+          We are working on this feature at the moment and it will be available soon.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary fw-bold text-white" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
