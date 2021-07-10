@@ -34,7 +34,8 @@
                   </a>
                 </td>
                 <td>{{ relationship.relationship_type }}</td>
-                {% if user.person == relationship.person or user.is_staff %}
+                {% comment %} user.person == relationship.person or user.is_staff {% endcomment %}
+                {% if user.is_superuser %}
                   <td>
                     <a href="{% url 'people:relationship_update' relationship.pk %}"
                       class="btn btn-sm btn-outline-primary fw-bold">
