@@ -31,14 +31,9 @@ urlpatterns = [
     # person
     path("add_child/", views.ChildCreateView.as_view(), name="child_create"),
     path(
-        "<slug:username>/relatives/relationships/",
+        "<slug:username>/relatives/",
         views.RelationshipByUserListView.as_view(),
         name="relationship_by_user_list",
-    ),
-    path(
-        "<slug:username>/relatives/",
-        views.PersonByUserListView.as_view(),
-        name="person_by_user_list",
     ),
     path(
         "<slug:username>/update/",

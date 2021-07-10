@@ -27,7 +27,7 @@ class PersonListView(
     def get_queryset(self):
         queryset = super().get_queryset()
         current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
-        return queryset.exclude(user=current_user)
+        return queryset.exclude(created_by=current_user)
 
 
 class ChildCreateView(LoginRequiredMixin, CreateView):
@@ -79,28 +79,6 @@ class PersonDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return get_object_or_404(Person, username=self.kwargs.get("username"))
 
 
-class PersonByUserListView(
-    LoginRequiredMixin, UserPassesTestMixin, SearchableListMixin, ListView
-):
-    model = Person
-    context_object_name = "people"
-    paginate_by = 10
-    search_fields = ("username", "full_name")
-
-    def test_func(self):
-        current_user = self.request.user
-        person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        if current_user.is_staff or (current_user == person.user):
-            return True
-        return False
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        user = get_object_or_404(get_user_model(), person=person)
-        return queryset.filter(created_by=user)
-
-
 class RelationshipByUserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = FamilyRelationship
     context_object_name = "relationships"
@@ -123,6 +101,7 @@ class RelationshipListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = FamilyRelationship
     context_object_name = "relationships"
     template_name = "people/relationship_list.html"
+    paginate_by = 10
 
     def test_func(self):
         if self.request.user.is_staff:
