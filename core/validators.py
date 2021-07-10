@@ -1,3 +1,5 @@
+import re
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -12,7 +14,7 @@ def validate_date_of_birth(value):
     age = get_age(value)
     if age < 0:
         raise ValidationError(_("Date of birth can't be in the future"))
-    elif age > MAX_HUMAN_LIFESPAN:
+    if age > MAX_HUMAN_LIFESPAN:
         raise ValidationError(_("Age can't be greater than the maximum human lifespan"))
 
 
@@ -32,3 +34,12 @@ def validate_child(value):
     age = get_age(value)
     if age >= AGE_OF_MAJORITY:
         raise ValidationError(_("Must be a child"))
+
+
+def validate_full_name(value):
+    """Raise a validation error if the full name consists of
+    a single word
+    """
+    words = re.findall(r"\w+", value)
+    if len(words) < 2:
+        raise ValidationError(_("Must more than one name"))

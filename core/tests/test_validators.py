@@ -29,3 +29,7 @@ class CoreValidatorsTestCase(SimpleTestCase):
             days = round(365.25 * constants.AGE_OF_MAJORITY) + 1
             adult_dob = date.today() - timedelta(days=days)
             validators.validate_child(adult_dob)
+
+    def test_full_name_is_not_one_name(self):
+        with self.assertRaises(ValidationError):
+            validators.validate_full_name("Abel")

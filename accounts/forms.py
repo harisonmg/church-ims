@@ -8,7 +8,8 @@ from people.models import Person
 
 class CustomSignupForm(SignupForm):
     phone_number = PhoneNumberField(
-        max_length=20, help_text="Enter a valid phone number"
+        max_length=50,
+        help_text="Enter a valid phone number that starts with a country code.",
     )
 
     def save(self, request):

@@ -7,7 +7,7 @@ from django.urls import reverse
 from core.constants import AGE_OF_MAJORITY
 from core.models import TimeStampedModel
 from core.utils import get_age
-from core.validators import validate_date_of_birth
+from core.validators import validate_date_of_birth, validate_full_name
 
 
 class Person(TimeStampedModel):
@@ -18,14 +18,15 @@ class Person(TimeStampedModel):
     username = models.SlugField(
         default=uuid.uuid4,
         error_messages={"unique": "A user with that username already exists."},
-        help_text="Enter a unique username. Don't use full-stops/periods",
+        help_text="Enter a human-readable unique username without any full-stops",
         unique=True,
     )
-    # TODO: remember to set blank=False after resolving the issues
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
-    full_name = models.CharField(max_length=300, null=True)
+    full_name = models.CharField(
+        max_length=300, null=True, validators=[validate_full_name]
+    )
     dob = models.DateField(
         verbose_name="date of birth",
         help_text="Please use the following format: <em>DD/MM/YYYY.</em>",

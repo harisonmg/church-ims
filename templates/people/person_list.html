@@ -5,15 +5,13 @@
 {% block content %}
   <div class="p-3">
     <h1>People</h1>
-    {% if not people %}
-      <p class="lead">There are no people yet!</p>
-    {% else %}
       <div class="p-3 mx-md-auto">
         <form id="search_form" class="d-flex">
           <input name="q" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-light fw-bold" type="submit">Search</button>
         </form>
       </div>
+    {% if people %}
       <div class="table-responsive-lg">
         <table class="table table-light table-striped">
           <thead>
@@ -29,20 +27,20 @@
             {% for person in people %}
               <tr>
                 <th scope="row">{{ forloop.counter }}</th>
-                <td><a href="{{ person.get_absolute_url }}">{{ person.username }}</a></td>
-                <td>{{ person.full_name }}</td>
+                <td><a href="{{ person.get_absolute_url }}">{{ person.username|truncatechars:15 }}</a></td>
+                <td>{{ person.full_name|truncatewords:3 }}</td>
                 <td>{{ person.is_adult }}</td>
                 {% if user.is_staff %}
                   <td>
                     <a href="{% url 'records:body_temperature_create' person.username %}"
-                      class="btn btn-sm btn-outline-success fw-bold">
+                      class="btn btn-sm btn-outline-success fw-bold text-nowrap">
                       add temp
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-thermometer-half" viewBox="0 0 16 16">
                         <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415z"/>
                         <path d="M5.5 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0V2.5zM8 1a1.5 1.5 0 0 0-1.5 1.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0l-.166-.15V2.5A1.5 1.5 0 0 0 8 1z"/>
                       </svg>
                     </a>
-                  </td>                    
+                  </td>
                 {% endif %}
               </tr>
             {% endfor %}
