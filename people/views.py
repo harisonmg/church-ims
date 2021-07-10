@@ -144,7 +144,8 @@ class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
     def test_func(self):
         current_user = self.request.user
         relationship = self.get_object()
-        if current_user.is_staff or (current_user.pk == relationship.person.pk):
+        # current_user.is_staff or (current_user.pk == relationship.person.pk)
+        if current_user.is_superuser:
             return True
         return False
 

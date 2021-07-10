@@ -84,7 +84,7 @@ class FamilyRelationship(models.Model):
     )
     relationship_type = models.ForeignKey(
         "RelationshipType",
-        help_text="How are you related to the person?",
+        help_text="How is the person related to you?",
         on_delete=models.PROTECT,
     )
     created_by = models.ForeignKey(
