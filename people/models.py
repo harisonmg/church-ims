@@ -24,7 +24,9 @@ class Person(TimeStampedModel):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
-    full_name = models.CharField(max_length=300, null=True, validators=[validate_full_name])
+    full_name = models.CharField(
+        max_length=300, null=True, validators=[validate_full_name]
+    )
     dob = models.DateField(
         verbose_name="date of birth",
         help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
