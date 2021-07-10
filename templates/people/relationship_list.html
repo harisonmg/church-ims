@@ -16,7 +16,9 @@
               <th scope="col">Person</th>
               <th scope="col">Relative</th>
               <th scope="col">Relationship</th>
-              <th scope="col" colspan="2">Actions</th>
+              {% if user.is_staff %}
+                <th scope="col" colspan="2">Actions</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>

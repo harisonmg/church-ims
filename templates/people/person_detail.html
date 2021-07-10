@@ -8,12 +8,18 @@
     <p class="lead"><strong>Full name:</strong> {{ person.full_name }}</p>
     <p class="lead"><strong>Age:</strong> {{ person.age }}</p>
 
-    {% if not person.is_adult and user.is_staff %}
+    {% if person.is_adult %}
+      {% if  person.created_by == user %}
+        <a href="{% url 'accounts:profile_self_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
+          Edit
+        </a>
+      {% elif user.is_superuser%}
+        <a href="{% url 'accounts:profile_superuser_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
+          Edit
+        </a>
+      {% endif %}
+    {% elif person.created_by == user or user.is_staff %}
       <a href="{% url 'people:child_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
-        Edit
-      </a>
-    {% elif person.is_adult and user.is_superuser %}
-      <a href="{% url 'accounts:profile_superuser_update' person.username %}" class="btn btn-secondary fw-bold border-white bg-white">
         Edit
       </a>
     {% endif %}
