@@ -17,11 +17,10 @@
 | `/accounts/<username>/update/` | `accounts:profile_self_update` | current logged-in user |
 | `/dashboard/` | `core:dashboard` | current logged-in user |
 | `/people/` | `people:person_list` | staff |
-| `/people/add/` | `people:child_create` | any logged-in user |
+| `/people/add_child/` | `people:child_create` | any logged-in user |
 | `/people/<username>/` | `people:person_detail` | person creator, staff |
 | `/people/<username>/update/` | `people:person_update` | person creator, staff |
-| `/people/<username>/relatives/` | `people:person_by_user_list` | current logged-in user, staff |
-| `/people/<username>/relatives/relationships/` | `people:relationships_by_user_list` | current logged-in user, staff |
+| `/people/<username>/relatives/` | `people:relationships_by_user_list` | current logged-in user, staff |
 | `/people/relationships/` | `people:relationship_list` | staff |
 | `/people/relationships/add/` | `people:relationship_create` | any logged-in user |
 | `/people/relationships/<uuid>/` | `people:relationship_detail` | relationship creator |
