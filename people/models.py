@@ -76,7 +76,7 @@ class Person(TimeStampedModel):
         return "Undefined"
 
 
-class FamilyRelationship(models.Model):
+class FamilyRelationship(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     relative = models.ForeignKey(
