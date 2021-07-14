@@ -102,7 +102,7 @@ class FamilyRelationship(TimeStampedModel):
     )
 
     class Meta:
-        db_table = "family_relationship"
+        db_table = "people_family_relationship"
         constraints = [
             models.UniqueConstraint(
                 fields=["person", "relative"],
@@ -125,7 +125,7 @@ class RelationshipType(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        db_table = "relationship_type"
+        db_table = "people_relationship_type"
 
     def __str__(self):
         return self.name
