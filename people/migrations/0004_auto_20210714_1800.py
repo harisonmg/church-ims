@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('people', '0003_auto_20210710_2034'),
+        ("people", "0003_auto_20210710_2034"),
     ]
 
     operations = [
         migrations.AlterModelTable(
-            name='familyrelationship',
-            table='people_family_relationship',
+            name="familyrelationship",
+            table="people_family_relationship",
         ),
         migrations.AlterModelTable(
-            name='relationshiptype',
-            table='people_relationship_type',
+            name="relationshiptype",
+            table="people_relationship_type",
         ),
     ]
