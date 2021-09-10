@@ -1,5 +1,6 @@
-from allauth.account.forms import SignupForm
 from django import forms
+
+from allauth.account.forms import SignupForm
 from phonenumber_field.formfields import PhoneNumberField
 
 from core.validators import validate_adult, validate_date_of_birth
