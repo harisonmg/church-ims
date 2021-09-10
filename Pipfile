@@ -23,5 +23,11 @@ coveralls = "*"
 sphinx-rtd-theme = "*"
 recommonmark = "*"
 sphinx-markdown-tables = "*"
+flake8 = "*"
+isort = "*"
+black = "*"
 
 [requires]
+
+[pipenv]
+allow_prereleases = true
