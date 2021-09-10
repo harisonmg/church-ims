@@ -1,7 +1,6 @@
 from django import forms
-from django.core.exceptions import NON_FIELD_ERRORS
 
-from core.validators import validate_adult, validate_child, validate_date_of_birth
+from core.validators import validate_child, validate_date_of_birth
 
 from .models import FamilyRelationship, Person
 
