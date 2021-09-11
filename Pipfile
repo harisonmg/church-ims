@@ -22,6 +22,7 @@ coveralls = "*"
 flake8 = "*"
 isort = "*"
 black = "*"
+factory-boy = "*"
 
 [requires]
 
