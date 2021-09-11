@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
 from extra_views import SearchableListMixin
 
 from .forms import ChildForm, FamilyRelationshipForm
@@ -143,7 +144,7 @@ class RelationshipUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
 
     def test_func(self):
         current_user = self.request.user
-        relationship = self.get_object()
+        # relationship = self.get_object()
         # current_user.is_staff or (current_user.pk == relationship.person.pk)
         if current_user.is_superuser:
             return True
