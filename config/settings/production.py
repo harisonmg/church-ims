@@ -49,14 +49,10 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 ADMIN_URL = decouple.config("ADMIN_URL")
 
-GOOGLE_ANALYTICS_ID = decouple.config("GOOGLE_ANALYTICS_ID", default=None)
-
 MIDDLEWARE += [
     "django.middleware.common.BrokenLinkEmailsMiddleware",
 ]
 
-# TODO
-# TEMPLATES[0]["OPTIONS"]["context_processors"] += [
-#     "core.context_processors.site_settings",
-#     "core.context_processors.google_analytics"
-# ]
+TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+    "core.context_processors.google_analytics"
+]
