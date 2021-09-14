@@ -62,7 +62,9 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
 ]
 
-LOCAL_APPS = []
+LOCAL_APPS = [
+    "core",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -94,6 +96,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.site_info",
             ],
         },
     },
@@ -225,3 +228,11 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # =========================
 
 ADMIN_URL = "admin"
+
+SITE_NAME = decouple.config("SITE_NAME", default="Church Information Management System")
+
+SITE_SHORT_NAME = decouple.config("SITE_SHORT_NAME", default="Church IMS")
+
+SITE_DESCRIPTION = decouple.config(
+    "SITE_DESCRIPTION", default="An information management system for churches."
+)

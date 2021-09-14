@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import tag
 
@@ -40,3 +41,11 @@ class FunctionalTestCase(StaticLiveServerTestCase):
             string: The link to the homepage of the admin site
         """
         return f"{self.live_server_url}/{settings.ADMIN_URL}/"
+
+    @staticmethod
+    def get_admin_site_title():
+        return admin.site.site_title
+
+    @staticmethod
+    def get_site_short_name():
+        return settings.SITE_SHORT_NAME

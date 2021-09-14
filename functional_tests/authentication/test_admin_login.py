@@ -10,12 +10,11 @@ class AdminLoginTestCase(FunctionalTestCase):
         self.admin_user = AdminUserFactory(password=self.admin_password)
 
     def test_that_a_staff_can_log_in_to_the_admin_site(self):
-        # He visits the admin site
+        # An admin user visits the admin site
         self.browser.get(self.get_admin_url())
 
         # He can tell he's in the right place because of the title
-        # TODO: customize the admin site title
-        admin_site_title = "Log in | Django site admin"
+        admin_site_title = f"Log in | {self.get_admin_site_title()}"
         self.assertEqual(self.browser.title, admin_site_title)
 
         # He enters his email and password and submits the form to
