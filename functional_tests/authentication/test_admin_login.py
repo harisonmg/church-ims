@@ -6,7 +6,7 @@ class AdminLoginTestCase(FunctionalTestCase):
     def setUp(self):
         super().setUp()
 
-        self.admin_password = "insecure-sekrit"
+        self.admin_password = self.fake.password()
         self.admin_user = AdminUserFactory(password=self.admin_password)
 
     def test_that_a_staff_can_log_in_to_the_admin_site(self):
