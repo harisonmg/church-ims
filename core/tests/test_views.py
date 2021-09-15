@@ -7,11 +7,13 @@ class IndexViewTestCase(SimpleTestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.request = self.factory.get("dummy_path/")
-        self.response = views.IndexView.as_view()(self.request)
+        self.view = views.IndexView
 
     def test_response_status_code(self):
-        self.assertEqual(self.response.status_code, 200)
+        response = self.view.as_view()(self.request)
+        self.assertEqual(response.status_code, 200)
 
     def test_template_used(self):
+        response = self.view.as_view()(self.request)
         with self.assertTemplateUsed("core/index.html"):
-            self.response.render()
+            response.render()
