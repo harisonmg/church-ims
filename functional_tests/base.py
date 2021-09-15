@@ -4,6 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import tag
 
 import decouple
+from faker import Faker
 from selenium import webdriver
 
 
@@ -19,6 +20,9 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        # set up a faker object
+        cls.fake = Faker()
 
         # set browser options based on settings
         cls.browser_options = webdriver.firefox.options.Options()
