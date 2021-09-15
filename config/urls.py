@@ -21,5 +21,6 @@ admin_url = settings.ADMIN_URL + "/"
 
 urlpatterns = [
     path(admin_url, admin.site.urls),
+    path("accounts/", include("accounts.urls")),
     path("", include("core.urls")),
 ]
