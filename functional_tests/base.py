@@ -47,5 +47,5 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         return admin.site.site_title
 
     @staticmethod
-    def get_site_short_name():
-        return settings.SITE_SHORT_NAME
+    def get_site_name():
+        return settings.SITE_NAME

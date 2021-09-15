@@ -231,10 +231,10 @@ ADMIN_URL = "admin"
 
 GOOGLE_ANALYTICS_ID = decouple.config("GOOGLE_ANALYTICS_ID", default=None)
 
-SITE_NAME = decouple.config("SITE_NAME", default="Church Information Management System")
-
-SITE_SHORT_NAME = decouple.config("SITE_SHORT_NAME", default="Church IMS")
+SITE_NAME = decouple.config("SITE_NAME", default="Church IMS")
 
 SITE_DESCRIPTION = decouple.config(
-    "SITE_DESCRIPTION", default="An information management system for churches."
+    "SITE_DESCRIPTION",
+    default="Church information management system provides congregations "
+    + "with a seamless way to store and retrieve church records online.",
 )

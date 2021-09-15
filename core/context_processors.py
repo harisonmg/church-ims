@@ -9,7 +9,6 @@ def google_analytics(request):
 def site_info(request):
     site_information = {
         "SITE_NAME": settings.SITE_NAME,
-        "SITE_SHORT_NAME": settings.SITE_SHORT_NAME,
         "SITE_DESCRIPTION": settings.SITE_DESCRIPTION
     }
     return site_information

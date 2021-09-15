@@ -29,7 +29,6 @@ class SiteInfoTestCase(ContextProcessorTestCase):
         response = context_processors.site_info(self.request)
         expected_response = {
             "SITE_NAME": settings.SITE_NAME,
-            "SITE_SHORT_NAME": settings.SITE_SHORT_NAME,
             "SITE_DESCRIPTION": settings.SITE_DESCRIPTION
         }
         self.assertEqual(response.keys(), expected_response.keys())
