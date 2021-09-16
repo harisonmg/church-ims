@@ -43,13 +43,13 @@ class SignUpTestCase(FunctionalTestCase):
         email_input = signup_form.find_element_by_css_selector("input#id_email")
         self.assertEqual(
             signup_form.find_element_by_css_selector('label[for="id_email"]').text,
-            "Email address",
+            "E-mail*",
         )
 
         password_input = signup_form.find_element_by_css_selector("input#id_password1")
         self.assertEqual(
             signup_form.find_element_by_css_selector('label[for="id_password1"]').text,
-            "Password",
+            "Password*",
         )
 
         password_confirmation_input = signup_form.find_element_by_css_selector(
@@ -57,7 +57,7 @@ class SignUpTestCase(FunctionalTestCase):
         )
         self.assertEqual(
             signup_form.find_element_by_css_selector('label[for="id_password2"]').text,
-            "Confirm password",
+            "Password (again)*",
         )
 
         signup_button = signup_form.find_element_by_css_selector(
@@ -76,7 +76,8 @@ class SignUpTestCase(FunctionalTestCase):
         password_confirmation_input.send_keys(password)
         signup_form.find_element_by_css_selector('button[type="submit"]').click()
 
-        # The sign up was successful and he is redirected to the login page
-        self.assertEqual(
-            self.browser.current_url, self.live_server_url + "/accounts/login/"
+        # The sign up was successful and he is redirected to the success page
+        # which depends on the `ACCOUNT_EMAIL_VERIFICATION` setting
+        self.assertNotEqual(
+            self.browser.current_url, self.live_server_url + "/accounts/signup/"
         )
