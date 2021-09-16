@@ -1,12 +1,19 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from faker import Faker
+
 from accounts import factories
 
 
 class UserFactoryTestCase(TestCase):
-    def setUp(self):
-        self.user = factories.UserFactory()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.fake = Faker()
+        cls.user_password = cls.fake.password()
+        cls.user = factories.UserFactory(password=cls.user_password)
 
     def test_object_creation(self):
         self.assertEqual(get_user_model().objects.count(), 1)
@@ -24,13 +31,15 @@ class UserFactoryTestCase(TestCase):
         self.assertIn("@", email)
 
     def test_password(self):
-        password = self.user.password
+        password = self.user_password
         self.assertEqual(len(password), 10)
 
 
 class AdminUserFactoryTestCase(TestCase):
-    def setUp(self):
-        self.user = factories.AdminUserFactory()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = factories.AdminUserFactory()
 
     def test_user_is_staff(self):
         staff_users = get_user_model().objects.filter(is_staff=True)
