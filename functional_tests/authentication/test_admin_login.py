@@ -1,7 +1,10 @@
+from django.test import tag
+
 from accounts.factories import AdminUserFactory
 from functional_tests.base import FunctionalTestCase
 
 
+@tag("slow")
 class AdminLoginTestCase(FunctionalTestCase):
     def setUp(self):
         super().setUp()
