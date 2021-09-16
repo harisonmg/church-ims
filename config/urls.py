@@ -17,10 +17,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
+from accounts.urls import allauth_urlpatterns
+
 admin_url = settings.ADMIN_URL + "/"
 
 urlpatterns = [
     path(admin_url, admin.site.urls),
     path("accounts/", include("accounts.urls")),
+    # to remove app namespace
+    path("accounts/", include(allauth_urlpatterns)),
     path("", include("core.urls")),
 ]

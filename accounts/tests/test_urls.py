@@ -10,7 +10,7 @@ class SignupURLTestCase(SimpleTestCase):
         self.assertEqual(self.match.func.__name__, "SignupView")
 
     def test_view_name(self):
-        self.assertEqual(self.match.view_name, "accounts:signup")
+        self.assertEqual(self.match.view_name, "account_signup")
 
 
 class LoginURLTestCase(SimpleTestCase):
@@ -21,4 +21,4 @@ class LoginURLTestCase(SimpleTestCase):
         self.assertEqual(self.match.func.__name__, "LoginView")
 
     def test_view_name(self):
-        self.assertEqual(self.match.view_name, "accounts:login")
+        self.assertEqual(self.match.view_name, "account_login")
