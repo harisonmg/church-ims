@@ -65,6 +65,9 @@ class SignUpTestCase(FunctionalTestCase):
         )
         self.assertEqual(signup_button.text, "Sign up")
 
+        # He also sees a login link
+        signup_form.find_element_by_link_text("Log in")
+
         # He keys in his first name, last name, email, phone number
         # and password and clicks sign up button to send the form.
         email_input.send_keys(self.fake.email())

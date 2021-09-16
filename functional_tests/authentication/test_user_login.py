@@ -60,6 +60,18 @@ class LoginTestCase(FunctionalTestCase):
             "Password",
         )
 
+        # He also sees links for signing up and password reset
+        login_form.find_element_by_link_text("Sign up")
+
+        password_reset_link = login_form.find_element_by_link_text(
+            "I don't remember my password"
+        )
+
+        self.assertEqual(
+            password_reset_link.get_attribute("href"),
+            self.live_server_url + "/accounts/password_reset/"
+        )
+
         # He enters his email and password and clicks the login button
         # to log in to the resource center.
         email_input.send_keys(self.user.email)
