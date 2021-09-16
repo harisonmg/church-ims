@@ -1,21 +1,17 @@
 {% extends '_base.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
   <main class="mt-auto">
     <div class="col-md-8 col-lg-4 p-3 mx-auto text-center">
       <h1 class="display-5 fw-bold">Log in</h1>
-      <form id="login_form" class="p-2 p-md-3">
-          <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="id_email" placeholder="name@example.com">
-            <label for="id_email">Email address</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="id_password" placeholder="Password">
-            <label for="id_password">Password</label>
-          </div>
+      <form id="login_form" class="p-2 p-md-3" method="POST">
+          {% csrf_token %}
+          {{ form|crispy }}
           <button class="w-100 btn btn-lg btn-primary" type="submit">Log in</button>
           <div class="pt-3">
-            <a href="/accounts/password_reset/">I don't remember my password</a>
+            <a href="{% url 'account_reset_password' %}">I don't remember my password</a>
           </div>
           <hr class="my-4">
           <small class="text-muted">
