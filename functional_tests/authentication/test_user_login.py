@@ -25,7 +25,7 @@ class LoginTestCase(FunctionalTestCase):
         cta_buttons = self.browser.find_elements_by_css_selector("main .btn")
         self.assertEqual(len(cta_buttons), 2)
 
-        login_link, signup_link = cta_buttons
+        signup_link, login_link = cta_buttons
 
         self.assertEqual("Sign up", signup_link.text)
         self.assertEqual("Log in", login_link.text)
