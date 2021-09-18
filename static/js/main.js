@@ -1,11 +1,12 @@
-let formGroups = document.getElementsByClassName("form-group");
+// update forms to have floating labels and modify checkbox classes
+const formGroups = document.getElementsByClassName("form-group");
 
 let updateFormElements = function(formElements){
     for (let index = 0; index < formElements.length; index++) {
         // get the label and immediate child div
-        const formElement = formElements[index];
-        const label = formElement.getElementsByTagName("label")[0];
-        const childDiv = formElement.getElementsByTagName("div")[0];
+        let formElement = formElements[index];
+        let label = formElement.getElementsByTagName("label")[0];
+        let childDiv = formElement.getElementsByTagName("div")[0];
 
         // add margin to the form element
         formElement.classList.add("mb-3");
@@ -24,3 +25,23 @@ let updateFormElements = function(formElements){
 };
 
 updateFormElements(formGroups);
+
+
+// set active class on sidebar links
+let updateSidebarLinks = function(){
+    const currentPath = window.location.pathname;
+    const sidebar = document.getElementById("sidebarMenu");
+    let sidebarLinks = sidebar.getElementsByTagName("a");
+
+    for (let index = 0; index < sidebarLinks.length; index++) {
+        let link = sidebarLinks[index];
+        let linkPath = link.getAttribute("href");
+
+        // add `active` class to the current page's link
+        if (linkPath === currentPath) {
+            link.classList.add("active");
+        };
+    };
+};
+
+updateSidebarLinks();
