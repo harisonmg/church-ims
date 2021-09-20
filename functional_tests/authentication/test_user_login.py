@@ -70,7 +70,6 @@ class LoginTestCase(FunctionalTestCase):
         )
 
         # He enters his email and password and clicks the login button
-        # to log in to the resource center.
         email_input.send_keys(self.user.email)
         password_input.send_keys(self.user_password)
         login_form.find_element_by_css_selector('button[type="submit"]').click()
