@@ -1,3 +1,38 @@
+// set active class on sidebar links
+let updateSidebarLinks = function(){
+    const currentPath = window.location.pathname;
+    const sidebar = document.getElementById("sidebarMenu");
+
+    if (sidebar !== null) {
+        let sidebarLinks = sidebar.getElementsByTagName("a");
+        for (let index = 0; index < sidebarLinks.length; index++) {
+            let link = sidebarLinks[index];
+            let linkPath = link.getAttribute("href");
+
+            // add `active` class to the current page's link
+            if (linkPath === currentPath) {
+                link.classList.add("active");
+            };
+        };
+    };
+};
+
+updateSidebarLinks();
+
+
+// vertically center forms
+let verticallyCenterForms = function(){
+    // check if the page has a form
+    let forms = document.getElementsByTagName("form")
+    if (forms.length > 0) {
+        let mainElement = document.getElementsByTagName("main")[0];
+        mainElement.classList.add("my-auto");
+    };
+};
+
+verticallyCenterForms();
+
+
 // update forms to have floating labels and modify checkbox classes
 const formGroups = document.getElementsByClassName("form-group");
 
@@ -25,23 +60,3 @@ let updateFormElements = function(formElements){
 };
 
 updateFormElements(formGroups);
-
-
-// set active class on sidebar links
-let updateSidebarLinks = function(){
-    const currentPath = window.location.pathname;
-    const sidebar = document.getElementById("sidebarMenu");
-    let sidebarLinks = sidebar.getElementsByTagName("a");
-
-    for (let index = 0; index < sidebarLinks.length; index++) {
-        let link = sidebarLinks[index];
-        let linkPath = link.getAttribute("href");
-
-        // add `active` class to the current page's link
-        if (linkPath === currentPath) {
-            link.classList.add("active");
-        };
-    };
-};
-
-updateSidebarLinks();
