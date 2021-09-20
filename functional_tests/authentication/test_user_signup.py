@@ -30,7 +30,7 @@ class SignUpTestCase(FunctionalTestCase):
             login_link.get_attribute("href"), self.live_server_url + "/accounts/login/"
         )
 
-        # He doesn't have an account and therefore decides to register. He clicks
+        # He doesn"t have an account and therefore decides to register. He clicks
         # on the sign up link and is redirected to the sign up page, where he sees
         # the inputs of the sign up form, including labels and placeholders.
         signup_link.click()
@@ -42,13 +42,13 @@ class SignUpTestCase(FunctionalTestCase):
         signup_form = self.browser.find_element_by_id("signup_form")
         email_input = signup_form.find_element_by_css_selector("input#id_email")
         self.assertEqual(
-            signup_form.find_element_by_css_selector('label[for="id_email"]').text,
+            signup_form.find_element_by_css_selector("label[for='id_email']").text,
             "E-mail*",
         )
 
         password_input = signup_form.find_element_by_css_selector("input#id_password1")
         self.assertEqual(
-            signup_form.find_element_by_css_selector('label[for="id_password1"]').text,
+            signup_form.find_element_by_css_selector("label[for='id_password1']").text,
             "Password*",
         )
 
@@ -56,12 +56,12 @@ class SignUpTestCase(FunctionalTestCase):
             "input#id_password2"
         )
         self.assertEqual(
-            signup_form.find_element_by_css_selector('label[for="id_password2"]').text,
+            signup_form.find_element_by_css_selector("label[for='id_password2']").text,
             "Password (again)*",
         )
 
         signup_button = signup_form.find_element_by_css_selector(
-            'button[type="submit"]'
+            "button[type='submit']"
         )
         self.assertEqual(signup_button.text, "Sign up")
 
@@ -74,7 +74,7 @@ class SignUpTestCase(FunctionalTestCase):
         password = self.fake.password()
         password_input.send_keys(password)
         password_confirmation_input.send_keys(password)
-        signup_form.find_element_by_css_selector('button[type="submit"]').click()
+        signup_form.find_element_by_css_selector("button[type='submit']").click()
 
         # The sign up was successful and he is redirected to the success page
         # which depends on the `ACCOUNT_EMAIL_VERIFICATION` setting
