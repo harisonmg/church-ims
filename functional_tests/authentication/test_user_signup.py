@@ -77,7 +77,7 @@ class SignUpTestCase(FunctionalTestCase):
         password = self.fake.password()
         password_input.send_keys(password)
         password_confirmation_input.send_keys(password)
-        signup_form.find_element_by_css_selector("button[type='submit']").click()
+        signup_button.click()
 
         # The sign up was successful and he is redirected to the success page
         # which depends on the `ACCOUNT_EMAIL_VERIFICATION` setting

@@ -60,6 +60,9 @@ class LoginTestCase(FunctionalTestCase):
             "Password*",
         )
 
+        login_button = login_form.find_element_by_css_selector("button[type='submit']")
+        self.assertEqual(login_button.text, "Log in")
+
         # He also sees links for signing up and password reset
         login_form.find_element_by_link_text("Sign up")
 
@@ -75,7 +78,9 @@ class LoginTestCase(FunctionalTestCase):
         # He enters his email and password and clicks the login button
         email_input.send_keys(self.user.email)
         password_input.send_keys(self.user_password)
-        login_form.find_element_by_css_selector("button[type='submit']").click()
+        login_button.click()
 
         # The login was successful and he is redirected to his dashboard
         self.assertEqual(self.browser.current_url, self.live_server_url + "/dashboard/")
+        self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Dashboard")
+        self.assertIsNotNone(self.browser.find_element_by_id("sidebarMenu"))
