@@ -12,6 +12,9 @@ class LoginTestCase(FunctionalTestCase):
     def test_that_a_user_can_login(self):
         # A user visits the home page
         self.browser.get(self.live_server_url)
+        self.assertEqual(
+            self.browser.find_element_by_tag_name("h1").text, self.get_site_name()
+        )
 
         # He knows he's in the right place because he can see the name
         # of the site in the navigation bar
