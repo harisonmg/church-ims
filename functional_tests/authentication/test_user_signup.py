@@ -87,7 +87,7 @@ class SignUpTestCase(FunctionalTestCase):
         signup_button.click()
 
         # The sign up was successful and she is redirected to the email
-        # verification page and receives an email
+        # verification page
         self.assertEqual(
             self.browser.current_url,
             self.live_server_url + "/accounts/confirm-email/",
@@ -97,12 +97,15 @@ class SignUpTestCase(FunctionalTestCase):
             "Verify your email address",
         )
 
+        alerts = self.browser.find_elements_by_class_name("alert")
+        self.assertEqual(alerts[0].text, f"Confirmation e-mail sent to {user_email}.")
+
+        # She receives an email with a link for verifying her email address
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn(user_email, email.to)
         self.assertIn("To confirm this is correct, go to", email.body)
 
-        # The email has a link for verifying her email address
         url = re.search(r"(?P<url>https?://[^\s]+)", email.body).group("url")
         self.assertIn(self.live_server_url, url)
 
@@ -132,6 +135,9 @@ class SignUpTestCase(FunctionalTestCase):
             self.live_server_url + "/accounts/login/",
         )
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Log in")
+
+        alerts = self.browser.find_elements_by_class_name("alert")
+        self.assertEqual(alerts[0].text, f"You have confirmed {user_email}.")
 
     def test_invalid_email_confirmation_link(self):
         # A user who recently signed up opens the email that was sent
