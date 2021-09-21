@@ -81,6 +81,9 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Dashboard")
         self.assertIsNotNone(self.browser.find_element_by_id("sidebarMenu"))
 
+        alerts = self.browser.find_elements_by_class_name("alert")
+        self.assertEqual(alerts[0].text, f"Successfully signed in as {user.username}.")
+
     def test_that_an_inactive_user_cannot_login(self):
         # An inactive user visits the login page
         self.browser.get(self.live_server_url + "/accounts/login/")
