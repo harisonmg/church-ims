@@ -7,10 +7,6 @@ from functional_tests.base import FunctionalTestCase
 
 
 class PasswordResetTestCase(FunctionalTestCase):
-    def setUp(self):
-        super().setUp()
-
-        self.user = UserFactory()
 
     def test_that_a_user_can_reset_their_password(self):
         # An existing user wants to log in to the site, but they
@@ -82,7 +78,8 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(password_reset_button.text, "Reset my password")
 
         # She enters her email and clicks the password reset button
-        email_input.send_keys(self.user.email)
+        user = UserFactory()
+        email_input.send_keys(user.email)
         password_reset_button.click()
 
         # She is redirected to the password reset done page and receives an
@@ -97,7 +94,7 @@ class PasswordResetTestCase(FunctionalTestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn(self.user.email, email.to)
+        self.assertIn(user.email, email.to)
         self.assertIn("Click the link below to reset your password", email.body)
 
         # The email has a password reset link
@@ -150,8 +147,10 @@ class PasswordResetTestCase(FunctionalTestCase):
             self.browser.current_url,
             self.live_server_url + "/accounts/password/reset/key/done/",
         )
-
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, "Password reset complete"
         )
         self.browser.find_element_by_link_text("log in")
+
+        alerts = self.browser.find_elements_by_class_name("alert")
+        self.assertEqual(alerts[0].text, "Password successfully changed.")
