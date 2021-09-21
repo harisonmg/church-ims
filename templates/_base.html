@@ -10,7 +10,9 @@
       <meta name="description" content="{{ SITE_DESCRIPTION }}">
     {% endblock seo %}
 
-    <title>{{ SITE_NAME }}</title>
+    <title>
+      {% block title %} {{ SITE_NAME }} {% endblock title %}
+    </title>
 
     {% comment %} Favicon {% endcomment %}
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
@@ -27,6 +29,10 @@
     <div class="d-flex h-100 w-100 flex-column mx-auto">
       {% include '_header.html' %}
 
+      {% if messages %}
+        {% include '_messages.html' %}
+      {% endif %}
+
       <div class="h-100 container-fluid">
         <div class="h-100 row">
           {% if user.is_authenticated %}
@@ -39,15 +45,7 @@
         </div>
       </div>
 
-      {% block footer %}
-        <div class="mt-auto border-top">
-          <footer class="py-3 mt-2">
-            <p class="text-center text-muted">
-              Made with &#128153; by <a href="https://harisonmg.co">Harison Gachuru</a>
-            </p>
-          </footer>
-        </div>
-      {% endblock footer %}
+      {% include '_footer.html' %}
     </div>
 
     {% comment %} JavaScript {% endcomment %}
