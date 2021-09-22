@@ -23,5 +23,6 @@ urlpatterns = [
     path(admin_url, admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),  # to remove app namespace
+    path("people/", include("people.urls")),
     path("", include("core.urls")),
 ]
