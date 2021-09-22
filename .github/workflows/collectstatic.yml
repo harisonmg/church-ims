@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: collectstatic
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - closed
 
   push:
-    branches: [main]
+    # branches: [main]
 
 jobs:
   deploy:
@@ -28,15 +28,13 @@ jobs:
 
     - name: Authenticate gcloud
       run: |
-        chmod +x ./scripts/decrypt_secret.sh
-        ./scripts/decrypt_secret.sh
-        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+        chmod +x ./scripts/authenticate_gcloud.sh
+        ./scripts/authenticate_gcloud.sh
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ./secrets/raw/${{secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_FILE}}
-        SECRET_FILE: ${{secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_FILE}}
-        SECRET_FILE_PASSPHRASE: ${{secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_FILE_PASSPHRASE}}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-    - name: Deploy static files to Cloud Storage
+    - name: Collect the static files into STATIC_ROOT (Cloud Storage)
       run: |
         pipenv run python manage.py collectstatic --no-input
       env:
@@ -53,4 +51,4 @@ jobs:
 
         # Google Cloud
         GCP_STORAGE_BUCKET_NAME: ${{secrets.GCP_STORAGE_BUCKET_NAME}}
-        GOOGLE_APPLICATION_CREDENTIALS: ./secrets/raw/${{secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_FILE}}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
