@@ -11,6 +11,7 @@ class SignUpTestCase(FunctionalTestCase):
     def test_that_a_user_can_signup(self):
         # A user visits the home page
         self.browser.get(self.live_server_url)
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, self.get_site_name()
         )
@@ -44,6 +45,7 @@ class SignUpTestCase(FunctionalTestCase):
         # the inputs of the sign up form, including labels and placeholders.
         signup_link.click()
 
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_css_selector("h1").text, "Sign up"
         )
@@ -92,6 +94,7 @@ class SignUpTestCase(FunctionalTestCase):
             self.browser.current_url,
             self.live_server_url + "/accounts/confirm-email/",
         )
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text,
             "Verify your email address",
@@ -111,6 +114,7 @@ class SignUpTestCase(FunctionalTestCase):
 
         # She clicks the link and is taken to the email confirmation page
         self.browser.get(url)
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, "Confirm email address"
         )
@@ -134,6 +138,7 @@ class SignUpTestCase(FunctionalTestCase):
             self.browser.current_url,
             self.live_server_url + "/accounts/login/",
         )
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Log in")
 
         alerts = self.browser.find_elements_by_class_name("alert")
@@ -144,6 +149,7 @@ class SignUpTestCase(FunctionalTestCase):
         # to verify their email. They click on the link provided
         url = self.live_server_url + "/accounts/confirm-email/expired-token/"
         self.browser.get(url)
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, "Confirm email address"
         )

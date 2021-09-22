@@ -4,6 +4,7 @@ class LoginPage:
         self.path = "/accounts/login/"
 
     def get_attributes(self):
+        self.test.assertEqual(self.test.browser.title, f"{self.test.get_site_name()}")
         self.h1 = self.test.browser.find_element_by_css_selector("h1").text
         self.test.assertEqual(self.h1, "Log in")
 

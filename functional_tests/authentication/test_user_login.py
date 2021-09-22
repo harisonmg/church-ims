@@ -12,6 +12,7 @@ class LoginTestCase(FunctionalTestCase):
     def test_that_a_user_can_login(self):
         # A user visits the home page
         self.browser.get(self.live_server_url)
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, self.get_site_name()
         )
@@ -54,6 +55,7 @@ class LoginTestCase(FunctionalTestCase):
 
         # The login was successful and he is redirected to his dashboard
         self.assertEqual(self.browser.current_url, self.live_server_url + "/dashboard/")
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Dashboard")
         self.assertIsNotNone(self.browser.find_element_by_id("sidebarMenu"))
 
@@ -77,6 +79,7 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(
             self.browser.current_url, self.live_server_url + "/accounts/inactive/"
         )
+        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(
             self.browser.find_element_by_css_selector("h1").text, "Account inactive"
         )
