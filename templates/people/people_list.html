@@ -1,5 +1,36 @@
 {% extends '_base.html' %}
 
 {% block content %}
-  <h1>People</h1>
+  <div class="col-lg-10 p-3 mx-auto text-center vertical-center">
+    <h1 class="display-5 fw-bold lh-1 mb-5">People</h1>
+    {% if not people %}
+      <p class="lead">There are no people yet!</p>
+    {% else %}
+      <form id="search_form" class="d-flex my-3">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+
+      <div class="table-responsive-md">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Username</th>
+              <th scope="col">Full name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for person in people %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ person.username }}</td>
+                <td>{{ person.full_name }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
 {% endblock content %}
