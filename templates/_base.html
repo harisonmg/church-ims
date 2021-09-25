@@ -45,6 +45,10 @@
         </div>
       </div>
 
+      {% if is_paginated %}
+        {% include '_pagination.html' %}
+      {% endif %}
+
       {% include '_footer.html' %}
     </div>
 
