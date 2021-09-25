@@ -57,7 +57,10 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.current_url, self.live_server_url + "/dashboard/")
         self.assertEqual(self.browser.title, f"{self.get_site_name()}")
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Dashboard")
-        self.assertIsNotNone(self.browser.find_element_by_id("sidebarMenu"))
+
+        sidebar_navigation = self.browser.find_element_by_id("sidebarMenu")
+        dashboard_link = sidebar_navigation.find_element_by_link_text("Dashboard")
+        self.assertIn("active", dashboard_link.get_attribute("class"))
 
         alerts = self.browser.find_elements_by_class_name("alert")
         self.assertEqual(
