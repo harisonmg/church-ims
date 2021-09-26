@@ -20,17 +20,18 @@ let updateSidebarLinks = function(){
 updateSidebarLinks();
 
 
-// vertically center elements
-let verticallyCenterElements = function(){
-    // get all elements with `vertical-center` class
-    let elementsToCenter = document.getElementsByClassName("vertical-center");
-    for (let index = 0; index < elementsToCenter.length; index++) {
-        let element = elementsToCenter[index];
-        element.parentElement.classList.add("my-auto");
+// update parent element's classes
+let updateParentClass = function(){
+    // get all elements with `parent-class` attribute
+    let elements = document.querySelectorAll("[parent-class]");
+    for (let index = 0; index < elements.length; index++) {
+        let element = elements[index];
+        let parent_classes = element.getAttribute("parent-class").split(" ");
+        element.parentElement.classList.add(...parent_classes);
     };
 };
 
-verticallyCenterElements();
+updateParentClass();
 
 
 // update forms to have floating labels and modify checkbox classes
