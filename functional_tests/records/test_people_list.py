@@ -126,13 +126,14 @@ class PeopleListTestCase(FunctionalTestCase):
         search_button.click()
 
         people_list = self.get_people_list()
-        # self.assertEqual(len(people_list), 1) TODO
+        self.assertEqual(len(people_list), 1)
 
         # He decides to search for a person that doesn't exist
         search_input, search_button = self.get_search_form()
         search_input.send_keys("Does not exist")
         search_button.click()
-        # self.assertEqual(
-        #     self.browser.find_elements_by_css_selector("p.lead").text,
-        #     "Your search didn't yield any results",
-        # )
+
+        self.assertEqual(
+            self.browser.find_element_by_css_selector("p.lead").text,
+            "Your search didn't yield any results",
+        )
