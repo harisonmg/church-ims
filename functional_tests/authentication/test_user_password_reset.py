@@ -37,7 +37,7 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(
             self.browser.current_url, self.live_server_url + "/accounts/password/reset/"
         )
-        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
+        self.assertEqual(self.browser.title, self.get_site_name())
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, "Password reset"
         )
@@ -66,7 +66,7 @@ class PasswordResetTestCase(FunctionalTestCase):
             self.browser.current_url,
             self.live_server_url + "/accounts/password/reset/done/",
         )
-        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
+        self.assertEqual(self.browser.title, self.get_site_name())
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, "Password reset"
         )
@@ -125,7 +125,7 @@ class PasswordResetTestCase(FunctionalTestCase):
             self.browser.current_url,
             self.live_server_url + "/accounts/password/reset/key/done/",
         )
-        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
+        self.assertEqual(self.browser.title, self.get_site_name())
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, "Password reset complete"
         )

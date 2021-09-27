@@ -29,7 +29,7 @@ class PeopleListTestCase(FunctionalTestCase):
         return element.find_element_by_xpath("..").get_attribute(attribute)
 
     def get_page_attributes(self):
-        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
+        self.assertEqual(self.browser.title, self.get_site_name())
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "People")
 
         sidebar_navigation = self.browser.find_element_by_id("sidebarMenu")

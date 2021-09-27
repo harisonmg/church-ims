@@ -24,7 +24,7 @@ class LogoutTestCase(FunctionalTestCase):
         self.assertEqual(
             self.browser.current_url, self.live_server_url + "/accounts/logout/"
         )
-        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
+        self.assertEqual(self.browser.title, self.get_site_name())
         self.assertEqual(self.browser.find_element_by_tag_name("h1").text, "Log out")
 
         logout_form = self.browser.find_element_by_id("logout_form")
@@ -36,7 +36,7 @@ class LogoutTestCase(FunctionalTestCase):
         # He clicks on the logout button and is redirected to the home page
         logout_button.click()
         self.assertEqual(self.browser.current_url, self.live_server_url + "/")
-        self.assertEqual(self.browser.title, f"{self.get_site_name()}")
+        self.assertEqual(self.browser.title, self.get_site_name())
         self.assertEqual(
             self.browser.find_element_by_tag_name("h1").text, self.get_site_name()
         )
