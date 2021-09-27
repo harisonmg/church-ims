@@ -19,13 +19,6 @@ class PasswordResetTestCase(FunctionalTestCase):
         # have forgotten their password. She visits the login page
         self.browser.get(self.live_server_url + "/accounts/login/")
 
-        # She knows she's in the right place because she can see the name
-        # of the site in the navigation bar
-        self.assertEqual(
-            self.browser.find_element_by_css_selector("header > a").text,
-            self.get_site_name(),
-        )
-
         # She sees the inputs of the login form, including labels and placeholders
         # as well as links for signing up and password reset
         login_page = LoginPage(self).get_attributes()
