@@ -1,7 +1,6 @@
 class LoginPage:
     def __init__(self, test):
         self.test = test
-        self.path = "/accounts/login/"
 
     def get_attributes(self):
         self.test.assertEqual(self.test.browser.title, self.test.get_site_name())
@@ -48,8 +47,3 @@ class LoginPage:
         self.email_input.send_keys(email)
         self.password_input.send_keys(password)
         self.login_button.click()
-
-    def visit(self):
-        url = self.test.live_server_url + self.path
-        self.test.browser.get(url)
-        return self
