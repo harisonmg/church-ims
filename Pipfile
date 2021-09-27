@@ -7,22 +7,22 @@ name = "pypi"
 django = "*"
 python-decouple = "*"
 dj-database-url = "*"
+django-allauth = "*"
+django-crispy-forms = "*"
+django-extra-views = "*"
+django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
+django-storages = {extras = ["google"], version = "*"}
 psycopg2 = "*"
 gunicorn = "*"
-django-storages = {extras = ["google"], version = "*"}
-django-crispy-forms = "*"
-django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
-django-extra-views = "*"
-django-allauth = "*"
 
 [dev-packages]
-coverage = "*"
-selenium = "*"
-coveralls = "*"
+black = "*"
 flake8 = "*"
 isort = "*"
-black = "*"
 factory-boy = "*"
+selenium = "*"
+coverage = "*"
+coveralls = "*"
 
 [requires]
 
