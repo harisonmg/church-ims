@@ -2,8 +2,9 @@ from django.contrib.auth.models import Permission
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
-from functional_tests.pages import LoginPage, PeopleListPage
 from people.factories import PersonFactory
+
+from .pages import LoginPage, PeopleListPage
 
 
 class PeopleListTestCase(FunctionalTestCase):
