@@ -11,8 +11,8 @@ class LogoutTestCase(FunctionalTestCase):
         self.user = UserFactory(password=self.password)
 
     def login(self):
-        login_page = LoginPage(self).visit()
-        login_page.get_attributes().login(self.user.email, self.password)
+        self.browser.get(self.live_server_url + "/accounts/login/")
+        LoginPage(self).get_attributes().login(self.user.email, self.password)
 
     def test_that_a_user_can_logout(self):
         # A logged in user clicks on the logout link on the account dropdown

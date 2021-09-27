@@ -22,8 +22,8 @@ class PeopleListTestCase(FunctionalTestCase):
         self.people = sorted(people, key=lambda p: p.username)
 
     def login(self):
-        login_page = LoginPage(self).visit()
-        login_page.get_attributes().login(self.user.email, self.password)
+        self.browser.get(self.live_server_url + "/accounts/login/")
+        LoginPage(self).get_attributes().login(self.user.email, self.password)
 
     def get_parent_attribute(self, element, attribute="class"):
         return element.find_element_by_xpath("..").get_attribute(attribute)

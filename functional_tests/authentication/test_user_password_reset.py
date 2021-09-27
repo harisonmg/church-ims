@@ -17,7 +17,7 @@ class PasswordResetTestCase(FunctionalTestCase):
     def test_that_a_user_can_reset_their_password(self):
         # An existing user wants to log in to the site, but they
         # have forgotten their password. She visits the login page
-        login_page = LoginPage(self).visit()
+        self.browser.get(self.live_server_url + "/accounts/login/")
 
         # She knows she's in the right place because she can see the name
         # of the site in the navigation bar
@@ -28,7 +28,7 @@ class PasswordResetTestCase(FunctionalTestCase):
 
         # She sees the inputs of the login form, including labels and placeholders
         # as well as links for signing up and password reset
-        login_page.get_attributes()
+        login_page = LoginPage(self).get_attributes()
 
         # She clicks on the password reset link and is redirected to the
         # password reset page, where she sees an email input and placeholder

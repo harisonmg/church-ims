@@ -50,8 +50,8 @@ class LoginTestCase(FunctionalTestCase):
         login_page = LoginPage(self).get_attributes()
 
         # He enters his email and password and clicks the login button
-        self.user = UserFactory(password=self.password)
-        login_page.login(self.user.email, self.password)
+        user = UserFactory(password=self.password)
+        login_page.login(user.email, self.password)
 
         # The login was successful and he is redirected to his dashboard
         self.assertEqual(self.browser.current_url, self.live_server_url + "/dashboard/")
@@ -64,19 +64,19 @@ class LoginTestCase(FunctionalTestCase):
 
         alerts = self.browser.find_elements_by_class_name("alert")
         self.assertEqual(
-            alerts[0].text, f"Successfully signed in as {self.user.username}."
+            alerts[0].text, f"Successfully signed in as {user.username}."
         )
 
     def test_that_an_inactive_user_cannot_login(self):
         # An inactive user visits the login page
-        self.user = UserFactory(password=self.password, is_active=False)
-        login_page = LoginPage(self).visit()
+        user = UserFactory(password=self.password, is_active=False)
+        self.browser.get(self.live_server_url + "/accounts/login/")
 
         # He sees the inputs of the login form, including labels and placeholders
-        login_page.get_attributes()
+        login_page = LoginPage(self).get_attributes()
 
         # He enters his email and password and clicks the login button
-        login_page.login(self.user.email, self.password)
+        login_page.login(user.email, self.password)
 
         # He is redirected to the account inactive page
         self.assertEqual(
