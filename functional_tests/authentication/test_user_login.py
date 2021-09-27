@@ -63,9 +63,7 @@ class LoginTestCase(FunctionalTestCase):
         self.assertIn("active", dashboard_link.get_attribute("class"))
 
         alerts = self.browser.find_elements_by_class_name("alert")
-        self.assertEqual(
-            alerts[0].text, f"Successfully signed in as {user.username}."
-        )
+        self.assertEqual(alerts[0].text, f"Successfully signed in as {user.username}.")
 
     def test_that_an_inactive_user_cannot_login(self):
         # An inactive user visits the login page
