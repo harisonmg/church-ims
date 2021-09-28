@@ -58,6 +58,14 @@ class Sidebar(BaseComponent):
     def _links(self):
         return self.browser.find_elements(*self.SIDEBAR_LINK)
 
+    @property
+    def active_links(self):
+        active_hrefs = []
+        for link in self._links:
+            if "active" in link.get_attribute("class"):
+                active_hrefs.append(link.get_attribute("href"))
+        return active_hrefs
+
 
 class Pagination(BaseComponent):
     PAGE_ITEM = (By.CLASS_NAME, "page-item")
