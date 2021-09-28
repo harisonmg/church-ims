@@ -9,7 +9,10 @@ class BasePage:
 
     def __init__(self, test):
         self.test = test
-        self.browser = test.browser
+
+    @property
+    def browser(self):
+        return self.test.browser
 
     @property
     def url(self):
@@ -75,6 +78,14 @@ class HomePage(BasePage):
 # authentication-related pages
 class LoginPage(BasePage):
     PATH = "/accounts/login/"
+
+    @property
+    def form(self):
+        return components.LoginForm(self.browser)
+
+    def login(self, email, password):
+        self.form.send_keys(email=email, password=password)
+        return self
 
 
 class LogoutPage(BasePage):
