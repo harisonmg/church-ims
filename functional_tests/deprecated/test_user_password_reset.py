@@ -4,7 +4,8 @@ from django.core import mail
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
-from functional_tests.pages import LoginPage
+
+from .pages import LoginPage
 
 
 class PasswordResetTestCase(FunctionalTestCase):
