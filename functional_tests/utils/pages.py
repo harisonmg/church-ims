@@ -91,6 +91,14 @@ class LoginPage(BasePage):
 class LogoutPage(BasePage):
     PATH = "/accounts/logout/"
 
+    @property
+    def form(self):
+        return components.BaseForm(self.browser)
+
+    def logout(self):
+        self.form.submit()
+        return self
+
 
 class AccountInactivePage(BasePage):
     PATH = "/accounts/inactive/"
