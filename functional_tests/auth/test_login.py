@@ -11,7 +11,7 @@ class LoginTestCase(FunctionalTestCase):
         self.active_user = UserFactory(password=self.password)
         self.inactive_user = UserFactory(password=self.password, is_active=False)
 
-    def test_that_a_user_can_login(self):
+    def test_active_user_can_login(self):
         # A user visits the login page
         login_page = pages.LoginPage(self)
         login_page.visit()
@@ -45,7 +45,7 @@ class LoginTestCase(FunctionalTestCase):
             f"Successfully signed in as {self.active_user.username}.",
         )
 
-    def test_that_an_inactive_user_cannot_login(self):
+    def test_inactive_user_cannot_login(self):
         # An inactive user visits the login page
         login_page = pages.LoginPage(self)
         login_page.visit()

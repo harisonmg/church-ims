@@ -3,7 +3,7 @@ from functional_tests.utils import pages
 
 
 class HomePageTestCase(FunctionalTestCase):
-    def test_that_a_user_can_access_the_home_page(self):
+    def test_anonymous_user_can_access_the_home_page(self):
         # A user visits the home page
         home_page = pages.HomePage(self)
         home_page.visit()
