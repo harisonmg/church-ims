@@ -93,6 +93,10 @@ class BaseForm(BaseComponent):
     def _submit_button(self):
         return self.browser.find_element(*self.SUBMIT_BUTTON)
 
+    @property
+    def submit_button_label(self):
+        return self._submit_button.text
+
     def submit(self):
         self._submit_button.click()
         return self
@@ -111,7 +115,43 @@ class GenericSearchForm(BaseForm):
 
 
 class LoginForm(BaseForm):
-    pass
+    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
+    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
+    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
+    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password']")
+    SIGN_UP_LINK = (By.LINK_TEXT, "Sign up")
+    PASSWORD_RESET_LINK = (By.LINK_TEXT, "I don't remember my password")
+
+    @property
+    def _email_input(self):
+        return self.browser.find_element(*self.EMAIL_INPUT)
+
+    @property
+    def email_label(self):
+        return self.browser.find_element(*self.EMAIL_LABEL).text
+
+    @property
+    def _password_input(self):
+        return self.browser.find_element(*self.PASSWORD_INPUT)
+
+    @property
+    def password_label(self):
+        return self.browser.find_element(*self.PASSWORD_LABEL).text
+
+    @property
+    def signup_link(self):
+        link_element = self.browser.find_element(*self.SIGN_UP_LINK)
+        return link_element.get_attribute("href")
+
+    @property
+    def password_reset_link(self):
+        link_element = self.browser.find_element(*self.PASSWORD_RESET_LINK)
+        return link_element.get_attribute("href")
+
+    def send_keys(self, email, password):
+        self._email_input.send_keys(email)
+        self._password_input.send_keys(password)
+        return self.submit()
 
 
 class PasswordResetRequestForm(BaseForm):
