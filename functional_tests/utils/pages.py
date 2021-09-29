@@ -4,7 +4,7 @@ from . import components
 
 
 class BasePage:
-    PATH = None
+    PATH = "/404/"
     HEADING = (By.TAG_NAME, "h1")
 
     def __init__(self, test):
@@ -16,9 +16,7 @@ class BasePage:
 
     @property
     def url(self):
-        if self.PATH is not None:
-            return self.test.live_server_url + self.PATH
-        return self.test.live_server_url
+        return self.test.live_server_url + self.PATH
 
     @property
     def title(self):
