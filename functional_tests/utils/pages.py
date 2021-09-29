@@ -121,13 +121,34 @@ class PasswordResetDonePage(BasePage):
 class SignupPage(BasePage):
     PATH = "/accounts/signup/"
 
+    @property
+    def form(self):
+        return components.SignupForm(self.browser)
+
+    def signup(self, email, password1, password2):
+        self.form.send_keys(email=email, password1=password1, password2=password2)
+        return self
+
 
 class EmailVerificationRequiredPage(BasePage):
     PATH = "/accounts/confirm-email/"
 
 
 class EmailConfirmationPage(BasePage):
-    PATH = "/accounts/confirm-email/"  # TODO: get correct path
+    PATH = "/accounts/confirm-email/invalid-token/"
+    MAIN_PARAGRAPHS = (By.CSS_SELECTOR, "main p")
+
+    @property
+    def _main_paragraphs(self):
+        return self.browser.find_elements(*self.MAIN_PARAGRAPHS)
+
+    @property
+    def form(self):
+        return components.BaseForm(self.browser)
+
+    def confirm_email(self):
+        self.form.submit()
+        return self
 
 
 # application-related pages
