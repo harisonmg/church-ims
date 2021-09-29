@@ -105,17 +105,44 @@ class AccountInactivePage(BasePage):
 class PasswordResetRequestPage(BasePage):
     PATH = "/accounts/password/reset/"
 
+    @property
+    def form(self):
+        return components.PasswordResetRequestForm(self.browser)
+
+    def request_password_reset(self, email):
+        self.form.send_keys(email=email)
+        return self
+
 
 class PasswordResetRequestDonePage(BasePage):
     PATH = "/accounts/password/reset/done/"
 
 
 class PasswordResetPage(BasePage):
-    PATH = "/accounts/password/reset/key/"
+    PATH = "/accounts/password/reset/key/invalid-token/"
+
+    @property
+    def form(self):
+        return components.PasswordResetForm(self.browser)
+
+    def set_password(self, password1, password2):
+        self.form.send_keys(password1=password1, password2=password2)
+        return self
 
 
 class PasswordResetDonePage(BasePage):
     PATH = "/accounts/password/reset/key/done/"
+    LOGIN_LINK = (By.LINK_TEXT, "log in")
+    MAIN_PARAGRAPHS = (By.CSS_SELECTOR, "main p")
+
+    @property
+    def login_link(self):
+        link_element = self.browser.find_element(*self.LOGIN_LINK)
+        return link_element.get_attribute("href")
+
+    @property
+    def _main_paragraphs(self):
+        return self.browser.find_elements(*self.MAIN_PARAGRAPHS)
 
 
 class SignupPage(BasePage):

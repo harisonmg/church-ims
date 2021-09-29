@@ -171,11 +171,48 @@ class LoginForm(BaseForm):
 
 
 class PasswordResetRequestForm(BaseForm):
-    pass
+    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
+    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
+
+    @property
+    def _email_input(self):
+        return self.browser.find_element(*self.EMAIL_INPUT)
+
+    @property
+    def email_label(self):
+        return self.browser.find_element(*self.EMAIL_LABEL).text
+
+    def send_keys(self, email):
+        self._email_input.send_keys(email)
+        return self.submit()
 
 
 class PasswordResetForm(BaseForm):
-    pass
+    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
+    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
+    PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
+    PASSWORD_CONFIRMATION_LABEL = (By.CSS_SELECTOR, "label[for='id_password2']")
+
+    @property
+    def _password_input(self):
+        return self.browser.find_element(*self.PASSWORD_INPUT)
+
+    @property
+    def password_label(self):
+        return self.browser.find_element(*self.PASSWORD_LABEL).text
+
+    @property
+    def _password_confirmation_input(self):
+        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_INPUT)
+
+    @property
+    def password_confirmation_label(self):
+        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_LABEL).text
+
+    def send_keys(self, password1, password2):
+        self._password_input.send_keys(password1)
+        self._password_confirmation_input.send_keys(password2)
+        return self.submit()
 
 
 class SignupForm(BaseForm):
