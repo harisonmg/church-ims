@@ -12,7 +12,7 @@ class HomePageTestCase(FunctionalTestCase):
         # of the site in the site title, heading and header
         site_name = self.get_site_name()
         self.assertEqual(home_page.title, site_name)
-        self.assertEqual(home_page.header.title, site_name)
+        self.assertEqual(home_page.header._title.text, site_name)
         self.assertEqual(home_page.heading, site_name)
 
         # He sees links for the sign up and login pages

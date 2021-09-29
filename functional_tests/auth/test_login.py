@@ -20,14 +20,14 @@ class LoginTestCase(FunctionalTestCase):
         # of the site in the site title, heading and header
         site_name = self.get_site_name()
         self.assertEqual(login_page.title, site_name)
-        self.assertEqual(login_page.header.title, site_name)
+        self.assertEqual(login_page.header._title.text, site_name)
         self.assertEqual(login_page.heading, "Log in")
 
         # He sees the inputs of the login form, including labels and placeholders.
         # He also sees links for signing up and password reset
         self.assertEqual(login_page.form.email_label, "E-mail*")
         self.assertEqual(login_page.form.password_label, "Password*")
-        self.assertEqual(login_page.form.submit_button_label, "Log in")
+        self.assertEqual(login_page.form._submit_button.text, "Log in")
         self.assertEqual(login_page.form.signup_link, pages.SignupPage(self).url)
         self.assertEqual(
             login_page.form.password_reset_link,
@@ -60,5 +60,5 @@ class LoginTestCase(FunctionalTestCase):
         # He can see the name of the site in the site title, heading and header
         site_name = self.get_site_name()
         self.assertEqual(account_inactive_page.title, site_name)
-        self.assertEqual(account_inactive_page.header.title, site_name)
+        self.assertEqual(account_inactive_page.header._title.text, site_name)
         self.assertEqual(account_inactive_page.heading, "Account inactive")

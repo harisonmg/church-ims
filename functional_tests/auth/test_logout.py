@@ -25,11 +25,11 @@ class LogoutTestCase(FunctionalTestCase):
         # of the site in the site title, heading and header
         site_name = self.get_site_name()
         self.assertEqual(logout_page.title, site_name)
-        self.assertEqual(logout_page.header.title, site_name)
+        self.assertEqual(logout_page.header._title.text, site_name)
         self.assertEqual(logout_page.heading, "Log out")
 
         # He sees a logout confirmation button to ascertain that he wants to log out
-        self.assertEqual(logout_page.form.submit_button_label, "Log out")
+        self.assertEqual(logout_page.form._submit_button.text, "Log out")
 
         # He confirms that he indeed wants to log out
         logout_page.logout()

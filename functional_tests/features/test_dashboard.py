@@ -25,7 +25,7 @@ class DashboardTestCase(FunctionalTestCase):
         # of the site in the site title, heading and header
         site_name = self.get_site_name()
         self.assertEqual(dashboard.title, site_name)
-        self.assertEqual(dashboard.header.title, site_name)
+        self.assertEqual(dashboard.header._title.text, site_name)
         self.assertEqual(dashboard.heading, "Dashboard")
 
         # He can also see a sidebar navigation, with the dashboard link highlighted

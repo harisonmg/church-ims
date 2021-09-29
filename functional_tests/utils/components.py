@@ -9,34 +9,36 @@ class BaseComponent:
 # generic page components
 class Header(BaseComponent):
     ACCOUNT_DROPDOWN_TOGGLE = (By.ID, "accountDropdownMenu")
-    ACCOUNT_DROPDOWN = (By.CSS_SELECTOR, "[aria-labelledby='accountDropdownMenu']")
-    DROPDOWN_LINKS = (By.CSS_SELECTOR, "a.dropdown-item")
-    HOME_PAGE_LINK = (By.CSS_SELECTOR, "#site_header > a")
+    ACCOUNT_DROPDOWN_LINK = (
+        By.CSS_SELECTOR,
+        "[aria-labelledby='accountDropdownMenu'] .dropdown-item",
+    )
     SIDEBAR_TOGGLE = (By.CSS_SELECTOR, "button[data-bs-target='#sidebarMenu']")
+    TITLE = (By.CSS_SELECTOR, "#site_header > a")
 
     @property
     def _account_dropdown_toggle(self):
         return self.browser.find_element(*self.ACCOUNT_DROPDOWN_TOGGLE)
 
-    @property
-    def _account_dropdown(self):
-        return self.browser.find_element(*self.ACCOUNT_DROPDOWN)
+    def toggle_account_dropdown(self):
+        self._account_dropdown_toggle.click()
+        return self
 
     @property
     def _account_dropdown_links(self):
-        return self.account_dropdown.find_elements(*self.DROPDOWN_LINKS)
+        return self.browser.find_elements(*self.ACCOUNT_DROPDOWN_LINK)
 
     @property
-    def _home_page_link(self):
-        return self.browser.find_element(*self.HOME_PAGE_LINK)
+    def _title(self):
+        return self.browser.find_element(*self.TITLE)
 
     @property
     def _sidebar_toggle(self):
         return self.browser.find_element(*self.SIDEBAR_TOGGLE)
 
-    @property
-    def title(self):
-        return self._home_page_link.text
+    def toggle_sidebar(self):
+        self._sidebar_toggle.click()
+        return self
 
 
 class Messages(BaseComponent):
@@ -72,21 +74,31 @@ class Pagination(BaseComponent):
     PAGE_LINK = (By.CLASS_NAME, "page-link")
 
     @property
-    def _items(self):
+    def _page_items(self):
         return self.browser.find_elements(*self.PAGE_ITEM)
 
     @property
-    def _links(self):
+    def _page_links(self):
         return self.browser.find_elements(*self.PAGE_LINK)
+
+    @property
+    def links(self):
+        link_names = map(lambda l: l.name, self._page_links)
+        return dict(zip(link_names, self._page_links))
+
+    def go_to_page(self, link_text):
+        page_link = self.links.get(link_text)
+        if page_link is not None:
+            page_link.click()
 
 
 class Footer(BaseComponent):
-    FOOTER = (By.ID, "site_footer")
+    LOCATOR = (By.ID, "site_footer")
     FOOTER_LINK = (By.CSS_SELECTOR, "#site_footer a")
 
     @property
-    def _text(self):
-        return self.browser.find_element(*self.FOOTER).text
+    def _container(self):
+        return self.browser.find_element(*self.LOCATOR)
 
     @property
     def _links(self):
@@ -100,10 +112,6 @@ class BaseForm(BaseComponent):
     @property
     def _submit_button(self):
         return self.browser.find_element(*self.SUBMIT_BUTTON)
-
-    @property
-    def submit_button_label(self):
-        return self._submit_button.text
 
     def submit(self):
         self._submit_button.click()
