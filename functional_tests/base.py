@@ -1,6 +1,9 @@
+import re
+
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.core import mail
 from django.test import tag
 
 import decouple
@@ -53,3 +56,10 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     @staticmethod
     def get_site_name():
         return settings.SITE_NAME
+
+    @property
+    def mail(self):
+        return mail
+
+    def find_url(self, text):
+        return re.search(r"(?P<url>https?://[^\s]+)", text).group("url")

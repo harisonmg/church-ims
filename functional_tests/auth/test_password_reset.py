@@ -1,7 +1,3 @@
-import re
-
-from django.core import mail
-
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
 from functional_tests.utils import pages
@@ -55,13 +51,13 @@ class PasswordResetTestCase(FunctionalTestCase):
             + " within a few minutes.",
         )
 
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        self.assertEqual(len(self.mail.outbox), 1)
+        email = self.mail.outbox[0]
         self.assertIn(self.user.email, email.to)
         self.assertIn("Click the link below to reset your password", email.body)
 
         # The email has a password reset link
-        url = re.search(r"(?P<url>https?://[^\s]+)", email.body).group("url")
+        url = self.find_url(email.body)
         self.assertIn(self.live_server_url, url)
 
         # She clicks the link and is taken to the password reset page

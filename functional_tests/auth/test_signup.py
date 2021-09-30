@@ -1,6 +1,3 @@
-import re
-
-from django.core import mail
 from django.test import override_settings
 
 from functional_tests.base import FunctionalTestCase
@@ -62,12 +59,12 @@ class SignupTestCase(FunctionalTestCase):
         )
 
         # She also receives an email with a link for verifying her email address
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        self.assertEqual(len(self.mail.outbox), 1)
+        email = self.mail.outbox[0]
         self.assertIn(self.user_email, email.to)
         self.assertIn("To confirm this is correct, go to", email.body)
 
-        url = re.search(r"(?P<url>https?://[^\s]+)", email.body).group("url")
+        url = self.find_url(email.body)
         self.assertIn(self.live_server_url, url)
 
         # She clicks the link and is taken to the email confirmation page
