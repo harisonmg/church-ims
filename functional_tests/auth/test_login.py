@@ -64,6 +64,5 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(account_inactive_page.header._title.text, site_name)
         self.assertEqual(account_inactive_page.heading, "Account inactive")
         self.assertEqual(
-            account_inactive_page.main_text[0],
-            "This account is inactive."
+            account_inactive_page.main_text[0], "This account is inactive."
         )

@@ -54,6 +54,12 @@ class SignupTestCase(FunctionalTestCase):
             email_verification_page.messages.messages[0],
             f"Confirmation e-mail sent to {self.user_email}.",
         )
+        self.assertEqual(
+            email_verification_page.main_text[0],
+            "We have sent an e-mail to you for verification."
+            + " Follow the link provided to finalize the signup process."
+            + " Please contact us if you do not receive it within a few minutes.",
+        )
 
         # She also receives an email with a link for verifying her email address
         self.assertEqual(len(mail.outbox), 1)
@@ -72,7 +78,7 @@ class SignupTestCase(FunctionalTestCase):
         self.assertEqual(email_confirmation_page.header._title.text, site_name)
         self.assertEqual(email_confirmation_page.heading, "Confirm email address")
         self.assertEqual(
-            email_confirmation_page._main_paragraphs[0].text,
+            email_confirmation_page.main_text[0],
             "Please confirm that {} is an e-mail address for user {}.".format(
                 self.user_email, self.user_email.split("@")[0]
             ),

@@ -25,6 +25,11 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(password_reset_request_page.title, site_name)
         self.assertEqual(password_reset_request_page.header._title.text, site_name)
         self.assertEqual(password_reset_request_page.heading, "Password reset")
+        self.assertEqual(
+            password_reset_request_page.main_text[0],
+            "Forgotten your password? Enter your e-mail address below,"
+            + " and we'll send you an e-mail allowing you to reset it.",
+        )
 
         # She sees the inputs of the password reset request form,
         # including labels and placeholders
@@ -44,6 +49,11 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(password_reset_request_done_page.title, site_name)
         self.assertEqual(password_reset_request_done_page.header._title.text, site_name)
         self.assertEqual(password_reset_request_done_page.heading, "Password reset")
+        self.assertEqual(
+            password_reset_request_done_page.main_text[0],
+            "We have sent you an e-mail. Please contact us if you do not receive it"
+            + " within a few minutes.",
+        )
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
@@ -89,7 +99,7 @@ class PasswordResetTestCase(FunctionalTestCase):
             "Password successfully changed.",
         )
         self.assertEqual(
-            password_reset_done_page._main_paragraphs[0].text,
+            password_reset_done_page.main_text[0],
             "You can now log in with your new password.",
         )
         self.assertEqual(password_reset_done_page.login_link, pages.LoginPage(self).url)
