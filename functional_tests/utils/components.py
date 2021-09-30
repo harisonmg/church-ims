@@ -135,6 +135,8 @@ class LoginForm(BaseForm):
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
     PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password']")
+    REMEMBER_CHECKBOX = (By.CSS_SELECTOR, "input#id_remember")
+    REMEMBER_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_remember']")
     SIGN_UP_LINK = (By.LINK_TEXT, "Sign up")
     PASSWORD_RESET_LINK = (By.LINK_TEXT, "I don't remember my password")
 
@@ -155,6 +157,14 @@ class LoginForm(BaseForm):
         return self.browser.find_element(*self.PASSWORD_LABEL).text
 
     @property
+    def _remember_checkbox(self):
+        return self.browser.find_element(*self.REMEMBER_CHECKBOX)
+
+    @property
+    def remember_checkbox_label(self):
+        return self.browser.find_element(*self.REMEMBER_CHECKBOX_LABEL).text
+
+    @property
     def signup_link(self):
         link_element = self.browser.find_element(*self.SIGN_UP_LINK)
         return link_element.get_attribute("href")
@@ -164,9 +174,11 @@ class LoginForm(BaseForm):
         link_element = self.browser.find_element(*self.PASSWORD_RESET_LINK)
         return link_element.get_attribute("href")
 
-    def send_keys(self, email, password):
+    def send_keys(self, email, password, remember=False):
         self._email_input.send_keys(email)
         self._password_input.send_keys(password)
+        if remember:
+            self._remember_checkbox.click()
         return self.submit()
 
 

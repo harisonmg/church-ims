@@ -27,6 +27,7 @@ class LoginTestCase(FunctionalTestCase):
         # He also sees links for signing up and password reset
         self.assertEqual(login_page.form.email_label, "E-mail*")
         self.assertEqual(login_page.form.password_label, "Password*")
+        self.assertEqual(login_page.form.remember_checkbox_label, "Remember Me")
         self.assertEqual(login_page.form._submit_button.text, "Log in")
         self.assertEqual(login_page.form.signup_link, pages.SignupPage(self).url)
         self.assertEqual(
@@ -35,7 +36,7 @@ class LoginTestCase(FunctionalTestCase):
         )
 
         # He enters his email and password and submits the form
-        login_page.login(self.active_user.email, self.password)
+        login_page.login(self.active_user.email, self.password, True)
 
         # The login was successful and he is redirected to his dashboard
         dashboard = pages.Dashboard(self)
@@ -62,3 +63,7 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(account_inactive_page.title, site_name)
         self.assertEqual(account_inactive_page.header._title.text, site_name)
         self.assertEqual(account_inactive_page.heading, "Account inactive")
+        self.assertEqual(
+            account_inactive_page.main_text[0],
+            "This account is inactive."
+        )
