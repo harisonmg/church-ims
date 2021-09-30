@@ -98,6 +98,8 @@ class SignupTestCase(FunctionalTestCase):
         email_confirmation_page.visit()
 
         self.assertEqual(email_confirmation_page.heading, "Confirm email address")
-        self.browser.find_element_by_link_text(
-            "issue a new e-mail confirmation request"
+        self.assertEqual(
+            email_confirmation_page.main_text[0],
+            "This e-mail confirmation link expired or is invalid."
+            + " Please issue a new e-mail confirmation request.",
         )
