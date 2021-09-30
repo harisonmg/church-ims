@@ -6,6 +6,7 @@ from . import components
 class BasePage:
     PATH = "/404/"
     HEADING = (By.TAG_NAME, "h1")
+    MAIN_PARAGRAPHS = (By.CSS_SELECTOR, "main p")
 
     def __init__(self, test):
         self.test = test
@@ -29,6 +30,14 @@ class BasePage:
     @property
     def header(self):
         return components.Header(self.browser)
+
+    @property
+    def _main_paragraphs(self):
+        return self.browser.find_elements(*self.MAIN_PARAGRAPHS)
+
+    @property
+    def main_text(self):
+        return list(map(lambda p: p.text, self._main_paragraphs))
 
     @property
     def messages(self):
@@ -81,8 +90,8 @@ class LoginPage(BasePage):
     def form(self):
         return components.LoginForm(self.browser)
 
-    def login(self, email, password):
-        self.form.send_keys(email=email, password=password)
+    def login(self, email, password, remember=False):
+        self.form.send_keys(email=email, password=password, remember=remember)
         return self
 
 
@@ -133,16 +142,11 @@ class PasswordResetPage(BasePage):
 class PasswordResetDonePage(BasePage):
     PATH = "/accounts/password/reset/key/done/"
     LOGIN_LINK = (By.LINK_TEXT, "log in")
-    MAIN_PARAGRAPHS = (By.CSS_SELECTOR, "main p")
 
     @property
     def login_link(self):
         link_element = self.browser.find_element(*self.LOGIN_LINK)
         return link_element.get_attribute("href")
-
-    @property
-    def _main_paragraphs(self):
-        return self.browser.find_elements(*self.MAIN_PARAGRAPHS)
 
 
 class SignupPage(BasePage):
@@ -163,11 +167,6 @@ class EmailVerificationRequiredPage(BasePage):
 
 class EmailConfirmationPage(BasePage):
     PATH = "/accounts/confirm-email/invalid-token/"
-    MAIN_PARAGRAPHS = (By.CSS_SELECTOR, "main p")
-
-    @property
-    def _main_paragraphs(self):
-        return self.browser.find_elements(*self.MAIN_PARAGRAPHS)
 
     @property
     def form(self):
