@@ -64,18 +64,17 @@ class NavigationComponent(BaseComponent):
 
     @property
     def _link_elements(self):
-        return self._container.find_elements(*self.LINK)
-
-    @property
-    def _link_text(self):
-        return map(lambda a: a.text, self._link_elements)
+        elements = self._container.find_elements(*self.LINK)
+        text = map(lambda a: a.text, elements)
+        return dict(zip(text, elements))
 
     @property
     def links(self):
-        return dict(zip(self._link_text, self._link_elements))
+        hrefs = map(lambda a: a.get_attribute("href"), self._link_elements.values())
+        return dict(zip(self._link_elements.keys(), hrefs))
 
     def go_to_page(self, link_text):
-        page_link = self.links.get(link_text)
+        page_link = self._link_elements.get(link_text)
         if page_link is not None:
             page_link.click()
 
@@ -96,14 +95,14 @@ class Pagination(NavigationComponent):
     def _link_classes(self):
         page_items = self._container.find_elements(*self.PAGE_ITEM)
         link_classes = map(lambda el: el.get_attribute("class"), page_items)
-        return dict(zip(self._link_text, list(link_classes)))
+        return dict(zip(self.links.keys(), list(link_classes)))
 
     @property
     def active_links(self):
         active = {}
         for link, classes in self._link_classes.items():
             if "active" in classes:
-                active[link] = self.links[link].get_attribute("href")
+                active[link] = self.links[link]
         return active
 
     @property
@@ -121,9 +120,9 @@ class Sidebar(NavigationComponent):
     @property
     def active_links(self):
         active = {}
-        for link, element in self.links.items():
+        for link, element in self._link_elements.items():
             if "active" in element.get_attribute("class"):
-                active[link] = element.get_attribute("href")
+                active[link] = self.links[link]
         return active
 
 
