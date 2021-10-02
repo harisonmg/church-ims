@@ -162,7 +162,7 @@ class Table(BaseComponent):
 
 
 # forms
-class BaseForm(BaseComponent):
+class FormComponent(BaseComponent):
     SUBMIT_BUTTON = (By.CSS_SELECTOR, "button[type='submit']")
 
     @property
@@ -174,7 +174,7 @@ class BaseForm(BaseComponent):
         return self
 
 
-class SearchForm(BaseForm):
+class SearchForm(FormComponent):
     SEARCH_INPUT = (By.CSS_SELECTOR, "input[type='search']")
 
     @property
@@ -194,7 +194,7 @@ class SearchForm(BaseForm):
         return self.submit()
 
 
-class LoginForm(BaseForm):
+class LoginForm(FormComponent):
     EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
@@ -246,7 +246,7 @@ class LoginForm(BaseForm):
         return self.submit()
 
 
-class PasswordResetRequestForm(BaseForm):
+class PasswordResetRequestForm(FormComponent):
     EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
 
@@ -263,7 +263,7 @@ class PasswordResetRequestForm(BaseForm):
         return self.submit()
 
 
-class PasswordResetForm(BaseForm):
+class PasswordResetForm(FormComponent):
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
     PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
     PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
@@ -291,7 +291,7 @@ class PasswordResetForm(BaseForm):
         return self.submit()
 
 
-class SignupForm(BaseForm):
+class SignupForm(FormComponent):
     EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
