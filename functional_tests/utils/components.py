@@ -105,6 +105,40 @@ class Footer(BaseComponent):
         return self.browser.find_elements(*self.FOOTER_LINK)
 
 
+# tables
+class Table(BaseComponent):
+    COLUMN = (By.CSS_SELECTOR, "thead th[scope='col']")
+    ROW_HEADER = (By.CSS_SELECTOR, "tbody th[scope='row']")
+    ROW = (By.CSS_SELECTOR, "tbody tr")
+    DATA = (By.TAG_NAME, "td")
+
+    @property
+    def columns(self):
+        elements = self.browser.find_elements(*self.COLUMN)
+        return list(map(lambda el: el.text, elements))
+
+    @property
+    def _row_headers(self):
+        return self.browser.find_elements(*self.ROW_HEADER)
+
+    @property
+    def _row_data(self):
+        """Returns table data elements for each row in a list of lists"""
+        rows = self.browser.find_elements(*self.ROW)
+        return map(lambda row: row.find_elements(*self.DATA), rows)
+
+    @property
+    def data(self):
+        """Returns a dictionary with row headers as keys and lists
+        containing row data as values
+        """
+        row_headers = map(lambda el: el.text, self._row_headers)
+        row_data = []
+        for row in self._row_data:
+            row_data.append(list(map(lambda el: el.text, row)))
+        return dict(zip(row_headers, row_data))
+
+
 # forms
 class BaseForm(BaseComponent):
     SUBMIT_BUTTON = (By.CSS_SELECTOR, "button[type='submit']")
@@ -118,12 +152,20 @@ class BaseForm(BaseComponent):
         return self
 
 
-class GenericSearchForm(BaseForm):
+class SearchForm(BaseForm):
     SEARCH_INPUT = (By.CSS_SELECTOR, "input[type='search']")
 
     @property
     def _search_input(self):
         return self.browser.find_element(*self.SEARCH_INPUT)
+
+    @property
+    def search_input_placeholder(self):
+        return self._search_input.get_attribute("placeholder")
+
+    @property
+    def search_input_aria_label(self):
+        return self._search_input.get_attribute("aria-label")
 
     def search(self, search_term):
         self._search_input.send_keys(search_term)
