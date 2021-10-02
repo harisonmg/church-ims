@@ -53,43 +53,50 @@ class Messages(BaseComponent):
         return [msg.text for msg in self._alerts]
 
 
-class Sidebar(BaseComponent):
-    SIDEBAR_LINK = (By.CSS_SELECTOR, "#sidebarMenu a")
+# navigation
+class NavigationComponent(BaseComponent):
+    CONTAINER = (By.TAG_NAME, "main")
+    LINK = (By.TAG_NAME, "a")
 
     @property
-    def _links(self):
-        return self.browser.find_elements(*self.SIDEBAR_LINK)
+    def _container(self):
+        return self.browser.find_element(*self.CONTAINER)
 
     @property
-    def active_links(self):
-        active_hrefs = []
-        for link in self._links:
-            if "active" in link.get_attribute("class"):
-                active_hrefs.append(link.get_attribute("href"))
-        return active_hrefs
-
-
-class Pagination(BaseComponent):
-    PAGE_ITEM = (By.CLASS_NAME, "page-item")
-    PAGE_LINK = (By.CLASS_NAME, "page-link")
-
-    @property
-    def _page_links(self):
-        return self.browser.find_elements(*self.PAGE_LINK)
+    def _link_elements(self):
+        return self._container.find_elements(*self.LINK)
 
     @property
     def _link_text(self):
-        return map(lambda a: a.text, self._page_links)
-
-    @property
-    def _link_classes(self):
-        page_items = self.browser.find_elements(*self.PAGE_ITEM)
-        link_classes = map(lambda el: el.get_attribute("class"), page_items)
-        return dict(zip(self._link_text, list(link_classes)))
+        return map(lambda a: a.text, self._link_elements)
 
     @property
     def links(self):
-        return dict(zip(self._link_text, self._page_links))
+        return dict(zip(self._link_text, self._link_elements))
+
+    def go_to_page(self, link_text):
+        page_link = self.links.get(link_text)
+        if page_link is not None:
+            page_link.click()
+
+
+class Footer(NavigationComponent):
+    CONTAINER = (By.ID, "site_footer")
+
+    @property
+    def text(self):
+        return self._container.text
+
+
+class Pagination(NavigationComponent):
+    CONTAINER = (By.CSS_SELECTOR, "nav .pagination")
+    PAGE_ITEM = (By.CLASS_NAME, "page-item")
+
+    @property
+    def _link_classes(self):
+        page_items = self._container.find_elements(*self.PAGE_ITEM)
+        link_classes = map(lambda el: el.get_attribute("class"), page_items)
+        return dict(zip(self._link_text, list(link_classes)))
 
     @property
     def active_links(self):
@@ -107,23 +114,17 @@ class Pagination(BaseComponent):
                 disabled.append(link)
         return disabled
 
-    def go_to_page(self, link_text):
-        page_link = self.links.get(link_text)
-        if page_link is not None:
-            page_link.click()
 
-
-class Footer(BaseComponent):
-    LOCATOR = (By.ID, "site_footer")
-    FOOTER_LINK = (By.CSS_SELECTOR, "#site_footer a")
+class Sidebar(NavigationComponent):
+    CONTAINER = (By.ID, "sidebarMenu")
 
     @property
-    def _container(self):
-        return self.browser.find_element(*self.LOCATOR)
-
-    @property
-    def _links(self):
-        return self.browser.find_elements(*self.FOOTER_LINK)
+    def active_links(self):
+        active = {}
+        for link, element in self.links.items():
+            if "active" in element.get_attribute("class"):
+                active[link] = element.get_attribute("href")
+        return active
 
 
 # tables

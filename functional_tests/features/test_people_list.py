@@ -53,7 +53,7 @@ class PeopleListTestCase(FunctionalTestCase):
         self.assertEqual(people_list_page.header._title.text, site_name)
         self.assertEqual(people_list_page.heading, "People")
         self.assertEqual(
-            people_list_page.sidebar.active_links[0], self.browser.current_url
+            people_list_page.sidebar.active_links, {"People": self.browser.current_url}
         )
 
         # He also sees a list of people and a page navigation
