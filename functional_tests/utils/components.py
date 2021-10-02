@@ -74,17 +74,38 @@ class Pagination(BaseComponent):
     PAGE_LINK = (By.CLASS_NAME, "page-link")
 
     @property
-    def _page_items(self):
-        return self.browser.find_elements(*self.PAGE_ITEM)
-
-    @property
     def _page_links(self):
         return self.browser.find_elements(*self.PAGE_LINK)
 
     @property
+    def _link_text(self):
+        return map(lambda a: a.text, self._page_links)
+
+    @property
+    def _link_classes(self):
+        page_items = self.browser.find_elements(*self.PAGE_ITEM)
+        link_classes = map(lambda el: el.get_attribute("class"), page_items)
+        return dict(zip(self._link_text, list(link_classes)))
+
+    @property
     def links(self):
-        link_names = map(lambda l: l.name, self._page_links)
-        return dict(zip(link_names, self._page_links))
+        return dict(zip(self._link_text, self._page_links))
+
+    @property
+    def active_links(self):
+        active = {}
+        for link, classes in self._link_classes.items():
+            if "active" in classes:
+                active[link] = self.links[link].get_attribute("href")
+        return active
+
+    @property
+    def disabled_links(self):
+        disabled = []
+        for link, classes in self._link_classes.items():
+            if "disabled" in classes:
+                disabled.append(link)
+        return disabled
 
     def go_to_page(self, link_text):
         page_link = self.links.get(link_text)
