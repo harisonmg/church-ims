@@ -17,4 +17,11 @@ class HomePageTestCase(FunctionalTestCase):
 
         # He sees links for the sign up and login pages
         self.assertEqual(home_page.primary_cta_link, pages.SignupPage(self).url)
-        self.assertEqual(home_page.sencondary_cta_link, pages.LoginPage(self).url)
+        self.assertEqual(home_page.secondary_cta_link, pages.LoginPage(self).url)
+
+        # He can also see some site information in the footer
+        self.assertEqual(home_page.footer.text, "Made with 💙 by Harison Gachuru")
+        self.assertEqual(
+            home_page.footer.links,
+            {"Harison Gachuru": "https://harisonmg.netlify.app/"},
+        )
