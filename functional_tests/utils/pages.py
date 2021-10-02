@@ -184,3 +184,15 @@ class Dashboard(BasePage):
 
 class PeopleListPage(BasePage):
     PATH = "/people/"
+
+    @property
+    def form(self):
+        return components.SearchForm(self.browser)
+
+    @property
+    def table(self):
+        return components.Table(self.browser)
+
+    def search(self, search_term):
+        self.form.search(search_term=search_term)
+        return self
