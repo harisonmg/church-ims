@@ -87,29 +87,43 @@ class PeopleListViewTestCase(TestCase):
         self.assertInHTML(self.table_head, response.content.decode())
 
     def test_search_by_full_name(self):
+        # setup
         people = PersonFactory.create_batch(10)
         person = people[0]
+        search_term = person.full_name
         self.client.force_login(self.authorized_user)
-        response = self.client.get(f"{self.url}?q={person.full_name}")
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
         response_people = list(response.context.get("people"))
-        self.assertEqual(response_people, [person])
+        filtered_people = Person.objects.filter(full_name__icontains=search_term)
+        self.assertQuerysetEqual(response_people, filtered_people)
 
     def test_search_by_name(self):
+        # setup
         people = PersonFactory.create_batch(10)
         person = people[0]
-        first_name = person.full_name.split()[0]
+        search_term = person.full_name.split()[0]
         self.client.force_login(self.authorized_user)
-        response = self.client.get(f"{self.url}?q={first_name}")
-        response_people = list(response.context.get("people"))
-        self.assertEqual(response_people, [person])
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
+        response_people = response.context.get("people")
+        filtered_people = Person.objects.filter(full_name__icontains=search_term)
+        self.assertQuerysetEqual(response_people, filtered_people)
 
     def test_search_by_username(self):
+        # setup
         people = PersonFactory.create_batch(10)
         person = people[0]
+        search_term = person.username
         self.client.force_login(self.authorized_user)
-        response = self.client.get(f"{self.url}?q={person.username}")
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
         response_people = list(response.context.get("people"))
-        self.assertEqual(response_people, [person])
+        filtered_people = Person.objects.filter(username__icontains=search_term)
+        self.assertQuerysetEqual(response_people, filtered_people)
 
     def test_response_with_no_search_results(self):
         PersonFactory.create_batch(10)
