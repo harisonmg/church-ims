@@ -78,7 +78,7 @@ class HomePage(BasePage):
         return self._primary_cta.get_attribute("href")
 
     @property
-    def sencondary_cta_link(self):
+    def secondary_cta_link(self):
         return self._secondary_cta.get_attribute("href")
 
 
