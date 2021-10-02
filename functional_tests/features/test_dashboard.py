@@ -29,4 +29,4 @@ class DashboardTestCase(FunctionalTestCase):
         self.assertEqual(dashboard.heading, "Dashboard")
 
         # He can also see a sidebar navigation, with the dashboard link highlighted
-        self.assertEqual(dashboard.sidebar.active_links[0], dashboard.url)
+        self.assertEqual(dashboard.sidebar.active_links[0], self.browser.current_url)
