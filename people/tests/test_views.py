@@ -89,8 +89,7 @@ class PeopleListViewTestCase(TestCase):
     def test_search_by_full_name(self):
         # setup
         people = PersonFactory.create_batch(10)
-        person = people[0]
-        search_term = person.full_name
+        search_term = people[0].full_name
         self.client.force_login(self.authorized_user)
 
         # test
@@ -102,8 +101,7 @@ class PeopleListViewTestCase(TestCase):
     def test_search_by_name(self):
         # setup
         people = PersonFactory.create_batch(10)
-        person = people[0]
-        search_term = person.full_name.split()[0]
+        search_term = people[0].full_name.split()[0]
         self.client.force_login(self.authorized_user)
 
         # test
@@ -115,8 +113,7 @@ class PeopleListViewTestCase(TestCase):
     def test_search_by_username(self):
         # setup
         people = PersonFactory.create_batch(10)
-        person = people[0]
-        search_term = person.username
+        search_term = people[0].username
         self.client.force_login(self.authorized_user)
 
         # test
