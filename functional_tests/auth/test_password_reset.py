@@ -16,11 +16,15 @@ class PasswordResetTestCase(FunctionalTestCase):
         password_reset_request_page.visit()
 
         # She knows he's in the right place because she can see the name
-        # of the site in the site title, heading and header
+        # of the site in the site title and header
         site_name = self.get_site_name()
         self.assertEqual(password_reset_request_page.title, site_name)
-        self.assertEqual(password_reset_request_page.header._title.text, site_name)
+        self.assertEqual(
+            password_reset_request_page.header.title,
+            self.header_title,
+        )
         self.assertEqual(password_reset_request_page.heading, "Password reset")
+
         self.assertEqual(
             password_reset_request_page.main_text[0],
             "Forgotten your password? Enter your e-mail address below,"
@@ -43,8 +47,12 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.current_url, password_reset_request_done_page.url)
 
         self.assertEqual(password_reset_request_done_page.title, site_name)
-        self.assertEqual(password_reset_request_done_page.header._title.text, site_name)
+        self.assertEqual(
+            password_reset_request_done_page.header.title,
+            self.header_title,
+        )
         self.assertEqual(password_reset_request_done_page.heading, "Password reset")
+
         self.assertEqual(
             password_reset_request_done_page.main_text[0],
             "We have sent you an e-mail. Please contact us if you do not receive it"
@@ -65,7 +73,7 @@ class PasswordResetTestCase(FunctionalTestCase):
 
         password_reset_page = pages.PasswordResetPage(self)
         self.assertEqual(password_reset_page.title, site_name)
-        self.assertEqual(password_reset_page.header._title.text, site_name)
+        self.assertEqual(password_reset_page.header.title, self.header_title)
         self.assertEqual(password_reset_page.heading, "Change password")
 
         # She sees the inputs of the password change form,
@@ -88,8 +96,9 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.current_url, password_reset_done_page.url)
 
         self.assertEqual(password_reset_done_page.title, site_name)
-        self.assertEqual(password_reset_done_page.header._title.text, site_name)
+        self.assertEqual(password_reset_done_page.header.title, self.header_title)
         self.assertEqual(password_reset_done_page.heading, "Password reset complete")
+
         self.assertEqual(
             password_reset_done_page.messages.messages[0],
             "Password successfully changed.",

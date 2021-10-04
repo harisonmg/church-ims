@@ -19,10 +19,10 @@ class SignupTestCase(FunctionalTestCase):
         signup_page.visit()
 
         # She knows he's in the right place because she can see the name
-        # of the site in the site title, heading and header
+        # of the site in the title and header
         site_name = self.get_site_name()
         self.assertEqual(signup_page.title, site_name)
-        self.assertEqual(signup_page.header._title.text, site_name)
+        self.assertEqual(signup_page.header.title, self.header_title)
         self.assertEqual(signup_page.heading, "Sign up")
 
         # She sees the inputs of the signup form, including labels and placeholders.
@@ -44,7 +44,7 @@ class SignupTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.current_url, email_verification_page.url)
 
         self.assertEqual(email_verification_page.title, site_name)
-        self.assertEqual(email_verification_page.header._title.text, site_name)
+        self.assertEqual(email_verification_page.header.title, self.header_title)
         self.assertEqual(email_verification_page.heading, "Verify your email address")
 
         self.assertEqual(
@@ -72,8 +72,9 @@ class SignupTestCase(FunctionalTestCase):
         email_confirmation_page = pages.EmailConfirmationPage(self)
 
         self.assertEqual(email_confirmation_page.title, site_name)
-        self.assertEqual(email_confirmation_page.header._title.text, site_name)
+        self.assertEqual(email_confirmation_page.header.title, self.header_title)
         self.assertEqual(email_confirmation_page.heading, "Confirm email address")
+
         self.assertEqual(
             email_confirmation_page.main_text[0],
             "Please confirm that {} is an e-mail address for user {}.".format(

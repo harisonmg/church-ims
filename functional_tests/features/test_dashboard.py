@@ -22,11 +22,17 @@ class DashboardTestCase(FunctionalTestCase):
         dashboard.visit()
 
         # He knows he's in the right place because he can see the name
-        # of the site in the site title, heading and header
+        # of the site in the title and header
         site_name = self.get_site_name()
         self.assertEqual(dashboard.title, site_name)
-        self.assertEqual(dashboard.header._title.text, site_name)
+        self.assertEqual(dashboard.header.title, self.header_title)
         self.assertEqual(dashboard.heading, "Dashboard")
+
+        # The site header an account dropdown menu as well
+        dashboard.header.toggle_account_dropdown()
+        self.assertEqual(
+            dashboard.header.account_dropdown.links, self.account_dropdown_links
+        )
 
         # He can also see a sidebar navigation, with the dashboard link highlighted
         self.assertEqual(

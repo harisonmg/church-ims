@@ -46,12 +46,19 @@ class PeopleListTestCase(FunctionalTestCase):
         people_list_page.visit()
 
         # He knows he's in the right place because he can see the name
-        # of the site in the site title, heading and header as well as
-        # a sidebar navigation with the people link highlighted
+        # of the site in the title, header and heading
         site_name = self.get_site_name()
         self.assertEqual(people_list_page.title, site_name)
-        self.assertEqual(people_list_page.header._title.text, site_name)
+        self.assertEqual(people_list_page.header.title, self.header_title)
         self.assertEqual(people_list_page.heading, "People")
+
+        # The site header an account dropdown menu as well
+        people_list_page.header.toggle_account_dropdown()
+        self.assertEqual(
+            people_list_page.header.account_dropdown.links, self.account_dropdown_links
+        )
+
+        # He can also see a sidebar navigation, with the people link highlighted
         self.assertEqual(
             people_list_page.sidebar.active_links, {"People": self.browser.current_url}
         )

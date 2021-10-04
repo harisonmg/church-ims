@@ -10,6 +10,8 @@ import decouple
 from faker import Faker
 from selenium import webdriver
 
+from functional_tests.utils import pages
+
 
 @tag("functional")
 class FunctionalTestCase(StaticLiveServerTestCase):
@@ -53,6 +55,7 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     def get_admin_site_title():
         return admin.site.site_title
 
+    # TODO: make a property
     @staticmethod
     def get_site_name():
         return settings.SITE_NAME
@@ -63,3 +66,12 @@ class FunctionalTestCase(StaticLiveServerTestCase):
 
     def find_url(self, text):
         return re.search(r"(?P<url>https?://[^\s]+)", text).group("url")
+
+    @property
+    def account_dropdown_links(self):
+        links = {"Log out": pages.LogoutPage(self).url}
+        return links
+
+    @property
+    def header_title(self):
+        return {self.get_site_name(): pages.HomePage(self).url}

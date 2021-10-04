@@ -22,14 +22,20 @@ class LogoutTestCase(FunctionalTestCase):
         logout_page.visit()
 
         # He knows he's in the right place because he can see the name
-        # of the site in the site title, heading and header
+        # of the site in the title and header
         site_name = self.get_site_name()
         self.assertEqual(logout_page.title, site_name)
-        self.assertEqual(logout_page.header._title.text, site_name)
+        self.assertEqual(logout_page.header.title, self.header_title)
         self.assertEqual(logout_page.heading, "Log out")
-        self.assertEqual(logout_page.main_text[0], "Are you sure you want to log out?")
+
+        # The site header an account dropdown menu as well
+        logout_page.header.toggle_account_dropdown()
+        self.assertEqual(
+            logout_page.header.account_dropdown.links, self.account_dropdown_links
+        )
 
         # He sees a logout confirmation button and ascertains that he wants to log out
+        self.assertEqual(logout_page.main_text[0], "Are you sure you want to log out?")
         self.assertEqual(logout_page.form._submit_button.text, "Log out")
         logout_page.logout()
 

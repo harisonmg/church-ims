@@ -9,17 +9,17 @@ class HomePageTestCase(FunctionalTestCase):
         home_page.visit()
 
         # He knows he's in the right place because he can see the name
-        # of the site in the site title, heading and header
+        # of the site in the title, header and heading
         site_name = self.get_site_name()
         self.assertEqual(home_page.title, site_name)
-        self.assertEqual(home_page.header._title.text, site_name)
+        self.assertEqual(home_page.header.title, self.header_title)
         self.assertEqual(home_page.heading, site_name)
 
         # He sees links for the sign up and login pages
         self.assertEqual(home_page.primary_cta_link, pages.SignupPage(self).url)
         self.assertEqual(home_page.secondary_cta_link, pages.LoginPage(self).url)
 
-        # He can also see some site information in the footer
+        # There is also some site information in the footer
         self.assertEqual(home_page.footer.text, "Made with 💙 by Harison Gachuru")
         self.assertEqual(
             home_page.footer.links,

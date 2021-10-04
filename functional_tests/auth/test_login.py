@@ -17,10 +17,10 @@ class LoginTestCase(FunctionalTestCase):
         login_page.visit()
 
         # He knows he's in the right place because he can see the name
-        # of the site in the site title, heading and header
+        # of the site in the title and header
         site_name = self.get_site_name()
         self.assertEqual(login_page.title, site_name)
-        self.assertEqual(login_page.header._title.text, site_name)
+        self.assertEqual(login_page.header.title, self.header_title)
         self.assertEqual(login_page.heading, "Log in")
 
         # He sees the inputs of the login form, including labels and placeholders.
@@ -58,10 +58,10 @@ class LoginTestCase(FunctionalTestCase):
         account_inactive_page = pages.AccountInactivePage(self)
         self.assertEqual(self.browser.current_url, account_inactive_page.url)
 
-        # He can see the name of the site in the site title, heading and header
+        # He can see the name of the site in the site title and header
         site_name = self.get_site_name()
         self.assertEqual(account_inactive_page.title, site_name)
-        self.assertEqual(account_inactive_page.header._title.text, site_name)
+        self.assertEqual(account_inactive_page.header.title, self.header_title)
         self.assertEqual(account_inactive_page.heading, "Account inactive")
         self.assertEqual(
             account_inactive_page.main_text[0], "This account is inactive."
