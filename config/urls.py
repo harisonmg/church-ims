@@ -24,5 +24,6 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),  # to remove app namespace
     path("people/", include("people.urls")),
+    path("records/", include("records.urls")),
     path("", include("core.urls")),
 ]
