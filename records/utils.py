@@ -1,2 +1,2 @@
 def format_temperature(temperature):
-    return str(temperature) + u"\N{DEGREE SIGN}" + "C"
+    return "{:.2f}\N{DEGREE SIGN}C".format(temperature)
