@@ -1,7 +1,6 @@
 import re
 
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.test import tag
@@ -42,18 +41,6 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-
-    def get_admin_url(self):
-        """Returns the admin URL from the `ADMIN_URL` setting
-
-        Returns:
-            string: The link to the homepage of the admin site
-        """
-        return f"{self.live_server_url}/{settings.ADMIN_URL}/"
-
-    @staticmethod
-    def get_admin_site_title():
-        return admin.site.site_title
 
     # TODO: make a property
     @staticmethod
