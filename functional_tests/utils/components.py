@@ -7,40 +7,6 @@ class BaseComponent:
 
 
 # generic page components
-class Header(BaseComponent):
-    ACCOUNT_DROPDOWN_TOGGLE = (By.ID, "accountDropdownMenu")
-    ACCOUNT_DROPDOWN_LINK = (
-        By.CSS_SELECTOR,
-        "[aria-labelledby='accountDropdownMenu'] .dropdown-item",
-    )
-    SIDEBAR_TOGGLE = (By.CSS_SELECTOR, "button[data-bs-target='#sidebarMenu']")
-    TITLE = (By.CSS_SELECTOR, "#site_header > a")
-
-    @property
-    def _account_dropdown_toggle(self):
-        return self.browser.find_element(*self.ACCOUNT_DROPDOWN_TOGGLE)
-
-    def toggle_account_dropdown(self):
-        self._account_dropdown_toggle.click()
-        return self
-
-    @property
-    def _account_dropdown_links(self):
-        return self.browser.find_elements(*self.ACCOUNT_DROPDOWN_LINK)
-
-    @property
-    def _title(self):
-        return self.browser.find_element(*self.TITLE)
-
-    @property
-    def _sidebar_toggle(self):
-        return self.browser.find_element(*self.SIDEBAR_TOGGLE)
-
-    def toggle_sidebar(self):
-        self._sidebar_toggle.click()
-        return self
-
-
 class Messages(BaseComponent):
     ALERT = (By.CSS_SELECTOR, "div[role='alert']")
 
@@ -77,6 +43,33 @@ class NavigationComponent(BaseComponent):
         page_link = self._link_elements.get(link_text)
         if page_link is not None:
             page_link.click()
+
+
+class AccountDropdownMenu(NavigationComponent):
+    CONTAINER = (By.CSS_SELECTOR, "[aria-labelledby='accountDropdownMenu']")
+
+
+class Header(BaseComponent):
+    ACCOUNT_DROPDOWN_TOGGLE = (By.ID, "accountDropdownMenu")
+    SIDEBAR_TOGGLE = (By.CSS_SELECTOR, "button[data-bs-target='#sidebarMenu']")
+    TITLE = (By.CSS_SELECTOR, "#site_header > a")
+
+    def toggle_account_dropdown(self):
+        toggle_link = self.browser.find_element(*self.ACCOUNT_DROPDOWN_TOGGLE)
+        return toggle_link.click()
+
+    def toggle_sidebar(self):
+        toggle_link = self.browser.find_element(*self.SIDEBAR_TOGGLE)
+        return toggle_link.click()
+
+    @property
+    def account_dropdown(self):
+        return AccountDropdownMenu(self.browser)
+
+    @property
+    def title(self):
+        link = self.browser.find_element(*self.TITLE)
+        return {link.text: link.get_attribute("href")}
 
 
 class Footer(NavigationComponent):
