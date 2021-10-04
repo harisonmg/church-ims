@@ -1,5 +1,48 @@
 {% extends '_base.html' %}
 
 {% block content %}
-  <h1>Temperature records</h1>
+  <div class="col-lg-10 p-3 mx-auto text-center"
+    {% if temperature_records %}
+      parent-class="mt-3 mt-md-5 mb-auto"
+    {% else %}
+      parent-class="my-auto"
+    {% endif %}
+   >
+    <h1 class="display-5 fw-bold lh-1 mb-5">Temperature records</h1>
+    {% if not temperature_records %}
+      {% if "q" in request.GET %}
+        <p class="lead">Your search didn't yield any results</p>
+      {% else %}
+        <p class="lead">There are no temperature records yet!</p>
+      {% endif %}
+    {% else %}
+      <form id="search_form" class="d-flex my-3">
+        <input class="form-control me-2" name="q" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+
+      <div class="table-responsive-md">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Username</th>
+              <th scope="col">Temperature</th>
+              <th scope="col">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in temperature_records %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ record.person }}</td>
+                <td>{{ record.body_temperature }}&deg;C</td>
+                <td>{{ record.created_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
 {% endblock content %}
