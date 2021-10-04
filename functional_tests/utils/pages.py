@@ -196,3 +196,11 @@ class PeopleListPage(BasePage):
     def search(self, search_term):
         self.form.search(search_term=search_term)
         return self
+
+
+class TemperatureRecordsListPage(BasePage):
+    PATH = "/records/temperature/"
+
+    @property
+    def table(self):
+        return components.Table(self.browser)
