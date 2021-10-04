@@ -1,10 +1,12 @@
 from django.contrib.auth.models import Permission
+from django.utils import dateformat, timezone
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
 from functional_tests.utils import pages
 
-# from records.factories import TemperatureRecordFactory
+from records.factories import TemperatureRecordFactory
+from records.utils import format_temperature
 
 
 class TemperatureRecordsListTestCase(FunctionalTestCase):
@@ -13,14 +15,16 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
 
         # user
         self.password = self.fake.password()
-        permission = Permission.objects.filter(name="Can view person")
+        permission = Permission.objects.filter(name="Can view temperature record")
         self.user = UserFactory(
             password=self.password, user_permissions=tuple(permission)
         )
 
         # temperature records
-        # temperature_records = TemperatureRecordFactory.create_batch(45)
-        # self.temperature_records = sorted(temperature_records, key=lambda tr: tr.username)
+        temperature_records = TemperatureRecordFactory.create_batch(45)
+        self.temperature_records = sorted(
+            temperature_records, key=lambda record: record.person.username
+        )
         self.login()
 
     def login(self):
@@ -28,16 +32,25 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         login_page.visit()
         login_page.login(self.user.email, self.password)
 
+    @staticmethod
+    def format_datetime(dt, fmt="j M Y, h:i a"):
+        local_dt = timezone.localtime(dt)
+        return dateformat.format(local_dt, fmt)
+
     def format_temperature_records(self, temperature_records):
         search_results = {}
         for i, record in enumerate(temperature_records):
-            search_results[str(i + 1)] = [record.username, record.full_name]
+            search_results[str(i + 1)] = [
+                record.person.username,
+                format_temperature(record.body_temperature),
+                self.format_datetime(record.created_at),
+            ]
         return search_results
 
     def find_temperature_records_by_person_name(self, name):
         search_results = []
         for record in self.temperature_records:
-            if name.lower() in record.full_name.lower():
+            if name.lower() in record.person.full_name.lower():
                 search_results.append(record)
         return self.format_temperature_records(search_results)
 
