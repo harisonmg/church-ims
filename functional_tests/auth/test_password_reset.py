@@ -17,8 +17,7 @@ class PasswordResetTestCase(FunctionalTestCase):
 
         # She knows he's in the right place because she can see the name
         # of the site in the site title and header
-        site_name = self.get_site_name()
-        self.assertEqual(password_reset_request_page.title, site_name)
+        self.assertEqual(password_reset_request_page.title, self.SITE_NAME)
         self.assertEqual(
             password_reset_request_page.header.title,
             self.header_title,
@@ -45,8 +44,7 @@ class PasswordResetTestCase(FunctionalTestCase):
         # and receives an email with instructions for resetting her password
         password_reset_request_done_page = pages.PasswordResetRequestDonePage(self)
         self.assertEqual(self.browser.current_url, password_reset_request_done_page.url)
-
-        self.assertEqual(password_reset_request_done_page.title, site_name)
+        self.assertEqual(password_reset_request_done_page.title, self.SITE_NAME)
         self.assertEqual(
             password_reset_request_done_page.header.title,
             self.header_title,
@@ -70,9 +68,8 @@ class PasswordResetTestCase(FunctionalTestCase):
 
         # She clicks the link and is taken to the password reset page
         self.browser.get(url)
-
         password_reset_page = pages.PasswordResetPage(self)
-        self.assertEqual(password_reset_page.title, site_name)
+        self.assertEqual(password_reset_page.title, self.SITE_NAME)
         self.assertEqual(password_reset_page.header.title, self.header_title)
         self.assertEqual(password_reset_page.heading, "Change password")
 
@@ -94,8 +91,7 @@ class PasswordResetTestCase(FunctionalTestCase):
         # to the password reset done page
         password_reset_done_page = pages.PasswordResetDonePage(self)
         self.assertEqual(self.browser.current_url, password_reset_done_page.url)
-
-        self.assertEqual(password_reset_done_page.title, site_name)
+        self.assertEqual(password_reset_done_page.title, self.SITE_NAME)
         self.assertEqual(password_reset_done_page.header.title, self.header_title)
         self.assertEqual(password_reset_done_page.heading, "Password reset complete")
 

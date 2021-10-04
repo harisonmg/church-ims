@@ -21,6 +21,8 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         django.test.LiveServerTestCase
     """
 
+    SITE_NAME = settings.SITE_NAME
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -42,11 +44,6 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     def tearDownClass(cls):
         super().tearDownClass()
 
-    # TODO: make a property
-    @staticmethod
-    def get_site_name():
-        return settings.SITE_NAME
-
     @property
     def mail(self):
         return mail
@@ -61,4 +58,4 @@ class FunctionalTestCase(StaticLiveServerTestCase):
 
     @property
     def header_title(self):
-        return {self.get_site_name(): pages.HomePage(self).url}
+        return {self.SITE_NAME: pages.HomePage(self).url}

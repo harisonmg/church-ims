@@ -23,8 +23,7 @@ class LogoutTestCase(FunctionalTestCase):
 
         # He knows he's in the right place because he can see the name
         # of the site in the title and header
-        site_name = self.get_site_name()
-        self.assertEqual(logout_page.title, site_name)
+        self.assertEqual(logout_page.title, self.SITE_NAME)
         self.assertEqual(logout_page.header.title, self.header_title)
         self.assertEqual(logout_page.heading, "Log out")
 

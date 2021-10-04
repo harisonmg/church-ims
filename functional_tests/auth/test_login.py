@@ -18,8 +18,7 @@ class LoginTestCase(FunctionalTestCase):
 
         # He knows he's in the right place because he can see the name
         # of the site in the title and header
-        site_name = self.get_site_name()
-        self.assertEqual(login_page.title, site_name)
+        self.assertEqual(login_page.title, self.SITE_NAME)
         self.assertEqual(login_page.header.title, self.header_title)
         self.assertEqual(login_page.heading, "Log in")
 
@@ -59,8 +58,7 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.current_url, account_inactive_page.url)
 
         # He can see the name of the site in the site title and header
-        site_name = self.get_site_name()
-        self.assertEqual(account_inactive_page.title, site_name)
+        self.assertEqual(account_inactive_page.title, self.SITE_NAME)
         self.assertEqual(account_inactive_page.header.title, self.header_title)
         self.assertEqual(account_inactive_page.heading, "Account inactive")
         self.assertEqual(

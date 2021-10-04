@@ -23,8 +23,7 @@ class DashboardTestCase(FunctionalTestCase):
 
         # He knows he's in the right place because he can see the name
         # of the site in the title and header
-        site_name = self.get_site_name()
-        self.assertEqual(dashboard.title, site_name)
+        self.assertEqual(dashboard.title, self.SITE_NAME)
         self.assertEqual(dashboard.header.title, self.header_title)
         self.assertEqual(dashboard.heading, "Dashboard")
 

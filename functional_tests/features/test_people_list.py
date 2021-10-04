@@ -47,8 +47,7 @@ class PeopleListTestCase(FunctionalTestCase):
 
         # He knows he's in the right place because he can see the name
         # of the site in the title, header and heading
-        site_name = self.get_site_name()
-        self.assertEqual(people_list_page.title, site_name)
+        self.assertEqual(people_list_page.title, self.SITE_NAME)
         self.assertEqual(people_list_page.header.title, self.header_title)
         self.assertEqual(people_list_page.heading, "People")
 
