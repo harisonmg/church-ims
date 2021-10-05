@@ -11,3 +11,14 @@ class TemperatureRecordsListURLTestCase(SimpleTestCase):
 
     def test_view_name(self):
         self.assertEqual(self.match.view_name, "records:temperature_records_list")
+
+
+class TemperatureRecordCreateURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/records/temperature/username/add/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "TemperatureRecordCreateView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "records:temperature_record_create")

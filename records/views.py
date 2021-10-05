@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 
 from extra_views import SearchableListMixin
 
@@ -15,3 +15,8 @@ class TemperatureRecordsListView(
     permission_required = "records.view_temperaturerecord"
     search_fields = ["person__username", "person__full_name"]
     template_name = "records/temperature_records_list.html"
+
+
+class TemperatureRecordCreateView(LoginRequiredMixin, TemplateView):
+    # permission_required = "records.view_temperaturerecord"
+    template_name = "records/temperature_record_form.html"
