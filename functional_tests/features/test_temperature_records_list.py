@@ -32,7 +32,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         login_page.login(self.user.email, self.password)
 
     @staticmethod
-    def format_datetime(dt, fmt="j M Y, h:i a"):
+    def format_datetime(dt, fmt="j M Y, g:i a"):
         local_dt = timezone.localtime(dt)
         return dateformat.format(local_dt, fmt)
 
