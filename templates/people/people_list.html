@@ -37,7 +37,12 @@
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ person.username }}</td>
                 <td>{{ person.full_name }}</td>
-                <td><a href="#" class="btn btn-sm btn-outline-primary text-nowrap">add temp</a></td>
+                <td>
+                  <a href="{% url 'records:temperature_record_create' person.username %}"
+                   class="btn btn-sm btn-outline-primary text-nowrap">
+                    add temp
+                  </a>
+                </td>
               </tr>
             {% endfor %}
           </tbody>

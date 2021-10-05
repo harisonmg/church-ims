@@ -5,7 +5,7 @@ from . import views
 app_name = "records"
 urlpatterns = [
     path(
-        "temperature/username/add/",
+        "temperature/<str:username>/add/",
         views.TemperatureRecordCreateView.as_view(),
         name="temperature_record_create",
     ),
