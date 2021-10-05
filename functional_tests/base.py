@@ -21,7 +21,7 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         django.test.LiveServerTestCase
     """
 
-    PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name"]
+    PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Actions"]
     SITE_NAME = settings.SITE_NAME
 
     @classmethod
@@ -60,3 +60,8 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     @property
     def header_title(self):
         return {self.SITE_NAME: pages.HomePage(self).url}
+
+    def login(self, user, password):
+        login_page = pages.LoginPage(self)
+        login_page.visit()
+        login_page.login(user.email, password)
