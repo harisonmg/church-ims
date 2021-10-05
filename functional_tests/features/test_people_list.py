@@ -65,6 +65,10 @@ class PeopleListTestCase(FunctionalTestCase):
         # He also sees a list of people and a page navigation
         self.assertEqual(people_list_page.table.columns, ["#", "Username", "Full name"])
         self.assertEqual(
+            people_list_page.table.data.get("1"),
+            self.format_people_details(self.people[:1]).get("1"),
+        )
+        self.assertEqual(
             people_list_page.table.data, self.format_people_details(self.people[:10])
         )
         self.assertEqual(

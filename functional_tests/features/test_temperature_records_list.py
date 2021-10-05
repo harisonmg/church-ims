@@ -84,6 +84,10 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
             ["#", "Username", "Temperature", "Time"],
         )
         self.assertEqual(
+            temp_records_list_page.table.data.get("1"),
+            self.format_temperature_records(self.temperature_records[:1]).get("1"),
+        )
+        self.assertEqual(
             temp_records_list_page.table.data,
             self.format_temperature_records(self.temperature_records[:10]),
         )
