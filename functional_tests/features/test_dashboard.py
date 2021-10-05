@@ -9,12 +9,7 @@ class DashboardTestCase(FunctionalTestCase):
 
         self.password = self.fake.password()
         self.user = UserFactory(password=self.password)
-        self.login()
-
-    def login(self):
-        login_page = pages.LoginPage(self)
-        login_page.visit()
-        login_page.login(self.user.email, self.password)
+        self.login(self.user, self.password)
 
     def test_authenticated_user_can_access_dashboard(self):
         # A user visits their dashboard

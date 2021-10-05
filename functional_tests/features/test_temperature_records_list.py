@@ -24,12 +24,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         self.temperature_records = sorted(
             temperature_records, key=lambda record: record.person.username
         )
-        self.login()
-
-    def login(self):
-        login_page = pages.LoginPage(self)
-        login_page.visit()
-        login_page.login(self.user.email, self.password)
+        self.login(self.user, self.password)
 
     @staticmethod
     def format_datetime(dt, fmt="j M Y, g:i a"):

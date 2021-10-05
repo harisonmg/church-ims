@@ -21,12 +21,7 @@ class PeopleListTestCase(FunctionalTestCase):
         # people
         people = PersonFactory.create_batch(45)
         self.people = sorted(people, key=lambda p: p.username)
-        self.login()
-
-    def login(self):
-        login_page = pages.LoginPage(self)
-        login_page.visit()
-        login_page.login(self.user.email, self.password)
+        self.login(self.user, self.password)
 
     def test_page_navigation(self):
         # An authorized user visits the people list page
