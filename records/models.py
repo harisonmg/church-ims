@@ -15,7 +15,7 @@ class TemperatureRecord(models.Model):
 
     class Meta:  # noqa
         db_table = "records_temperature"
-        ordering = ["person__username"]
+        ordering = ["person__username", "created_at"]
 
     def __str__(self):
         temp = format_temperature(self.body_temperature)

@@ -17,7 +17,9 @@ class TemperatureRecordModelTestCase(TestCase):
         self.assertEqual(self.temp_record_meta.db_table, "records_temperature")
 
     def test_ordering(self):
-        self.assertEqual(self.temp_record_meta.ordering, ["person__username"])
+        self.assertEqual(
+            self.temp_record_meta.ordering, ["person__username", "created_at"]
+        )
 
     def test_verbose_name(self):
         self.assertEqual(self.temp_record_meta.verbose_name, "temperature record")
