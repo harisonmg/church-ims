@@ -27,7 +27,7 @@ class LoginTestCase(FunctionalTestCase):
         self.assertEqual(login_page.form.email_label, "E-mail*")
         self.assertEqual(login_page.form.password_label, "Password*")
         self.assertEqual(login_page.form.remember_checkbox_label, "Remember Me")
-        self.assertEqual(login_page.form._submit_button.text, "Log in")
+        self.assertEqual(login_page.form.submit_button_label, "Log in")
         self.assertEqual(login_page.form.signup_link, pages.SignupPage(self).url)
         self.assertEqual(
             login_page.form.password_reset_link,

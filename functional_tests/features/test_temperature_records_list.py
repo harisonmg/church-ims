@@ -149,7 +149,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         )
         self.assertEqual(temp_records_list_page.form.search_input_placeholder, "Search")
         self.assertEqual(temp_records_list_page.form.search_input_aria_label, "Search")
-        self.assertEqual(temp_records_list_page.form._submit_button.text, "Search")
+        self.assertEqual(temp_records_list_page.form.submit_button_label, "Search")
 
         # He decides to search temperature records for a person that exists
         search_term = self.temperature_records[20].person.full_name

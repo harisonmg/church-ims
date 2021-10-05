@@ -34,7 +34,7 @@ class PasswordResetTestCase(FunctionalTestCase):
         # including labels and placeholders
         self.assertEqual(password_reset_request_page.form.email_label, "E-mail*")
         self.assertEqual(
-            password_reset_request_page.form._submit_button.text, "Reset my password"
+            password_reset_request_page.form.submit_button_label, "Reset my password"
         )
 
         # She enters her email and submits the form
@@ -81,7 +81,7 @@ class PasswordResetTestCase(FunctionalTestCase):
             "New Password (again)*",
         )
         self.assertEqual(
-            password_reset_page.form._submit_button.text, "Change password"
+            password_reset_page.form.submit_button_label, "Change password"
         )
 
         # She enters a new password and submits the form

@@ -121,7 +121,7 @@ class PeopleListTestCase(FunctionalTestCase):
         )
         self.assertEqual(people_list_page.form.search_input_placeholder, "Search")
         self.assertEqual(people_list_page.form.search_input_aria_label, "Search")
-        self.assertEqual(people_list_page.form._submit_button.text, "Search")
+        self.assertEqual(people_list_page.form.submit_button_label, "Search")
 
         # He decides to search for a person that exists
         search_term = self.people[20].full_name

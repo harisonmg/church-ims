@@ -161,6 +161,10 @@ class FormComponent(BaseComponent):
     def _submit_button(self):
         return self.browser.find_element(*self.SUBMIT_BUTTON)
 
+    @property
+    def submit_button_label(self):
+        return self._submit_button.text
+
     def submit(self):
         self._submit_button.click()
         return self
