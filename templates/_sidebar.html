@@ -1,9 +1,18 @@
 <nav class="h-100 col-md-3 col-lg-2 d-md-block collapse border-end bg-light" id="sidebarMenu">
   <div class="list-group list-group-flush mt-3">
-    <a href="{% url 'core:dashboard' %}" class="list-group-item list-group-action">Dashboard</a>
-    <a href="{% url 'people:people_list' %}" class="list-group-item list-group-action">People</a>
-    <a href="{% url 'records:temperature_records_list' %}" class="list-group-item list-group-action">
-      Temperature records
+    <a href="{% url 'core:dashboard' %}" class="list-group-item list-group-action">
+      Dashboard
     </a>
+    {% if perms.people.view_person %}
+      <a href="{% url 'people:people_list' %}" class="list-group-item list-group-action">
+        People
+      </a>
+    {% endif %}
+    {% if perms.records.view_temperaturerecord %}
+      <a href="{% url 'records:temperature_records_list' %}"
+       class="list-group-item list-group-action">
+        Temperature records
+      </a>
+    {% endif %}
   </div>
 </nav>
