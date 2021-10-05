@@ -18,6 +18,7 @@ class PeopleListViewTestCase(TestCase):
               <th scope="col">#</th>
               <th scope="col">Username</th>
               <th scope="col">Full name</th>
+              <th scope="col">Actions</th>
             </tr>
         </thead>
         """
