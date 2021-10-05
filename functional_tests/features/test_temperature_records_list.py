@@ -132,3 +132,40 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
             {"3": self.browser.current_url},
         )
         self.assertEqual(temp_records_list_page.pagination.disabled_links, [])
+
+    def test_search(self):
+        # An authorized user visits the temperature records list page.
+        # He sees a list of temperature records and a search form
+        temp_records_list_page = pages.TemperatureRecordsListPage(self)
+        temp_records_list_page.visit()
+
+        self.assertEqual(
+            temp_records_list_page.table.columns,
+            ["#", "Username", "Temperature", "Time"],
+        )
+        self.assertEqual(
+            temp_records_list_page.table.data,
+            self.format_temperature_records(self.temperature_records[:10]),
+        )
+        self.assertEqual(temp_records_list_page.form.search_input_placeholder, "Search")
+        self.assertEqual(temp_records_list_page.form.search_input_aria_label, "Search")
+        self.assertEqual(temp_records_list_page.form._submit_button.text, "Search")
+
+        # He decides to search temperature records for a person that exists
+        search_term = self.temperature_records[20].person.full_name
+        temp_records_list_page.search(search_term)
+
+        search_results = self.find_temperature_records_by_person_name(search_term)
+        self.assertEqual(len(temp_records_list_page.table.data), len(search_results))
+        self.assertEqual(temp_records_list_page.table.data, search_results)
+        self.assertEqual(
+            temp_records_list_page.table.columns,
+            ["#", "Username", "Temperature", "Time"],
+        )
+
+        # He decides to search temperature records for a person that doesn't exist
+        temp_records_list_page.search("Does not exist")
+
+        self.assertEqual(
+            temp_records_list_page.main_text[0], "Your search didn't yield any results"
+        )
