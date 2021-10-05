@@ -69,8 +69,8 @@ class TemperatureRecordsListViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url + "?page=2")
         expected_records = list(TemperatureRecord.objects.all())[-2:]
-        people = list(response.context.get("temperature_records"))
-        self.assertEqual(people, expected_records)
+        temp_records = list(response.context.get("temperature_records"))
+        self.assertEqual(temp_records, expected_records)
 
     def test_response_with_no_temperature_records(self):
         self.client.force_login(self.authorized_user)
@@ -90,3 +90,56 @@ class TemperatureRecordsListViewTestCase(TestCase):
                 "There are no temperature records yet!", response.content.decode()
             )
         self.assertInHTML(self.table_head, response.content.decode())
+
+    def test_search_by_full_name(self):
+        # setup
+        temp_records = TemperatureRecordFactory.create_batch(10)
+        search_term = temp_records[0].person.full_name
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
+        response_temp_records = response.context.get("temperature_records")
+        filtered_temp_records = TemperatureRecord.objects.filter(
+            person__full_name__icontains=search_term
+        )
+        self.assertAlmostEqual(list(response_temp_records), list(filtered_temp_records))
+
+    def test_search_by_name(self):
+        # setup
+        temp_records = TemperatureRecordFactory.create_batch(10)
+        search_term = temp_records[0].person.full_name.split()[0]
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
+        response_temp_records = response.context.get("temperature_records")
+        filtered_temp_records = TemperatureRecord.objects.filter(
+            person__full_name__icontains=search_term
+        )
+        self.assertAlmostEqual(list(response_temp_records), list(filtered_temp_records))
+
+    def test_search_by_username(self):
+        # setup
+        temp_records = TemperatureRecordFactory.create_batch(10)
+        search_term = temp_records[0].person.username
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
+        response_temp_records = response.context.get("temperature_records")
+        filtered_temp_records = TemperatureRecord.objects.filter(
+            person__username__icontains=search_term
+        )
+        self.assertAlmostEqual(list(response_temp_records), list(filtered_temp_records))
+
+    def test_response_with_no_search_results(self):
+        TemperatureRecordFactory.create_batch(10)
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url + "?q=Does not exist")
+        self.assertEqual(list(response.context.get("temperature_records")), [])
+        with self.assertRaises(AssertionError):
+            self.assertInHTML(self.table_head, response.content.decode())
+        self.assertInHTML(
+            "Your search didn't yield any results", response.content.decode()
+        )
