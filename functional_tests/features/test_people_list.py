@@ -63,7 +63,7 @@ class PeopleListTestCase(FunctionalTestCase):
         )
 
         # He also sees a list of people and a page navigation
-        self.assertEqual(people_list_page.table.columns, ["#", "Username", "Full name"])
+        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
         self.assertEqual(
             people_list_page.table.data.get("1"),
             self.format_people_details(self.people[:1]).get("1"),
@@ -119,7 +119,7 @@ class PeopleListTestCase(FunctionalTestCase):
         people_list_page = pages.PeopleListPage(self)
         people_list_page.visit()
 
-        self.assertEqual(people_list_page.table.columns, ["#", "Username", "Full name"])
+        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
         self.assertEqual(
             people_list_page.table.data, self.format_people_details(self.people[:10])
         )
@@ -134,7 +134,7 @@ class PeopleListTestCase(FunctionalTestCase):
         search_results = self.find_people_by_name(search_term)
         self.assertEqual(len(people_list_page.table.data), len(search_results))
         self.assertEqual(people_list_page.table.data, search_results)
-        self.assertEqual(people_list_page.table.columns, ["#", "Username", "Full name"])
+        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
 
         # He decides to search for a person that doesn't exist
         people_list_page.search("Does not exist")

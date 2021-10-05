@@ -21,6 +21,7 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         django.test.LiveServerTestCase
     """
 
+    PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name"]
     SITE_NAME = settings.SITE_NAME
 
     @classmethod
