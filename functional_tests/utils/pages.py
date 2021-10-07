@@ -191,7 +191,7 @@ class PeopleListPage(BasePage):
 
     @property
     def table(self):
-        return components.Table(self.browser)
+        return components.PeopleTable(self.browser)
 
     def search(self, search_term):
         self.form.search(search_term=search_term)
@@ -211,4 +211,22 @@ class TemperatureRecordsListPage(BasePage):
 
     def search(self, search_term):
         self.form.search(search_term=search_term)
+        return self
+
+
+class TemperatureRecordCreatePage(BasePage):
+    def __init__(self, test, person_username):
+        super().__init__(test)
+        self.person_username = person_username
+
+    @property
+    def PATH(self):
+        return f"/records/temperature/{self.person_username}/add/"
+
+    @property
+    def form(self):
+        return components.TemperatureRecordForm(self.browser)
+
+    def add_temperature(self, temperature):
+        self.form.send_keys(temperature=temperature)
         return self

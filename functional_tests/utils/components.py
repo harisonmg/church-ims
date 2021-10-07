@@ -152,6 +152,37 @@ class Table(BaseComponent):
             row_data.append(list(map(lambda el: el.text, row)))
         return dict(zip(row_headers, row_data))
 
+    def get_column_index(self, column):
+        return self.columns.index(column) - 1
+
+    def get_column_data(self, column):
+        col_index = self.get_column_index(column)
+        return {row: data[col_index] for row, data in self.data.items()}
+
+    def get_cell_data(self, row, column):
+        row_data = self.data.get(row)
+        return row_data[self.get_column_index(column)]
+
+
+class PeopleTable(Table):
+    ADD_TEMP_LINK = (By.CSS_SELECTOR, "td a.btn")
+
+    @property
+    def _add_temp_elements(self):
+        elements = self.browser.find_elements(*self.ADD_TEMP_LINK)
+        usernames = self.get_column_data("Username").values()
+        return dict(zip(usernames, elements))
+
+    @property
+    def add_temp_links(self):
+        hrefs = map(lambda a: a.get_attribute("href"), self._add_temp_elements.values())
+        return dict(zip(self._add_temp_elements.keys(), hrefs))
+
+    def add_temperature_for_person(self, username):
+        link = self._add_temp_elements.get(username)
+        if link is not None:
+            link.click()
+
 
 # forms
 class FormComponent(BaseComponent):
@@ -329,4 +360,21 @@ class SignupForm(FormComponent):
         self._email_input.send_keys(email)
         self._password_input.send_keys(password1)
         self._password_confirmation_input.send_keys(password2)
+        return self.submit()
+
+
+class TemperatureRecordForm(FormComponent):
+    BODY_TEMPERATURE_INPUT = (By.CSS_SELECTOR, "input#id_body_temperature")
+    BODY_TEMPERATURE_LABEL = (By.CSS_SELECTOR, "label[for='id_body_temperature']")
+
+    @property
+    def _body_temperature_input(self):
+        return self.browser.find_element(*self.BODY_TEMPERATURE_INPUT)
+
+    @property
+    def body_temperature_label(self):
+        return self.browser.find_element(*self.BODY_TEMPERATURE_LABEL).text
+
+    def send_keys(self, temperature):
+        self._body_temperature_input.send_keys(str(temperature))
         return self.submit()
