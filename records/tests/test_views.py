@@ -1,10 +1,10 @@
-from django.contrib.auth.models import AnonymousUser, Permission
-from django.test import RequestFactory, TestCase
-
-from faker import Faker
+from django.contrib.auth.models import Permission
+from django.test import TestCase
+from django.urls import reverse
+from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
-from records import views
+from people.factories import PersonFactory
 from records.factories import TemperatureRecordFactory
 from records.models import TemperatureRecord
 
@@ -153,27 +153,72 @@ class TemperatureRecordCreateViewTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.url = "/records/temperature/username/add/"
-        cls.view = views.TemperatureRecordCreateView
+        # users
+        create_temp = Permission.objects.filter(name="Can add temperature record")
+        view_person = Permission.objects.filter(name="Can view person")
+        permissions = list(create_temp) + list(view_person)
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
+        cls.staff_user = UserFactory(is_staff=True)
 
-    def test_template_used(self):
-        factory = RequestFactory()
-        request = factory.get("dummy_path/")
-        request.user = AnonymousUser
+        # person
+        cls.person = PersonFactory()
+        cls.url = f"/records/temperature/{cls.person.username}/add/"
 
-        response = self.view.as_view()(request)
-        with self.assertTemplateUsed("records/temperature_record_form.html"):
-            response.render()
+        # POST data
+        cls.data = {
+            "body_temperature": TemperatureRecordFactory.build().body_temperature
+        }
 
-    def test_view_requires_login(self):
+    def test_anonymous_user_response(self):
         response = self.client.get(self.url)
         self.assertRedirects(response, f"/accounts/login/?next={self.url}")
 
-    def test_logged_in_response_status_code(self):
-        fake = Faker()
-        user_password = fake.password()
-        user = UserFactory(password=user_password)
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
-        self.client.login(email=user.email, password=user_password)
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_response_with_nonexistent_person(self):
+        self.client.force_login(self.authorized_user)
+        url = self.url.replace(self.person.username, "nonexistent-username")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_context_data_contains_person(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("person"), self.person)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "records/temperature_record_form.html")
+
+    def test_form_class(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(form.__class__.__name__, "TemperatureRecordForm")
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+
+    def test_form_fields(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(list(form.fields.keys()), ["body_temperature"])
+
+    def test_success_url(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(response, reverse("people:people_list"))
