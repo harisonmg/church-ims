@@ -97,7 +97,7 @@ class PeopleListViewTestCase(TestCase):
         response = self.client.get(f"{self.url}?q={search_term}")
         response_people = response.context.get("people")
         filtered_people = Person.objects.filter(full_name__icontains=search_term)
-        self.assertAlmostEqual(list(response_people), list(filtered_people))
+        self.assertQuerysetEqual(response_people, filtered_people)
 
     def test_search_by_name(self):
         # setup
@@ -109,7 +109,7 @@ class PeopleListViewTestCase(TestCase):
         response = self.client.get(f"{self.url}?q={search_term}")
         response_people = response.context.get("people")
         filtered_people = Person.objects.filter(full_name__icontains=search_term)
-        self.assertAlmostEqual(list(response_people), list(filtered_people))
+        self.assertQuerysetEqual(response_people, filtered_people)
 
     def test_search_by_username(self):
         # setup
@@ -121,7 +121,7 @@ class PeopleListViewTestCase(TestCase):
         response = self.client.get(f"{self.url}?q={search_term}")
         response_people = response.context.get("people")
         filtered_people = Person.objects.filter(username__icontains=search_term)
-        self.assertAlmostEqual(list(response_people), list(filtered_people))
+        self.assertQuerysetEqual(response_people, filtered_people)
 
     def test_response_with_no_search_results(self):
         PersonFactory.create_batch(10)

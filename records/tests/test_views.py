@@ -107,7 +107,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
         filtered_temp_records = TemperatureRecord.objects.filter(
             person__full_name__icontains=search_term
         )
-        self.assertAlmostEqual(list(response_temp_records), list(filtered_temp_records))
+        self.assertQuerysetEqual(response_temp_records, filtered_temp_records)
 
     def test_search_by_name(self):
         # setup
@@ -121,7 +121,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
         filtered_temp_records = TemperatureRecord.objects.filter(
             person__full_name__icontains=search_term
         )
-        self.assertAlmostEqual(list(response_temp_records), list(filtered_temp_records))
+        self.assertQuerysetEqual(response_temp_records, filtered_temp_records)
 
     def test_search_by_username(self):
         # setup
@@ -135,7 +135,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
         filtered_temp_records = TemperatureRecord.objects.filter(
             person__username__icontains=search_term
         )
-        self.assertAlmostEqual(list(response_temp_records), list(filtered_temp_records))
+        self.assertQuerysetEqual(response_temp_records, filtered_temp_records)
 
     def test_response_with_no_search_results(self):
         TemperatureRecordFactory.create_batch(10)
