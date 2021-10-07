@@ -49,7 +49,7 @@ class PeopleListTestCase(FunctionalTestCase):
         self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
         self.assertEqual(
             people_list_page.table.data.get("1"),
-            format_people_details(self.people[:1]).get("1")
+            format_people_details(self.people[:1]).get("1"),
         )
         self.assertEqual(
             people_list_page.table.data, format_people_details(self.people[:10])
