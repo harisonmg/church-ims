@@ -8,6 +8,7 @@ from extra_views import SearchableListMixin
 
 from people.models import Person
 
+from .forms import TemperatureRecordForm
 from .models import TemperatureRecord
 
 
@@ -25,8 +26,7 @@ class TemperatureRecordsListView(
 class TemperatureRecordCreateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
 ):
-    fields = ["body_temperature"]
-    model = TemperatureRecord
+    form_class = TemperatureRecordForm
     permission_required = "records.add_temperaturerecord"
     success_url = reverse_lazy("people:people_list")
     success_message = "A temperature record for %(person)s has been added successfully."

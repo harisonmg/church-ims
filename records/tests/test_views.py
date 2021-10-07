@@ -7,6 +7,7 @@ from accounts.factories import UserFactory
 from people.factories import PersonFactory
 from records.factories import TemperatureRecordFactory
 from records.models import TemperatureRecord
+from records import constants
 
 
 class TemperatureRecordsListViewTestCase(TestCase):
@@ -217,6 +218,20 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         response = self.client.get(self.url)
         form = response.context.get("form")
         self.assertEqual(list(form.fields.keys()), ["body_temperature"])
+
+    def test_form_with_body_temperature_above_max(self):
+        self.client.force_login(self.authorized_user)
+        data = {"body_temperature": constants.MAX_HUMAN_BODY_TEMP + 1}
+        response = self.client.post(self.url, data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+
+    def test_form_with_body_temperature_below_min(self):
+        self.client.force_login(self.authorized_user)
+        data = {"body_temperature": constants.MIN_HUMAN_BODY_TEMP - 1}
+        response = self.client.post(self.url, data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
