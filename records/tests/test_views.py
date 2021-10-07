@@ -5,9 +5,9 @@ from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
 from people.factories import PersonFactory
+from records import constants
 from records.factories import TemperatureRecordFactory
 from records.models import TemperatureRecord
-from records import constants
 
 
 class TemperatureRecordsListViewTestCase(TestCase):
