@@ -9,3 +9,4 @@ def human_body_temperature_validator(value):
 
     if value < constants.MIN_HUMAN_BODY_TEMP:
         raise ValueError(INVALID_HUMAN_BODY_TEMP_ERROR)
+    return None
