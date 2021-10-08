@@ -5,6 +5,7 @@ from functional_tests.base import FunctionalTestCase
 from functional_tests.helpers import find_people_by_name, format_people_details
 from functional_tests.utils import pages
 from people.factories import PersonFactory
+from records.factories import TemperatureRecordFactory
 
 
 class TemperatureRecordCreationTestCase(FunctionalTestCase):
@@ -26,9 +27,7 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         self.login(self.user, self.password)
 
         # body temperature
-        self.body_temperature = self.fake.pydecimal(
-            right_digits=2, min_value=35, max_value=38
-        )
+        self.body_temperature = TemperatureRecordFactory.build().body_temperature
 
     def test_temperature_record_creation(self):
         # An authorized user visits the people list page.
