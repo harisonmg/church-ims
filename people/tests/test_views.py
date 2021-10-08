@@ -171,6 +171,20 @@ class PersonCreateViewTestCase(TestCase):
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.PersonForm"))
 
+    def test_response_with_non_unique_username(self):
+        # setup
+        person = PersonFactory()
+        data = self.data.copy()
+        data["username"] = person.username
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+        errors = {"username": ["Person with this Username already exists."]}
+        self.assertEqual(form.errors, errors)
+
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)

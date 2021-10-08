@@ -53,6 +53,9 @@ class PersonUsernameTestCase(PersonModelFieldsTestCase):
     def test_null(self):
         self.assertFalse(self.field.null)
 
+    def test_unique(self):
+        self.assertTrue(self.field.unique)
+
     def test_validators(self):
         self.assertEqual(len(self.field.validators), 2)
         self.assertIsInstance(

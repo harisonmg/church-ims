@@ -6,7 +6,9 @@ from .validators import validate_full_name
 
 
 class Person(models.Model):
-    username = models.CharField(max_length=50, validators=[UnicodeUsernameValidator()])
+    username = models.CharField(
+        max_length=50, unique=True, validators=[UnicodeUsernameValidator()]
+    )
     full_name = models.CharField(max_length=300, validators=[validate_full_name])
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
