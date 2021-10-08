@@ -40,21 +40,34 @@ class PersonUsernameTestCase(PersonFormFieldsTestCase):
         cls.field = cls.form_fields.get("username")
 
     def test_max_length(self):
-        self.assertEqual(self.field.max_length, 50)
+        self.assertEqual(self.field.max_length, 25)
 
     def test_required(self):
         self.assertTrue(self.field.required)
 
     def test_validators(self):
-        self.assertEqual(len(self.field.validators), 2)
+        self.assertEqual(len(self.field.validators), 3)
         self.assertIsInstance(
             self.field.validators[0],
-            import_string("django.core.validators.MaxLengthValidator"),
+            import_string("django.contrib.auth.validators.UnicodeUsernameValidator"),
         )
         self.assertIsInstance(
             self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[2],
             import_string("django.core.validators.ProhibitNullCharactersValidator"),
         )
+
+    def test_value_with_spaces(self):
+        data = self.data.copy()
+        data["username"] = data["full_name"]
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        username_error = "Enter a valid username. This value may contain only letters, "
+        username_error += "numbers, and @/./+/-/_ characters."
+        self.assertEqual(form.errors, {"username": [username_error]})
 
 
 class PersonFullNameTestCase(PersonFormFieldsTestCase):
