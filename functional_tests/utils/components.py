@@ -378,3 +378,31 @@ class TemperatureRecordForm(FormComponent):
     def send_keys(self, temperature):
         self._body_temperature_input.send_keys(str(temperature))
         return self.submit()
+
+
+class PersonForm(FormComponent):
+    USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_username")
+    USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_username']")
+    FULL_NAME_INPUT = (By.CSS_SELECTOR, "input#id_full_name")
+    FULL_NAME_LABEL = (By.CSS_SELECTOR, "label[for='id_full_name']")
+
+    @property
+    def _username_input(self):
+        return self.browser.find_element(*self.USERNAME_INPUT)
+
+    @property
+    def username_label(self):
+        return self.browser.find_element(*self.USERNAME_LABEL).text
+
+    @property
+    def _full_name_input(self):
+        return self.browser.find_element(*self.FULL_NAME_INPUT)
+
+    @property
+    def full_name_label(self):
+        return self.browser.find_element(*self.FULL_NAME_LABEL).text
+
+    def send_keys(self, username, full_name):
+        self._username_input.send_keys(username)
+        self._full_name_input.send_keys(full_name)
+        return self.submit()

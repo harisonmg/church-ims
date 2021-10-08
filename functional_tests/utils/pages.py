@@ -230,3 +230,25 @@ class TemperatureRecordCreatePage(BasePage):
     def add_temperature(self, temperature):
         self.form.send_keys(temperature=temperature)
         return self
+
+
+class PersonCreationPage(BasePage):
+    PATH = "/people/add/"
+
+    @property
+    def form(self):
+        return components.PersonForm(self.browser)
+
+    def add_person(self, username, full_name):
+        self.form.send_keys(username=username, full_name=full_name)
+        return self
+
+
+class PersonDetailPage(BasePage):
+    def __init__(self, test, person_username):
+        super().__init__(test)
+        self.person_username = person_username
+
+    @property
+    def PATH(self):
+        return f"/people/{self.person_username}/"
