@@ -183,6 +183,11 @@ class PersonCreateViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "people/person_form.html")
 
+    def test_context_data_contains_action(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("action"), "add")
+
     def test_form_class(self):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
@@ -235,3 +240,74 @@ class PersonDetailViewTestCase(TestCase):
         self.client.login(email=user.email, password=user_password)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+
+class PersonUpdateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.person = PersonFactory()
+        cls.url = cls.person.get_absolute_url() + "update/"
+
+        # users
+        update_person = Permission.objects.filter(name="Can change person")
+        view_person = Permission.objects.filter(name="Can view person")
+        permissions = list(update_person) + list(view_person)
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
+        cls.staff_user = UserFactory(is_staff=True)
+
+        # POST data
+        cls.person = PersonFactory.build()
+        cls.data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name + " " + cls.person.username.title(),
+        }
+
+    def test_anonymous_user_response(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/person_form.html")
+
+    def test_context_data_contains_action(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("action"), "update")
+
+    def test_form_class(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(form.__class__.__name__, "PersonForm")
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+
+    def test_form_fields(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(list(form.fields.keys()), ["username", "full_name"])
+
+    def test_success_url(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(response, self.person.get_absolute_url())
