@@ -1,4 +1,5 @@
 from django.test import SimpleTestCase, TestCase
+from django.utils.module_loading import import_string
 
 from people.factories import PersonFactory
 
@@ -70,6 +71,17 @@ class PersonFullNameTestCase(PersonModelFieldsTestCase):
 
     def test_null(self):
         self.assertFalse(self.field.null)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string("people.validators.full_name_validator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
 
     def test_verbose_name(self):
         self.assertEqual(self.field.verbose_name, "full name")
