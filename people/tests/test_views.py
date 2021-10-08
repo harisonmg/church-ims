@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
+from django.utils.module_loading import import_string
 
 from faker import Faker
 
@@ -144,7 +146,73 @@ class PersonCreateViewTestCase(TestCase):
         super().setUpClass()
 
         cls.url = "/people/add/"
-        cls.view = views.PersonCreateView
+
+        # users
+        create_person = Permission.objects.filter(name="Can add person")
+        view_person = Permission.objects.filter(name="Can view person")
+        permissions = list(create_person) + list(view_person)
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
+        cls.staff_user = UserFactory(is_staff=True)
+
+        # POST data
+        person = PersonFactory.build()
+        cls.data = {"username": person.username, "full_name": person.full_name}
+
+    def test_anonymous_user_response(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/person_form.html")
+
+    def test_form_class(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(form.__class__.__name__, "PersonForm")
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+
+    def test_form_fields(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(list(form.fields.keys()), ["username", "full_name"])
+
+    def test_success_url(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(
+            response,
+            reverse("people:person_detail", kwargs={"username": self.data["username"]}),
+        )
+
+
+class PersonDetailViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.person = PersonFactory()
+        cls.url = cls.person.get_absolute_url()
+        cls.view = views.PersonDetailView
 
     def test_template_used(self):
         factory = RequestFactory()
@@ -152,7 +220,7 @@ class PersonCreateViewTestCase(TestCase):
         request.user = AnonymousUser
 
         response = self.view.as_view()(request)
-        with self.assertTemplateUsed("people/person_form.html"):
+        with self.assertTemplateUsed("people/person_detail.html"):
             response.render()
 
     def test_view_requires_login(self):
