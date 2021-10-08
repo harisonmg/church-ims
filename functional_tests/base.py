@@ -49,7 +49,8 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     def mail(self):
         return mail
 
-    def find_url(self, text):
+    @staticmethod
+    def find_url(text):
         return re.search(r"(?P<url>https?://[^\s]+)", text).group("url")
 
     @property
