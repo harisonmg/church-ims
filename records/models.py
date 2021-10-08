@@ -1,7 +1,7 @@
 from django.db import models
 
 from .utils import format_temperature
-from .validators import human_body_temperature_validator
+from .validators import validate_human_body_temperature
 
 
 class TemperatureRecord(models.Model):
@@ -9,7 +9,7 @@ class TemperatureRecord(models.Model):
     body_temperature = models.DecimalField(
         max_digits=4,
         decimal_places=2,
-        validators=[human_body_temperature_validator],
+        validators=[validate_human_body_temperature],
         help_text="The person's body temperature in degrees celsius.",
     )
     created_at = models.DateTimeField(auto_now_add=True)

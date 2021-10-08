@@ -98,7 +98,7 @@ class TemperatureRecordBodyTemperatureTestCase(TemperatureRecordModelFieldsTestC
         self.assertEqual(len(self.field.validators), 2)
         self.assertEqual(
             self.field.validators[0],
-            import_string("records.validators.human_body_temperature_validator"),
+            import_string("records.validators.validate_human_body_temperature"),
         )
 
     def test_verbose_name(self):

@@ -76,7 +76,7 @@ class PersonFullNameTestCase(PersonModelFieldsTestCase):
         self.assertEqual(len(self.field.validators), 2)
         self.assertEqual(
             self.field.validators[0],
-            import_string("people.validators.full_name_validator"),
+            import_string("people.validators.validate_full_name"),
         )
         self.assertIsInstance(
             self.field.validators[1],

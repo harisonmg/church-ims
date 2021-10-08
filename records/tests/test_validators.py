@@ -12,11 +12,11 @@ class HumanBodyTemperatureValidatorTestCase(TestCase):
             ValidationError, validators.INVALID_HUMAN_BODY_TEMP_ERROR
         ):
             temperature = constants.MAX_HUMAN_BODY_TEMP + Decimal(0.01)
-            validators.human_body_temperature_validator(temperature)
+            validators.validate_human_body_temperature(temperature)
 
     def test_minimum_temperature(self):
         with self.assertRaisesRegex(
             ValidationError, validators.INVALID_HUMAN_BODY_TEMP_ERROR
         ):
             temperature = constants.MIN_HUMAN_BODY_TEMP - Decimal(0.01)
-            validators.human_body_temperature_validator(temperature)
+            validators.validate_human_body_temperature(temperature)
