@@ -89,19 +89,7 @@ class PeopleListViewTestCase(TestCase):
             self.assertInHTML("There are no people yet!", response.content.decode())
         self.assertInHTML(self.table_head, response.content.decode())
 
-    def test_search_by_full_name(self):
-        # setup
-        people = PersonFactory.create_batch(10)
-        search_term = people[0].full_name
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.get(f"{self.url}?q={search_term}")
-        response_people = response.context.get("people")
-        filtered_people = Person.objects.filter(full_name__icontains=search_term)
-        self.assertQuerysetEqual(response_people, filtered_people)
-
-    def test_search_by_name(self):
+    def test_search_results(self):
         # setup
         people = PersonFactory.create_batch(10)
         search_term = people[0].full_name.split()[0]
@@ -109,21 +97,11 @@ class PeopleListViewTestCase(TestCase):
 
         # test
         response = self.client.get(f"{self.url}?q={search_term}")
-        response_people = response.context.get("people")
-        filtered_people = Person.objects.filter(full_name__icontains=search_term)
-        self.assertQuerysetEqual(response_people, filtered_people)
-
-    def test_search_by_username(self):
-        # setup
-        people = PersonFactory.create_batch(10)
-        search_term = people[0].username
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.get(f"{self.url}?q={search_term}")
-        response_people = response.context.get("people")
-        filtered_people = Person.objects.filter(username__icontains=search_term)
-        self.assertQuerysetEqual(response_people, filtered_people)
+        search_results = list(response.context.get("people"))
+        username_matches = Person.objects.filter(username__icontains=search_term)
+        full_name_matches = Person.objects.filter(full_name__icontains=search_term)
+        filtered_results = list(username_matches) + list(full_name_matches)
+        self.assertEqual(search_results, filtered_results)
 
     def test_response_with_no_search_results(self):
         PersonFactory.create_batch(10)

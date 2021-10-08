@@ -95,21 +95,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
             )
         self.assertInHTML(self.table_head, response.content.decode())
 
-    def test_search_by_full_name(self):
-        # setup
-        temp_records = TemperatureRecordFactory.create_batch(10)
-        search_term = temp_records[0].person.full_name
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.get(f"{self.url}?q={search_term}")
-        response_temp_records = response.context.get("temperature_records")
-        filtered_temp_records = TemperatureRecord.objects.filter(
-            person__full_name__icontains=search_term
-        )
-        self.assertQuerysetEqual(response_temp_records, filtered_temp_records)
-
-    def test_search_by_name(self):
+    def test_search_results(self):
         # setup
         temp_records = TemperatureRecordFactory.create_batch(10)
         search_term = temp_records[0].person.full_name.split()[0]
@@ -117,25 +103,15 @@ class TemperatureRecordsListViewTestCase(TestCase):
 
         # test
         response = self.client.get(f"{self.url}?q={search_term}")
-        response_temp_records = response.context.get("temperature_records")
-        filtered_temp_records = TemperatureRecord.objects.filter(
-            person__full_name__icontains=search_term
-        )
-        self.assertQuerysetEqual(response_temp_records, filtered_temp_records)
-
-    def test_search_by_username(self):
-        # setup
-        temp_records = TemperatureRecordFactory.create_batch(10)
-        search_term = temp_records[0].person.username
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.get(f"{self.url}?q={search_term}")
-        response_temp_records = response.context.get("temperature_records")
-        filtered_temp_records = TemperatureRecord.objects.filter(
+        search_results = list(response.context.get("temperature_records"))
+        username_matches = TemperatureRecord.objects.filter(
             person__username__icontains=search_term
         )
-        self.assertQuerysetEqual(response_temp_records, filtered_temp_records)
+        full_name_matches = TemperatureRecord.objects.filter(
+            person__full_name__icontains=search_term
+        )
+        filtered_results = list(username_matches) + list(full_name_matches)
+        self.assertEqual(search_results, filtered_results)
 
     def test_response_with_no_search_results(self):
         TemperatureRecordFactory.create_batch(10)
