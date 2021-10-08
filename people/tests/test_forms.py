@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
 from people.factories import PersonFactory
@@ -21,7 +21,7 @@ class PersonFormTestCase(SimpleTestCase):
         self.assertEqual(["username", "full_name"], list(fields))
 
 
-class PersonFormFieldsTestCase(SimpleTestCase):
+class PersonFormFieldsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -60,9 +60,24 @@ class PersonUsernameTestCase(PersonFormFieldsTestCase):
             import_string("django.core.validators.ProhibitNullCharactersValidator"),
         )
 
+    def test_non_unique_value(self):
+        # setup
+        person = PersonFactory()
+        data = self.data.copy()
+        data["username"] = person.username
+
+        # test
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"username": ["Person with this Username already exists."]}
+        self.assertEqual(form.errors, errors)
+
     def test_value_with_spaces(self):
+        # setup
         data = self.data.copy()
         data["username"] = data["full_name"]
+
+        # test
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
         username_error = "Enter a valid username. This value may contain only letters, "
