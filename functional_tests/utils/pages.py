@@ -245,6 +245,8 @@ class PersonCreationPage(BasePage):
 
 
 class PersonDetailPage(BasePage):
+    UPDATE_LINK = (By.ID, "update")
+
     def __init__(self, test, person_username):
         super().__init__(test)
         self.person_username = person_username
@@ -252,6 +254,18 @@ class PersonDetailPage(BasePage):
     @property
     def PATH(self):
         return f"/people/{self.person_username}/"
+
+    @property
+    def _update_link_element(self):
+        return self.browser.find_element(*self.UPDATE_LINK)
+
+    @property
+    def update_link(self):
+        element = self._update_link_element
+        return {element.text: element.get_attribute("href")}
+
+    def update_person(self):
+        self._update_link_element.click()
 
 
 class PersonUpdatePage(BasePage):
