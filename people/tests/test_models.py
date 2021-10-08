@@ -53,6 +53,17 @@ class PersonUsernameTestCase(PersonModelFieldsTestCase):
     def test_null(self):
         self.assertFalse(self.field.null)
 
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.contrib.auth.validators.UnicodeUsernameValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+
     def test_verbose_name(self):
         self.assertEqual(self.field.verbose_name, "username")
 
