@@ -32,9 +32,6 @@ class PersonCreateView(
         context["action"] = "add"
         return context
 
-    def form_valid(self, form):
-        return super().form_valid(form)
-
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(username=cleaned_data["username"])
 
@@ -62,9 +59,6 @@ class PersonUpdateView(
         context = super().get_context_data(**kwargs)
         context["action"] = "update"
         return context
-
-    def form_valid(self, form):
-        return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(username=cleaned_data["username"])
