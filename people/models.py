@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from people.validators import validate_full_name
+from .validators import validate_full_name
 
 
 class Person(models.Model):
