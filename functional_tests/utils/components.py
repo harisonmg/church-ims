@@ -402,7 +402,12 @@ class PersonForm(FormComponent):
     def full_name_label(self):
         return self.browser.find_element(*self.FULL_NAME_LABEL).text
 
-    def send_keys(self, username, full_name):
-        self._username_input.send_keys(username)
-        self._full_name_input.send_keys(full_name)
+    def send_keys(self, username=None, full_name=None):
+        if username is not None:
+            self._username_input.clear()
+            self._username_input.send_keys(username)
+
+        if full_name is not None:
+            self._full_name_input.clear()
+            self._full_name_input.send_keys(full_name)
         return self.submit()

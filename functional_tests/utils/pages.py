@@ -252,3 +252,21 @@ class PersonDetailPage(BasePage):
     @property
     def PATH(self):
         return f"/people/{self.person_username}/"
+
+
+class PersonUpdatePage(BasePage):
+    def __init__(self, test, person_username):
+        super().__init__(test)
+        self.person_username = person_username
+
+    @property
+    def PATH(self):
+        return f"/people/{self.person_username}/update/"
+
+    @property
+    def form(self):
+        return components.PersonForm(self.browser)
+
+    def update_person(self, username=None, full_name=None):
+        self.form.send_keys(username=username, full_name=full_name)
+        return self
