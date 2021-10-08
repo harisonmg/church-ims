@@ -62,8 +62,8 @@ class BasePage:
 
 class HomePage(BasePage):
     PATH = "/"
-    PRIMARY_CTA = (By.CSS_SELECTOR, "a#primary")
-    SECONDARY_CTA = (By.CSS_SELECTOR, "a#secondary")
+    PRIMARY_CTA = (By.ID, "primary_cta")
+    SECONDARY_CTA = (By.ID, "secondary_cta")
 
     @property
     def _primary_cta(self):
