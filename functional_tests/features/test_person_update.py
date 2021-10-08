@@ -28,7 +28,7 @@ class PersonUpdateTestCase(FunctionalTestCase):
         self.login(self.user, self.password)
 
     def test_person_creation(self):
-        # An authorized user visits the person update page.
+        # An authorized user visits a person's update page.
         person_update_page = pages.PersonUpdatePage(self, self.person.username)
         person_update_page.visit()
 
