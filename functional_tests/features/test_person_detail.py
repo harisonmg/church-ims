@@ -12,9 +12,11 @@ class PersonUpdateTestCase(FunctionalTestCase):
 
         # user
         self.password = self.fake.password()
+        change_person = Permission.objects.filter(name="Can change person")
         view_person = Permission.objects.filter(name="Can view person")
+        permissions = list(change_person) + list(view_person)
         self.user = UserFactory(
-            password=self.password, user_permissions=tuple(view_person)
+            password=self.password, user_permissions=tuple(permissions)
         )
 
         # person
@@ -38,5 +40,5 @@ class PersonUpdateTestCase(FunctionalTestCase):
         )
         self.assertEqual(
             person_detail_page.update_link,
-            {"Update": pages.PersonUpdatePage(self, self.person.username)},
+            {"Update": pages.PersonUpdatePage(self, self.person.username).url},
         )
