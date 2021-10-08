@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import CreateView, ListView, TemplateView, UpdateView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
@@ -39,7 +39,11 @@ class PersonCreateView(
         return self.success_message % dict(username=cleaned_data["username"])
 
 
-class PersonDetailView(LoginRequiredMixin, TemplateView):
+class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = Person
+    permission_required = "people.view_person"
+    slug_field = "username"
+    slug_url_kwarg = "username"
     template_name = "people/person_detail.html"
 
 

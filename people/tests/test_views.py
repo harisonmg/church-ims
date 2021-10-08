@@ -1,12 +1,9 @@
-from django.contrib.auth.models import AnonymousUser, Permission
-from django.test import RequestFactory, TestCase
+from django.contrib.auth.models import Permission
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
 
-from faker import Faker
-
 from accounts.factories import UserFactory
-from people import views
 from people.factories import PersonFactory
 from people.models import Person
 
@@ -217,29 +214,41 @@ class PersonDetailViewTestCase(TestCase):
 
         cls.person = PersonFactory()
         cls.url = cls.person.get_absolute_url()
-        cls.view = views.PersonDetailView
 
-    def test_template_used(self):
-        factory = RequestFactory()
-        request = factory.get("dummy_path/")
-        request.user = AnonymousUser
+        # users
+        view_person = Permission.objects.filter(name="Can view person")
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(view_person))
+        cls.staff_user = UserFactory(is_staff=True)
 
-        response = self.view.as_view()(request)
-        with self.assertTemplateUsed("people/person_detail.html"):
-            response.render()
-
-    def test_view_requires_login(self):
+    def test_anonymous_user_response(self):
         response = self.client.get(self.url)
         self.assertRedirects(response, f"/accounts/login/?next={self.url}")
 
-    def test_logged_in_response_status_code(self):
-        fake = Faker()
-        user_password = fake.password()
-        user = UserFactory(password=user_password)
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
-        self.client.login(email=user.email, password=user_password)
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/person_detail.html")
+
+    def test_context_data_contains_person(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("person"), self.person)
 
 
 class PersonUpdateViewTestCase(TestCase):
@@ -259,7 +268,6 @@ class PersonUpdateViewTestCase(TestCase):
         cls.staff_user = UserFactory(is_staff=True)
 
         # POST data
-        cls.person = PersonFactory.build()
         cls.data = {
             "username": cls.person.username,
             "full_name": cls.person.full_name + " " + cls.person.username.title(),
