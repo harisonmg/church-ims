@@ -1,0 +1,94 @@
+from django.test import SimpleTestCase
+from django.utils.module_loading import import_string
+
+from people.factories import PersonFactory
+from people.forms import PersonForm
+from people.validators import INVALID_FULL_NAME_ERROR
+
+
+class PersonFormTestCase(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form = PersonForm()
+
+    def test_parent_class(self):
+        self.assertIsInstance(self.form, import_string("django.forms.ModelForm"))
+
+    def test_fields(self):
+        fields = self.form.fields.keys()
+        self.assertEqual(["username", "full_name"], list(fields))
+
+
+class PersonFormFieldsTestCase(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form = PersonForm
+        cls.form_fields = cls.form().fields
+        cls.person = PersonFactory.build()
+        cls.data = {"username": cls.person.username, "full_name": cls.person.full_name}
+
+
+class PersonUsernameTestCase(PersonFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.field = cls.form_fields.get("username")
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 50)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.ProhibitNullCharactersValidator"),
+        )
+
+
+class PersonFullNameTestCase(PersonFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.field = cls.form_fields.get("full_name")
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 150)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 3)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string("people.validators.validate_full_name"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[2],
+            import_string("django.core.validators.ProhibitNullCharactersValidator"),
+        )
+
+    def test_value_with_one_name(self):
+        data = self.data.copy()
+        data["full_name"] = data["username"]
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"full_name": [INVALID_FULL_NAME_ERROR]}
+        self.assertEqual(form.errors, errors)
