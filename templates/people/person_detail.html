@@ -1,5 +1,14 @@
 {% extends '_base.html' %}
 
 {% block content %}
-  <h1>Person detail</h1>
+  <div class="mx-auto text-center" parent-class="my-auto">
+    <h1 class="fw-bold">{{ person.username }}'s info</h1>
+    <p class="lead"><span class="fw-bold">Name: </span>{{ person.full_name }}</p>
+    {% if perms.people.change_person %}
+      <a id="update" href="{% url 'people:person_update' person.username %}"
+        class="btn btn-primary">
+        Update
+      </a>
+    {% endif %}
+  </div>
 {% endblock content %}
