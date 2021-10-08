@@ -169,12 +169,7 @@ class PersonCreateViewTestCase(TestCase):
         form = response.context.get("form")
         self.assertEqual(form.__class__.__name__, "PersonForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-
-    def test_form_fields(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(list(form.fields.keys()), ["username", "full_name"])
+        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
@@ -286,12 +281,7 @@ class PersonUpdateViewTestCase(TestCase):
         form = response.context.get("form")
         self.assertEqual(form.__class__.__name__, "PersonForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-
-    def test_form_fields(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(list(form.fields.keys()), ["username", "full_name"])
+        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)

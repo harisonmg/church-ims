@@ -4,6 +4,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
+from .forms import PersonForm
 from .models import Person
 
 
@@ -21,8 +22,7 @@ class PeopleListView(
 class PersonCreateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
 ):
-    model = Person
-    fields = ["username", "full_name"]
+    form_class = PersonForm
     permission_required = "people.add_person"
     success_message = "%(username)s's information has been added successfully."
     template_name = "people/person_form.html"
@@ -47,8 +47,8 @@ class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 class PersonUpdateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
 ):
+    form_class = PersonForm
     model = Person
-    fields = ["username", "full_name"]
     permission_required = "people.change_person"
     slug_field = "username"
     slug_url_kwarg = "username"
