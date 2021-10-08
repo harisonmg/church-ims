@@ -5,7 +5,6 @@ from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
 from people.factories import PersonFactory
-from records import constants
 from records.factories import TemperatureRecordFactory
 from records.models import TemperatureRecord
 
@@ -188,26 +187,9 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         form = response.context.get("form")
         self.assertEqual(form.__class__.__name__, "TemperatureRecordForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-
-    def test_form_fields(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(list(form.fields.keys()), ["body_temperature"])
-
-    def test_form_with_body_temperature_above_max(self):
-        self.client.force_login(self.authorized_user)
-        data = {"body_temperature": constants.MAX_HUMAN_BODY_TEMP + 1}
-        response = self.client.post(self.url, data)
-        form = response.context.get("form")
-        self.assertFalse(form.is_valid())
-
-    def test_form_with_body_temperature_below_min(self):
-        self.client.force_login(self.authorized_user)
-        data = {"body_temperature": constants.MIN_HUMAN_BODY_TEMP - 1}
-        response = self.client.post(self.url, data)
-        form = response.context.get("form")
-        self.assertFalse(form.is_valid())
+        self.assertIsInstance(
+            form, import_string("records.forms.TemperatureRecordForm")
+        )
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
