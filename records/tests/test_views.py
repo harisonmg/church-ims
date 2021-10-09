@@ -8,6 +8,8 @@ from people.factories import PersonFactory
 from records.factories import TemperatureRecordFactory
 from records.models import TemperatureRecord
 
+from .helpers import search_temperature_records
+
 
 class TemperatureRecordsListViewTestCase(TestCase):
     @classmethod
@@ -102,15 +104,10 @@ class TemperatureRecordsListViewTestCase(TestCase):
 
         # test
         response = self.client.get(f"{self.url}?q={search_term}")
-        search_results = list(response.context.get("temperature_records"))
-        username_matches = TemperatureRecord.objects.filter(
-            person__username__icontains=search_term
+        search_results = response.context.get("temperature_records")
+        self.assertQuerysetEqual(
+            search_results, search_temperature_records(search_term)
         )
-        full_name_matches = TemperatureRecord.objects.filter(
-            person__full_name__icontains=search_term
-        )
-        filtered_results = list(username_matches) + list(full_name_matches)
-        self.assertEqual(search_results, filtered_results)
 
     def test_response_with_no_search_results(self):
         TemperatureRecordFactory.create_batch(10)
