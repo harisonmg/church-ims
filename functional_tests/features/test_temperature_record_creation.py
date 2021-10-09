@@ -2,8 +2,9 @@ from django.contrib.auth.models import Permission
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
-from functional_tests.helpers import find_people_by_name, format_people_details
 from functional_tests.pages import pages
+from functional_tests.utils.formatting import PEOPLE_LIST_COLUMNS, format_people_list
+from functional_tests.utils.search import search_people
 from people.factories import PersonFactory
 from records.factories import TemperatureRecordFactory
 
@@ -35,9 +36,9 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         people_list_page = pages.PeopleListPage(self)
         people_list_page.visit()
 
-        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
+        self.assertEqual(people_list_page.table.columns, PEOPLE_LIST_COLUMNS)
         self.assertEqual(
-            people_list_page.table.data, format_people_details(self.people[:10])
+            people_list_page.table.data, format_people_list(self.people[:10])
         )
         self.assertEqual(people_list_page.form.search_input_placeholder, "Search")
         self.assertEqual(people_list_page.form.search_input_aria_label, "Search")
@@ -47,10 +48,10 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         search_term = self.people[15].full_name
         people_list_page.search(search_term)
 
-        search_results = find_people_by_name(self.people, search_term)
+        search_results = search_people(search_term)
         self.assertEqual(len(people_list_page.table.data), len(search_results))
         self.assertEqual(people_list_page.table.data, search_results)
-        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
+        self.assertEqual(people_list_page.table.columns, PEOPLE_LIST_COLUMNS)
 
         # Upon seeing a link to add a temperature record for the person, he clicks
         # the it and is redirected to the temperature records creation page

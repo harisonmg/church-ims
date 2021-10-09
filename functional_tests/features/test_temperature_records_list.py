@@ -1,11 +1,11 @@
 from django.contrib.auth.models import Permission
-from django.utils import dateformat, timezone
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
 from functional_tests.pages import pages
+from functional_tests.utils.formatting import format_temperature_records
+from functional_tests.utils.search import search_temperature_records
 from records.factories import TemperatureRecordFactory
-from records.utils import format_temperature
 
 
 class TemperatureRecordsListTestCase(FunctionalTestCase):
@@ -25,28 +25,6 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
             temperature_records, key=lambda record: record.person.username
         )
         self.login(self.user, self.password)
-
-    @staticmethod
-    def format_datetime(dt, fmt="j M Y, g:i a"):
-        local_dt = timezone.localtime(dt)
-        return dateformat.format(local_dt, fmt)
-
-    def format_temperature_records(self, temperature_records):
-        search_results = {}
-        for i, record in enumerate(temperature_records):
-            search_results[str(i + 1)] = [
-                record.person.username,
-                format_temperature(record.body_temperature),
-                self.format_datetime(record.created_at),
-            ]
-        return search_results
-
-    def find_temperature_records_by_person_name(self, name):
-        search_results = []
-        for record in self.temperature_records:
-            if name.lower() in record.person.full_name.lower():
-                search_results.append(record)
-        return self.format_temperature_records(search_results)
 
     def test_page_navigation(self):
         # An authorized user visits the temperature records list page
@@ -80,11 +58,11 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         )
         self.assertEqual(
             temp_records_list_page.table.data.get("1"),
-            self.format_temperature_records(self.temperature_records[:1]).get("1"),
+            format_temperature_records(self.temperature_records[:1]).get("1"),
         )
         self.assertEqual(
             temp_records_list_page.table.data,
-            self.format_temperature_records(self.temperature_records[:10]),
+            format_temperature_records(self.temperature_records[:10]),
         )
         self.assertEqual(
             list(temp_records_list_page.pagination.links.keys()),
@@ -102,7 +80,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
 
         self.assertEqual(
             temp_records_list_page.table.data,
-            self.format_temperature_records(self.temperature_records[40:]),
+            format_temperature_records(self.temperature_records[40:]),
         )
         self.assertEqual(
             list(temp_records_list_page.pagination.links.keys()),
@@ -120,7 +98,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
 
         self.assertEqual(
             temp_records_list_page.table.data,
-            self.format_temperature_records(self.temperature_records[20:30]),
+            format_temperature_records(self.temperature_records[20:30]),
         )
         self.assertEqual(
             list(temp_records_list_page.pagination.links.keys()),
@@ -144,7 +122,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         )
         self.assertEqual(
             temp_records_list_page.table.data,
-            self.format_temperature_records(self.temperature_records[:10]),
+            format_temperature_records(self.temperature_records[:10]),
         )
         self.assertEqual(temp_records_list_page.form.search_input_placeholder, "Search")
         self.assertEqual(temp_records_list_page.form.search_input_aria_label, "Search")
@@ -154,7 +132,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         search_term = self.temperature_records[20].person.full_name
         temp_records_list_page.search(search_term)
 
-        search_results = self.find_temperature_records_by_person_name(search_term)
+        search_results = search_temperature_records(search_term)
         self.assertEqual(len(temp_records_list_page.table.data), len(search_results))
         self.assertEqual(temp_records_list_page.table.data, search_results)
         self.assertEqual(

@@ -2,8 +2,9 @@ from django.contrib.auth.models import Permission
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
-from functional_tests.helpers import find_people_by_name, format_people_details
 from functional_tests.pages import pages
+from functional_tests.utils.formatting import PEOPLE_LIST_COLUMNS, format_people_list
+from functional_tests.utils.search import search_people
 from people.factories import PersonFactory
 
 
@@ -46,13 +47,13 @@ class PeopleListTestCase(FunctionalTestCase):
         )
 
         # He also sees a list of people and a page navigation
-        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
+        self.assertEqual(people_list_page.table.columns, PEOPLE_LIST_COLUMNS)
         self.assertEqual(
             people_list_page.table.data.get("1"),
-            format_people_details(self.people[:1]).get("1"),
+            format_people_list(self.people[:1]).get("1"),
         )
         self.assertEqual(
-            people_list_page.table.data, format_people_details(self.people[:10])
+            people_list_page.table.data, format_people_list(self.people[:10])
         )
         self.assertEqual(
             list(people_list_page.pagination.links.keys()),
@@ -69,7 +70,7 @@ class PeopleListTestCase(FunctionalTestCase):
         people_list_page.pagination.go_to_page("Last")
 
         self.assertEqual(
-            people_list_page.table.data, format_people_details(self.people[40:])
+            people_list_page.table.data, format_people_list(self.people[40:])
         )
         self.assertEqual(
             list(people_list_page.pagination.links.keys()),
@@ -85,7 +86,7 @@ class PeopleListTestCase(FunctionalTestCase):
         people_list_page.pagination.go_to_page("3")
 
         self.assertEqual(
-            people_list_page.table.data, format_people_details(self.people[20:30])
+            people_list_page.table.data, format_people_list(self.people[20:30])
         )
         self.assertEqual(
             list(people_list_page.pagination.links.keys()),
@@ -102,9 +103,9 @@ class PeopleListTestCase(FunctionalTestCase):
         people_list_page = pages.PeopleListPage(self)
         people_list_page.visit()
 
-        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
+        self.assertEqual(people_list_page.table.columns, PEOPLE_LIST_COLUMNS)
         self.assertEqual(
-            people_list_page.table.data, format_people_details(self.people[:10])
+            people_list_page.table.data, format_people_list(self.people[:10])
         )
         self.assertEqual(people_list_page.form.search_input_placeholder, "Search")
         self.assertEqual(people_list_page.form.search_input_aria_label, "Search")
@@ -114,10 +115,10 @@ class PeopleListTestCase(FunctionalTestCase):
         search_term = self.people[20].full_name
         people_list_page.search(search_term)
 
-        search_results = find_people_by_name(self.people, search_term)
+        search_results = search_people(search_term)
         self.assertEqual(len(people_list_page.table.data), len(search_results))
         self.assertEqual(people_list_page.table.data, search_results)
-        self.assertEqual(people_list_page.table.columns, self.PEOPLE_LIST_COLUMNS)
+        self.assertEqual(people_list_page.table.columns, PEOPLE_LIST_COLUMNS)
 
         # He decides to search for a person that doesn't exist
         people_list_page.search("Does not exist")

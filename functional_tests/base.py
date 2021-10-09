@@ -1,5 +1,3 @@
-import re
-
 from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
@@ -10,6 +8,7 @@ from faker import Faker
 from selenium import webdriver
 
 from functional_tests.pages import pages
+from functional_tests.utils.search import find_url
 
 
 @tag("functional")
@@ -21,7 +20,6 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         django.test.LiveServerTestCase
     """
 
-    PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Actions"]
     SITE_NAME = settings.SITE_NAME
 
     @classmethod
@@ -51,7 +49,7 @@ class FunctionalTestCase(StaticLiveServerTestCase):
 
     @staticmethod
     def find_url(text):
-        return re.search(r"(?P<url>https?://[^\s]+)", text).group("url")
+        return find_url(text=text)
 
     @property
     def account_dropdown_links(self):
