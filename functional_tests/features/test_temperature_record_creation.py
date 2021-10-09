@@ -1,8 +1,8 @@
 from django.contrib.auth.models import Permission
 
 from accounts.factories import UserFactory
-from functional_tests.base import FunctionalTestCase
 from functional_tests import pages
+from functional_tests.base import FunctionalTestCase
 from functional_tests.utils.formatting import PEOPLE_LIST_COLUMNS, format_people_list
 from functional_tests.utils.search import search_people
 from people.factories import PersonFactory

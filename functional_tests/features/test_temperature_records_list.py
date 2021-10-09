@@ -1,8 +1,8 @@
 from django.contrib.auth.models import Permission
 
 from accounts.factories import UserFactory
-from functional_tests.base import FunctionalTestCase
 from functional_tests import pages
+from functional_tests.base import FunctionalTestCase
 from functional_tests.utils.formatting import format_temperature_records
 from functional_tests.utils.search import search_temperature_records
 from records.factories import TemperatureRecordFactory
