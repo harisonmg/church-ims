@@ -3,7 +3,7 @@ from django.utils import dateformat, timezone
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
-from functional_tests.utils import pages
+from functional_tests.pages import pages
 from records.factories import TemperatureRecordFactory
 from records.utils import format_temperature
 

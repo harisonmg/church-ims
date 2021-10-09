@@ -3,7 +3,7 @@ from django.contrib.auth.models import Permission
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
 from functional_tests.helpers import find_people_by_name, format_people_details
-from functional_tests.utils import pages
+from functional_tests.pages import pages
 from people.factories import PersonFactory
 from records.factories import TemperatureRecordFactory
 

@@ -9,7 +9,7 @@ import decouple
 from faker import Faker
 from selenium import webdriver
 
-from functional_tests.utils import pages
+from functional_tests.pages import pages
 
 
 @tag("functional")

@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-from . import components
+from .components import components
 
 
 class BasePage:
