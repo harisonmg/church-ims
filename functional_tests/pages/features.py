@@ -87,8 +87,10 @@ class PersonCreationPage(BasePage):
     def form(self):
         return components.PersonForm(self.browser)
 
-    def add_person(self, username, full_name):
-        self.form.send_keys(username=username, full_name=full_name)
+    def add_person(self, username, full_name, gender, dob):
+        self.form.send_keys(
+            username=username, full_name=full_name, gender=gender, dob=dob
+        )
         return self
 
 
@@ -129,6 +131,8 @@ class PersonUpdatePage(BasePage):
     def form(self):
         return components.PersonForm(self.browser)
 
-    def update_person(self, username=None, full_name=None):
-        self.form.send_keys(username=username, full_name=full_name)
+    def update_person(self, username=None, full_name=None, gender=None, dob=None):
+        self.form.send_keys(
+            username=username, full_name=full_name, gender=gender, dob=dob
+        )
         return self

@@ -203,6 +203,10 @@ class PersonForm(FormComponent):
     USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_username']")
     FULL_NAME_INPUT = (By.CSS_SELECTOR, "input#id_full_name")
     FULL_NAME_LABEL = (By.CSS_SELECTOR, "label[for='id_full_name']")
+    GENDER_OPTION = (By.CSS_SELECTOR, "select#id_gender option")
+    GENDER_LABEL = (By.CSS_SELECTOR, "label[for='id_gender']")
+    DATE_OF_BIRTH_INPUT = (By.CSS_SELECTOR, "input#id_dob")
+    DATE_OF_BIRTH_LABEL = (By.CSS_SELECTOR, "label[for='id_dob']")
 
     @property
     def _username_input(self):
@@ -220,7 +224,34 @@ class PersonForm(FormComponent):
     def full_name_label(self):
         return self.browser.find_element(*self.FULL_NAME_LABEL).text
 
-    def send_keys(self, username=None, full_name=None):
+    @property
+    def gender_label(self):
+        return self.browser.find_element(*self.GENDER_LABEL).text
+
+    @property
+    def _gender_options(self):
+        elements = self.browser.find_elements(*self.GENDER_OPTION)
+        options = map(lambda el: el.text, elements)
+        return dict(zip(options, elements))
+
+    @property
+    def gender_options(self):
+        return list(self._gender_options.keys())
+
+    def select_gender_option(self, option):
+        element = self._gender_options.get(option)
+        if element is not None:
+            element.click()
+
+    @property
+    def _date_of_birth_input(self):
+        return self.browser.find_element(*self.DATE_OF_BIRTH_INPUT)
+
+    @property
+    def date_of_birth_label(self):
+        return self.browser.find_element(*self.DATE_OF_BIRTH_LABEL).text
+
+    def send_keys(self, username=None, full_name=None, gender=None, dob=None):
         if username is not None:
             self._username_input.clear()
             self._username_input.send_keys(username)
@@ -228,4 +259,11 @@ class PersonForm(FormComponent):
         if full_name is not None:
             self._full_name_input.clear()
             self._full_name_input.send_keys(full_name)
+
+        if gender is not None:
+            self.select_gender_option(gender)
+
+        if dob is not None:
+            self._date_of_birth_input.clear()
+            self._date_of_birth_input.send_keys(str(dob))
         return self.submit()

@@ -38,10 +38,19 @@ class PersonCreationTestCase(FunctionalTestCase):
         # He sees the inputs of the person form, including labels and placeholders.
         self.assertEqual(person_creation_page.form.username_label, "Username*")
         self.assertEqual(person_creation_page.form.full_name_label, "Full name*")
+        self.assertEqual(person_creation_page.form.gender_label, "Gender*")
+        self.assertEqual(
+            person_creation_page.form.date_of_birth_label, "Date of birth*"
+        )
         self.assertEqual(person_creation_page.form.submit_button_label, "Add")
 
         # He enters the person's username and full name and submits the form
-        person_creation_page.add_person(self.person.username, self.person.full_name)
+        person_creation_page.add_person(
+            self.person.username,
+            self.person.full_name,
+            self.person.get_gender_display(),
+            self.person.dob,
+        )
 
         # The person's information was added successfully and he is redirected
         # to the person's detail page

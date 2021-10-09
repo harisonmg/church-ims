@@ -41,6 +41,8 @@ class PersonUpdateTestCase(FunctionalTestCase):
         # He sees the inputs of the person form, including labels and placeholders.
         self.assertEqual(person_update_page.form.username_label, "Username*")
         self.assertEqual(person_update_page.form.full_name_label, "Full name*")
+        self.assertEqual(person_update_page.form.gender_label, "Gender*")
+        self.assertEqual(person_update_page.form.date_of_birth_label, "Date of birth*")
         self.assertEqual(person_update_page.form.submit_button_label, "Update")
 
         # He enters the person's full name and submits the form
