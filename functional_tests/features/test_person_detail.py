@@ -39,6 +39,11 @@ class PersonUpdateTestCase(FunctionalTestCase):
             person_detail_page.main_text[0], f"Name: {self.person.full_name}"
         )
         self.assertEqual(
+            person_detail_page.main_text[1],
+            f"Gender: {self.person.get_gender_display()}",
+        )
+        self.assertEqual(person_detail_page.main_text[2], f"Age: {self.person.age}")
+        self.assertEqual(
             person_detail_page.update_link,
             {"Update": pages.PersonUpdatePage(self, self.person.username).url},
         )
