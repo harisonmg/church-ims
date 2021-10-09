@@ -15,19 +15,20 @@ jobs:
 
     services:
       postgres:
-        # Docker Hub image
-        image: postgres
+        image: postgres:13
         env:
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_USER }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        # Set health checks to wait until postgres has started
+        ports:
+        # will assign a random free host port
+        - 5432/tcp
+        # needed because the postgres container does not provide a healthcheck
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        # ports:
-          # Maps the TCP port on service container to the host
-          # - 5432: ${{ secrets.DB_PORT }}
 
     steps:
     - uses: actions/checkout@v2
@@ -48,7 +49,7 @@ jobs:
         DJANGO_SETTINGS_MODULE: config.settings.base
 
         # Database
-        DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}
+        DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:${{ job.services.postgres.ports[5432] }}/${{ secrets.DB_NAME }}
 
         # Email
         DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
