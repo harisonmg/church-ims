@@ -11,4 +11,4 @@ class PersonForm(forms.ModelForm):
 
     class Meta:  # noqa
         model = Person
-        fields = ["username", "full_name"]
+        fields = ["username", "full_name", "gender", "dob"]

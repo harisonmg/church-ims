@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
+from people.constants import GENDER_CHOICES
 from people.factories import PersonFactory
 from people.forms import PersonForm
 from people.validators import INVALID_FULL_NAME_ERROR
@@ -18,7 +19,7 @@ class PersonFormTestCase(SimpleTestCase):
 
     def test_fields(self):
         fields = self.form.fields.keys()
-        self.assertEqual(["username", "full_name"], list(fields))
+        self.assertEqual(list(fields), ["username", "full_name", "gender", "dob"])
 
 
 class PersonFormFieldsTestCase(TestCase):
@@ -29,7 +30,12 @@ class PersonFormFieldsTestCase(TestCase):
         cls.form = PersonForm
         cls.form_fields = cls.form().fields
         cls.person = PersonFactory.build()
-        cls.data = {"username": cls.person.username, "full_name": cls.person.full_name}
+        cls.data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+        }
 
 
 class PersonUsernameTestCase(PersonFormFieldsTestCase):
@@ -120,3 +126,27 @@ class PersonFullNameTestCase(PersonFormFieldsTestCase):
         self.assertFalse(form.is_valid())
         errors = {"full_name": [INVALID_FULL_NAME_ERROR]}
         self.assertEqual(form.errors, errors)
+
+
+class PersonGenderTestCase(PersonFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.form_fields.get("gender")
+
+    def test_choices(self):
+        none_option = [("", "---------")]
+        self.assertEqual(self.field.choices, none_option + GENDER_CHOICES)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+
+class PersonDOBTestCase(PersonFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.form_fields.get("dob")
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
