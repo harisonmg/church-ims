@@ -45,7 +45,7 @@ jobs:
         pipenv run coverage run manage.py test
       env:
         # Django Core
-        DJANGO_SETTINGS_MODULE: config.settings.local
+        DJANGO_SETTINGS_MODULE: config.settings.base
 
         # Database
         DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}
