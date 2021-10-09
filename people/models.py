@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 
 from .constants import GENDER_CHOICES
-from .utils import get_age
+from .utils import get_age, get_age_category
 from .validators import validate_full_name
 
 
@@ -30,3 +30,7 @@ class Person(models.Model):
     @property
     def age(self):
         return get_age(self.dob)
+
+    @property
+    def age_category(self):
+        return get_age_category(self.age)
