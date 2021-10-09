@@ -1,4 +1,4 @@
-from utils.config import list_of_tuples
+from config.helpers import list_of_tuples
 
 from .base import *
 
@@ -28,7 +28,7 @@ GS_BUCKET_NAME = decouple.config("GCP_STORAGE_BUCKET_NAME")
 
 STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
 
-STATICFILES_STORAGE = "utils.storages.StaticRootGoogleCloudStorage"
+STATICFILES_STORAGE = "config.storages.StaticRootGoogleCloudStorage"
 
 
 # Media (user uploaded files)
@@ -36,7 +36,7 @@ STATICFILES_STORAGE = "utils.storages.StaticRootGoogleCloudStorage"
 
 MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 
-DEFAULT_FILE_STORAGE = "utils.storages.MediaRootGoogleCloudStorage"
+DEFAULT_FILE_STORAGE = "config.storages.MediaRootGoogleCloudStorage"
 
 
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
