@@ -7,6 +7,8 @@ from accounts.factories import UserFactory
 from people.factories import PersonFactory
 from people.models import Person
 
+from .helpers import search_people
+
 
 class PeopleListViewTestCase(TestCase):
     @classmethod
@@ -97,11 +99,8 @@ class PeopleListViewTestCase(TestCase):
 
         # test
         response = self.client.get(f"{self.url}?q={search_term}")
-        search_results = list(response.context.get("people"))
-        username_matches = Person.objects.filter(username__icontains=search_term)
-        full_name_matches = Person.objects.filter(full_name__icontains=search_term)
-        filtered_results = list(username_matches) + list(full_name_matches)
-        self.assertEqual(search_results, filtered_results)
+        search_results = response.context.get("people")
+        self.assertQuerysetEqual(search_results, search_people(search_term))
 
     def test_response_with_no_search_results(self):
         PersonFactory.create_batch(10)
