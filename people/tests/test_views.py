@@ -19,10 +19,11 @@ class PeopleListViewTestCase(TestCase):
         cls.table_head = """
         <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Username</th>
-              <th scope="col">Full name</th>
-              <th scope="col">Actions</th>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Full name</th>
+                <th scope="col">Age category</th>
+                <th scope="col">Actions</th>
             </tr>
         </thead>
         """

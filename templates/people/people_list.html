@@ -28,6 +28,7 @@
               <th scope="col">#</th>
               <th scope="col">Username</th>
               <th scope="col">Full name</th>
+              <th scope="col">Age category</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -37,6 +38,7 @@
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ person.username }}</td>
                 <td>{{ person.full_name }}</td>
+                <td>{{ person.age_category }}</td>
                 <td>
                   <a href="{% url 'records:temperature_record_create' person.username %}"
                    class="btn btn-sm btn-outline-primary text-nowrap">

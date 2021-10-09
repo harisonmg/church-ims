@@ -2,7 +2,7 @@ from django.utils import dateformat, timezone
 
 from records import utils as record_utils
 
-PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Actions"]
+PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Age category", "Actions"]
 
 
 def format_datetime(dt, fmt="j M Y, g:i a"):
@@ -13,7 +13,12 @@ def format_datetime(dt, fmt="j M Y, g:i a"):
 def format_people_list(people):
     results = {}
     for i, person in enumerate(people):
-        results[str(i + 1)] = [person.username, person.full_name, "add temp"]
+        results[str(i + 1)] = [
+            person.username,
+            person.full_name,
+            person.age_category,
+            "add temp",
+        ]
     return results
 
 
