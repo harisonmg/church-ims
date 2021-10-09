@@ -54,7 +54,7 @@ jobs:
     - name: Collect the static files into STATIC_ROOT (Cloud Storage)
       run: |
         pipenv run python manage.py collectstatic --no-input
-        pipenv run manage.py test
+        pipenv run python manage.py test
       env:
         # Django Core
         DJANGO_SETTINGS_MODULE: config.settings.production
