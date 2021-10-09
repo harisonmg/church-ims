@@ -13,6 +13,22 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.7, 3.8, 3.9]
 
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps the TCP port on service container to the host
+          - ${{ secrets.DB_PORT }}:${{ secrets.DB_PORT }}
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -30,6 +46,9 @@ jobs:
       env:
         # Django Core
         DJANGO_SETTINGS_MODULE: config.settings.local
+
+        # Database
+        DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}
 
         # Email
         DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
