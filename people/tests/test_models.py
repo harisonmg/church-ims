@@ -3,6 +3,7 @@ from django.utils.module_loading import import_string
 
 from people.constants import GENDER_CHOICES
 from people.factories import PersonFactory
+from people.utils import get_age
 
 
 class PersonModelTestCase(TestCase):
@@ -28,6 +29,9 @@ class PersonModelTestCase(TestCase):
     def test_string_repr(self):
         expected_object_name = self.person.username
         self.assertEqual(str(self.person), expected_object_name)
+
+    def test_age(self):
+        self.assertEqual(self.person.age, get_age(self.person.dob))
 
 
 class PersonModelFieldsTestCase(SimpleTestCase):

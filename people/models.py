@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 
 from .constants import GENDER_CHOICES
+from .utils import get_age
 from .validators import validate_full_name
 
 
@@ -25,3 +26,7 @@ class Person(models.Model):
 
     def get_absolute_url(self):
         return reverse("people:person_detail", kwargs={"username": self.username})
+
+    @property
+    def age(self):
+        return get_age(self.dob)
