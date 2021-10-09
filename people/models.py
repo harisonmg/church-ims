@@ -2,6 +2,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.urls import reverse
 
+from .constants import GENDER_CHOICES
 from .validators import validate_full_name
 
 
@@ -10,6 +11,8 @@ class Person(models.Model):
         max_length=50, unique=True, validators=[UnicodeUsernameValidator()]
     )
     full_name = models.CharField(max_length=300, validators=[validate_full_name])
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    dob = models.DateField(verbose_name="date of birth")
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 

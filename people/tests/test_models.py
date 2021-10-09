@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
+from people.constants import GENDER_CHOICES
 from people.factories import PersonFactory
 
 
@@ -99,6 +100,57 @@ class PersonFullNameTestCase(PersonModelFieldsTestCase):
 
     def test_verbose_name(self):
         self.assertEqual(self.field.verbose_name, "full name")
+
+
+class PersonGenderTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("gender")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_choices(self):
+        self.assertEqual(self.field.choices, GENDER_CHOICES)
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 1)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 1)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "gender")
+
+
+class PersonDOBTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("dob")
+
+    def test_auto_now(self):
+        self.assertFalse(self.field.auto_now)
+
+    def test_auto_now_add(self):
+        self.assertFalse(self.field.auto_now_add)
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "date of birth")
 
 
 class PersonCreatedAtTestCase(PersonModelFieldsTestCase):
