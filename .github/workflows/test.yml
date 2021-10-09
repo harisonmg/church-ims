@@ -25,9 +25,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
+        # ports:
           # Maps the TCP port on service container to the host
-          - 5432: ${{ secrets.DB_PORT }}
+          # - 5432: ${{ secrets.DB_PORT }}
 
     steps:
     - uses: actions/checkout@v2
