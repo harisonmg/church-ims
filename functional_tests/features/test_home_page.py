@@ -1,5 +1,5 @@
 from functional_tests.base import FunctionalTestCase
-from functional_tests.pages import pages
+from functional_tests import pages
 
 
 class HomePageTestCase(FunctionalTestCase):

@@ -1,7 +1,7 @@
 from django.test import override_settings
 
 from functional_tests.base import FunctionalTestCase
-from functional_tests.pages import pages
+from functional_tests import pages
 
 
 @override_settings(ACCOUNT_EMAIL_VERIFICATION="mandatory")

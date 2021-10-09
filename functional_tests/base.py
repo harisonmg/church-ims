@@ -7,7 +7,7 @@ import decouple
 from faker import Faker
 from selenium import webdriver
 
-from functional_tests.pages import pages
+from functional_tests import pages
 from functional_tests.utils.search import find_url
 
 

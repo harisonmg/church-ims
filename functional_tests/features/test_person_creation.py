@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission
 
 from accounts.factories import UserFactory
 from functional_tests.base import FunctionalTestCase
-from functional_tests.pages import pages
+from functional_tests import pages
 from people.factories import PersonFactory
 
 
