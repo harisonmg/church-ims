@@ -132,7 +132,12 @@ class PersonCreateViewTestCase(TestCase):
 
         # POST data
         person = PersonFactory.build()
-        cls.data = {"username": person.username, "full_name": person.full_name}
+        cls.data = {
+            "username": person.username,
+            "full_name": person.full_name,
+            "gender": person.gender,
+            "dob": person.dob,
+        }
 
     def test_anonymous_user_response(self):
         response = self.client.get(self.url)
@@ -244,6 +249,8 @@ class PersonUpdateViewTestCase(TestCase):
         cls.data = {
             "username": cls.person.username,
             "full_name": cls.person.full_name + " " + cls.person.username.title(),
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
         }
 
     def test_anonymous_user_response(self):
