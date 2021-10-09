@@ -26,7 +26,7 @@ def get_age_category(age):
         return "adult"
     elif age < constants.AGE_OF_SENIORITY:
         return "middle-aged"
-    elif age < constants.MAX_HUMAN_AGE:
+    elif age <= constants.MAX_HUMAN_AGE:
         return "senior citizen"
     else:
         raise ValueError(MAX_HUMAN_AGE_EXCEEDED_ERROR)

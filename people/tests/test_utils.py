@@ -22,6 +22,9 @@ class GetAgeGroupTestCase(TestCase):
         with self.assertRaisesRegex(ValueError, utils.NEGATIVE_AGE_ERROR):
             utils.get_age_category(-1)
 
+    def test_age_zero(self):
+        self.assertEqual(utils.get_age_category(0), "child")
+
     def test_child(self):
         age = randint(0, constants.TEENAGE[0] - 1)
         self.assertEqual(utils.get_age_category(age), "child")
@@ -44,6 +47,10 @@ class GetAgeGroupTestCase(TestCase):
 
     def test_senior_citizen(self):
         age = randint(constants.AGE_OF_SENIORITY + 1, constants.MAX_HUMAN_AGE)
+        self.assertEqual(utils.get_age_category(age), "senior citizen")
+
+    def test_max_human_age(self):
+        age = constants.MAX_HUMAN_AGE
         self.assertEqual(utils.get_age_category(age), "senior citizen")
 
     def test_max_human_age_exceeded(self):
