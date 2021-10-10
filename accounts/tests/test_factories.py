@@ -20,8 +20,7 @@ class GroupFactoryTestCase(TestCase):
     def test_permissions(self):
         add_permissions = Permission.objects.filter(name__icontains="can add")
         group = factories.GroupFactory(permissions=tuple(add_permissions))
-        saved_group = Group.objects.first()
-        self.assertEqual(saved_group.permissions, group.permissions)
+        self.assertQuerysetEqual(group.permissions.all(), add_permissions)
 
 
 class UserFactoryTestCase(TestCase):
@@ -63,22 +62,22 @@ class UserFactoryTestCase(TestCase):
         add_permissions = Permission.objects.filter(name__icontains="can add")
         change_permissions = Permission.objects.filter(name__icontains="can change")
         delete_permissions = Permission.objects.filter(name__icontains="can delete")
-        editor_permissions = list(add_permissions) + list(change_permissions)
+        editor_permissions = add_permissions | change_permissions
 
         # create groups
         admins_group = factories.GroupFactory(permissions=tuple(delete_permissions))
         editors_group = factories.GroupFactory(permissions=tuple(editor_permissions))
+        all_groups = [admins_group, editors_group]
 
         # create user
         user = factories.UserFactory(groups=(admins_group, editors_group))
-        saved_user = get_user_model().objects.last()
-        self.assertEqual(saved_user.groups, user.groups)
+        user_groups = sorted(list(user.groups.all()), key=lambda g: g.name)
+        self.assertEqual(user_groups, all_groups)
 
     def test_user_permissions(self):
         change_permissions = Permission.objects.filter(name__icontains="can change")
         user = factories.UserFactory(user_permissions=tuple(change_permissions))
-        saved_user = get_user_model().objects.last()
-        self.assertEqual(saved_user.user_permissions, user.user_permissions)
+        self.assertQuerysetEqual(user.user_permissions.all(), change_permissions)
 
 
 class AdminUserFactoryTestCase(TestCase):
