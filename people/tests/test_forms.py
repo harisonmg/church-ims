@@ -16,9 +16,6 @@ class PersonFormTestCase(SimpleTestCase):
 
         cls.form = PersonForm()
 
-    def test_parent_class(self):
-        self.assertIsInstance(self.form, import_string("django.forms.ModelForm"))
-
     def test_fields(self):
         fields = self.form.fields.keys()
         self.assertEqual(list(fields), ["username", "full_name", "gender", "dob"])
