@@ -42,6 +42,7 @@ class TemperatureRecordCreateView(
 
     def form_valid(self, form):
         form.instance.person = self.get_person()
+        form.instance.created_by = self.request.user
         return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
