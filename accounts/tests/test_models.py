@@ -1,34 +1,32 @@
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
-
-from faker import Faker
 
 from accounts.factories import UserFactory
 
 
-class UserModelTestCase(SimpleTestCase):
+class UserModelTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.fake = Faker()
-        cls.user_attributes = {
-            "username": cls.fake.user_name(),
-            "email": cls.fake.email(),
-        }
-        cls.user = UserFactory.build(**cls.user_attributes)
+        cls.user = UserFactory()
+        cls.user_meta = cls.user._meta
 
-    def test_username(self):
-        username = self.user_attributes.get("username")
-        self.assertEqual(self.user.username, username)
+    def test_db_table(self):
+        self.assertEqual(self.user_meta.db_table, "accounts_user")
 
-    def test_email(self):
-        email = self.user_attributes.get("email")
-        self.assertEqual(self.user.email, email)
+    def test_ordering(self):
+        self.assertEqual(self.user_meta.ordering, ["email"])
+
+    def test_verbose_name(self):
+        self.assertEqual(self.user_meta.verbose_name, "user")
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(self.user_meta.verbose_name_plural, "users")
 
     def test_string_repr(self):
-        username = self.user_attributes.get("username")
-        self.assertEqual(str(self.user), username)
+        expected_object_name = self.user.username
+        self.assertEqual(str(self.user), expected_object_name)
 
 
 class UserModelFieldsTestCase(SimpleTestCase):
