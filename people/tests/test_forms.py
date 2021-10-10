@@ -150,6 +150,9 @@ class PersonDOBTestCase(PersonFormFieldsTestCase):
         super().setUpClass()
         cls.field = cls.form_fields.get("dob")
 
+    def test_label(self):
+        self.assertEqual(self.field.label, "date of birth")
+
     def test_required(self):
         self.assertTrue(self.field.required)
 
