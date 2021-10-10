@@ -176,6 +176,12 @@ class PersonCreateViewTestCase(TestCase):
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.PersonForm"))
 
+    def test_form_valid(self):
+        self.client.force_login(self.authorized_user)
+        self.client.post(self.url, self.data)
+        temp_record = Person.objects.first()
+        self.assertEqual(temp_record.created_by, self.authorized_user)
+
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)

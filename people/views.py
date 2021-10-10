@@ -32,6 +32,10 @@ class PersonCreateView(
         context["action"] = "add"
         return context
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(username=cleaned_data["username"])
 
