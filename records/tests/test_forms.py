@@ -12,22 +12,29 @@ class TemperatureRecordFormTestCase(SimpleTestCase):
 
         cls.form = TemperatureRecordForm()
 
-    def test_parent_class(self):
-        self.assertIsInstance(self.form, import_string("django.forms.ModelForm"))
-
     def test_fields(self):
         fields = self.form.fields.keys()
         self.assertEqual(["body_temperature"], list(fields))
 
 
-class TemperatureRecordBodyTemperatureTestCase(SimpleTestCase):
+class TemperatureRecordFormFieldsTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         cls.form = TemperatureRecordForm
         cls.form_fields = cls.form().fields
+
+
+class TemperatureRecordBodyTemperatureTestCase(TemperatureRecordFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
         cls.field = cls.form_fields.get("body_temperature")
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
 
     def test_validators(self):
         self.assertEqual(len(self.field.validators), 3)
