@@ -5,6 +5,14 @@ from . import constants
 NEGATIVE_AGE_ERROR = "Age can't be negative!"
 MAX_HUMAN_AGE_EXCEEDED_ERROR = f"Age shouldn't exceed {constants.MAX_HUMAN_AGE}!"
 
+# age categories
+CHILD = (0, constants.TEENAGE[0] - 1)
+TEENAGER = constants.TEENAGE
+YOUNG_ADULT = constants.YOUNG_ADULTHOOD
+ADULT = (constants.YOUNG_ADULTHOOD[1] + 1, constants.MIDDLE_AGE[0] - 1)
+MIDDLE_AGED = constants.MIDDLE_AGE
+SENIOR_CITIZEN = (constants.AGE_OF_SENIORITY + 1, constants.MAX_HUMAN_AGE)
+
 
 def get_age(dob):
     today = date.today()
@@ -14,19 +22,19 @@ def get_age(dob):
 
 
 def get_age_category(age):
-    if age < 0:
+    if age < CHILD[0]:
         raise ValueError(NEGATIVE_AGE_ERROR)
-    elif age < constants.TEENAGE[0] - 1:
+    elif age < TEENAGER[0]:
         return "child"
-    elif age < constants.YOUNG_ADULTHOOD[0]:
+    elif age < YOUNG_ADULT[0]:
         return "teenager"
-    elif age < constants.YOUNG_ADULTHOOD[1] + 1:
+    elif age < ADULT[0]:
         return "young adult"
-    elif age < constants.MIDDLE_AGE[0] - 1:
+    elif age < MIDDLE_AGED[0]:
         return "adult"
-    elif age < constants.AGE_OF_SENIORITY:
+    elif age < SENIOR_CITIZEN[0]:
         return "middle-aged"
-    elif age <= constants.MAX_HUMAN_AGE:
+    elif age <= SENIOR_CITIZEN[1]:
         return "senior citizen"
     else:
         raise ValueError(MAX_HUMAN_AGE_EXCEEDED_ERROR)
