@@ -110,7 +110,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Auth
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth
 
-# AUTH_USER_MODEL = "accounts.User" TODO
+AUTH_USER_MODEL = "accounts.User"
 
 
 # Password validation
