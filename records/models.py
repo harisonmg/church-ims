@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 
@@ -6,6 +8,9 @@ from .validators import validate_human_body_temperature
 
 
 class TemperatureRecord(models.Model):
+    id = models.UUIDField(
+        editable=False, default=uuid.uuid4, primary_key=True, verbose_name="ID"
+    )
     person = models.ForeignKey("people.Person", on_delete=models.PROTECT)
     body_temperature = models.DecimalField(
         max_digits=4,

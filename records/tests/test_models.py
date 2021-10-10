@@ -45,6 +45,34 @@ class TemperatureRecordModelFieldsTestCase(SimpleTestCase):
         cls.temp_record_meta = temp_record._meta
 
 
+class TemperatureRecordIDTestCase(TemperatureRecordModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.temp_record_meta.get_field("id")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_class_name(self):
+        self.assertEqual(self.field.__class__.__name__, "UUIDField")
+
+    def test_default(self):
+        self.assertEqual(self.field.default, import_string("uuid.uuid4"))
+
+    def test_editable(self):
+        self.assertFalse(self.field.editable)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_primary_key(self):
+        self.assertTrue(self.field.primary_key)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "ID")
+
+
 class TemperatureRecordPersonTestCase(TemperatureRecordModelFieldsTestCase):
     @classmethod
     def setUpClass(cls):
@@ -80,6 +108,9 @@ class TemperatureRecordBodyTemperatureTestCase(TemperatureRecordModelFieldsTestC
 
     def test_blank(self):
         self.assertFalse(self.field.blank)
+
+    def test_class_name(self):
+        self.assertEqual(self.field.__class__.__name__, "DecimalField")
 
     def test_decimal_places(self):
         self.assertEqual(self.field.decimal_places, 2)
