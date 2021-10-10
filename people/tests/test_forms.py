@@ -140,6 +140,9 @@ class PersonGenderTestCase(PersonFormFieldsTestCase):
         none_option = [("", "---------")]
         self.assertEqual(self.field.choices, none_option + GENDER_CHOICES)
 
+    def test_label(self):
+        self.assertEqual(self.field.label, "Gender")
+
     def test_required(self):
         self.assertTrue(self.field.required)
 
@@ -151,7 +154,7 @@ class PersonDOBTestCase(PersonFormFieldsTestCase):
         cls.field = cls.form_fields.get("dob")
 
     def test_label(self):
-        self.assertEqual(self.field.label, "date of birth")
+        self.assertEqual(self.field.label, "Date of birth")
 
     def test_required(self):
         self.assertTrue(self.field.required)
