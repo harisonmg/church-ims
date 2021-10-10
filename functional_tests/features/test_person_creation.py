@@ -49,7 +49,7 @@ class PersonCreationTestCase(FunctionalTestCase):
             self.person.username,
             self.person.full_name,
             self.person.get_gender_display(),
-            self.person.dob,
+            str(self.person.dob),
         )
 
         # The person's information was added successfully and he is redirected

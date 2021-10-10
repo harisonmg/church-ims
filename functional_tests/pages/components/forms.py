@@ -194,7 +194,7 @@ class TemperatureRecordForm(FormComponent):
         return self.browser.find_element(*self.BODY_TEMPERATURE_LABEL).text
 
     def send_keys(self, temperature):
-        self._body_temperature_input.send_keys(str(temperature))
+        self._body_temperature_input.send_keys(temperature)
         return self.submit()
 
 
@@ -265,5 +265,5 @@ class PersonForm(FormComponent):
 
         if dob is not None:
             self._date_of_birth_input.clear()
-            self._date_of_birth_input.send_keys(str(dob))
+            self._date_of_birth_input.send_keys(dob)
         return self.submit()
