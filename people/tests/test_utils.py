@@ -2,8 +2,8 @@ from datetime import date, timedelta
 from random import randint
 from unittest import TestCase
 
-from people.constants import MAX_HUMAN_AGE
 from people import utils
+from people.constants import MAX_HUMAN_AGE
 
 
 class GetAgeTestCase(TestCase):
