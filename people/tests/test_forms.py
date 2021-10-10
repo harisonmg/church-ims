@@ -1,10 +1,12 @@
+from datetime import date, timedelta
+
 from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
-from people.constants import GENDER_CHOICES
+from people import validators
+from people.constants import GENDER_CHOICES, MAX_HUMAN_AGE
 from people.factories import PersonFactory
 from people.forms import PersonForm
-from people.validators import INVALID_FULL_NAME_ERROR
 
 
 class PersonFormTestCase(SimpleTestCase):
@@ -124,7 +126,7 @@ class PersonFullNameTestCase(PersonFormFieldsTestCase):
         data["full_name"] = data["username"]
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
-        errors = {"full_name": [INVALID_FULL_NAME_ERROR]}
+        errors = {"full_name": [validators.INVALID_FULL_NAME_ERROR]}
         self.assertEqual(form.errors, errors)
 
 
@@ -150,3 +152,33 @@ class PersonDOBTestCase(PersonFormFieldsTestCase):
 
     def test_required(self):
         self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 1)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string("people.validators.validate_date_of_birth"),
+        )
+
+    def test_date_in_future(self):
+        # setup
+        data = self.data.copy()
+        data["dob"] = date.today() + timedelta(days=1)
+
+        # test
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"dob": [validators.DOB_IN_FUTURE_ERROR]}
+        self.assertEqual(form.errors, errors)
+
+    def test_date_in_distant_past(self):
+        # setup
+        data = self.data.copy()
+        days_lived = 365.25 * (MAX_HUMAN_AGE + 1)
+        data["dob"] = date.today() - timedelta(days=round(days_lived))
+
+        # test
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"dob": [validators.DOB_IN_DISTANT_PAST_ERROR]}
+        self.assertEqual(form.errors, errors)
