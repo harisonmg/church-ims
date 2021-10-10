@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.urls import reverse
@@ -14,6 +15,12 @@ class Person(models.Model):
     full_name = models.CharField(max_length=300, validators=[validate_full_name])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     dob = models.DateField(verbose_name="date of birth")
+    created_by = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="The user who created this record.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 

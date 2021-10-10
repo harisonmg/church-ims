@@ -160,6 +160,37 @@ class PersonDOBTestCase(PersonModelFieldsTestCase):
         self.assertEqual(self.field.verbose_name, "date of birth")
 
 
+class PersonCreatedByTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("created_by")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_help_text(self):
+        help_text = "The user who created this record."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_one(self):
+        self.assertTrue(self.field.many_to_one)
+
+    def test_null(self):
+        self.assertTrue(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model, import_string("accounts.models.User")
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "created by")
+
+
 class PersonCreatedAtTestCase(PersonModelFieldsTestCase):
     @classmethod
     def setUpClass(cls):
