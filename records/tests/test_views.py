@@ -182,10 +182,10 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "TemperatureRecordForm")
+        self.assertEqual(form.__class__.__name__, "TemperatureRecordCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(
-            form, import_string("records.forms.TemperatureRecordForm")
+            form, import_string("records.forms.TemperatureRecordCreationForm")
         )
 
     def test_success_url(self):

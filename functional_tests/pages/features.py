@@ -73,7 +73,7 @@ class TemperatureRecordCreatePage(BasePage):
 
     @property
     def form(self):
-        return components.TemperatureRecordForm(self.browser)
+        return components.TemperatureRecordCreationForm(self.browser)
 
     def add_temperature(self, temperature):
         self.form.send_keys(temperature=temperature)

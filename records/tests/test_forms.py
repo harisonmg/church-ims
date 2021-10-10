@@ -2,31 +2,33 @@ from django.test import SimpleTestCase
 from django.utils.module_loading import import_string
 
 from records import constants
-from records.forms import TemperatureRecordForm
+from records.forms import TemperatureRecordCreationForm
 
 
-class TemperatureRecordFormTestCase(SimpleTestCase):
+class TemperatureRecordCreationFormTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = TemperatureRecordForm()
+        cls.form = TemperatureRecordCreationForm()
 
     def test_fields(self):
         fields = self.form.fields.keys()
         self.assertEqual(["body_temperature"], list(fields))
 
 
-class TemperatureRecordFormFieldsTestCase(SimpleTestCase):
+class TemperatureRecordCreationFormFieldsTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = TemperatureRecordForm
+        cls.form = TemperatureRecordCreationForm
         cls.form_fields = cls.form().fields
 
 
-class TemperatureRecordBodyTemperatureTestCase(TemperatureRecordFormFieldsTestCase):
+class TemperatureRecordBodyTemperatureTestCase(
+    TemperatureRecordCreationFormFieldsTestCase
+):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

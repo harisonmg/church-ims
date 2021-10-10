@@ -7,7 +7,7 @@ from .forms import (
     PersonForm,
     SearchForm,
     SignupForm,
-    TemperatureRecordForm,
+    TemperatureRecordCreationForm,
 )
 from .navigation import Footer, Header, Pagination, Sidebar
 from .tables import PeopleTable, Table

@@ -181,7 +181,7 @@ class SignupForm(FormComponent):
         return self.submit()
 
 
-class TemperatureRecordForm(FormComponent):
+class TemperatureRecordCreationForm(FormComponent):
     BODY_TEMPERATURE_INPUT = (By.CSS_SELECTOR, "input#id_body_temperature")
     BODY_TEMPERATURE_LABEL = (By.CSS_SELECTOR, "label[for='id_body_temperature']")
 
