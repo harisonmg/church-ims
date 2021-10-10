@@ -2,6 +2,7 @@ from factory import SubFactory
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
+from accounts.factories import UserFactory
 from people.factories import PersonFactory
 
 from . import constants
@@ -19,3 +20,4 @@ class TemperatureRecordFactory(DjangoModelFactory):
         min_value=constants.MIN_HUMAN_BODY_TEMP,
         max_value=constants.MAX_HUMAN_BODY_TEMP,
     )
+    created_by = SubFactory(UserFactory)
