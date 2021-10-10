@@ -5,7 +5,7 @@ from records import utils as record_utils
 PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Age category", "Actions"]
 
 
-def format_datetime(dt, fmt="j M Y, g:i a"):
+def format_datetime(dt, fmt="j M Y, P"):
     local_dt = timezone.localtime(dt)
     return dateformat.format(local_dt, fmt)
 
