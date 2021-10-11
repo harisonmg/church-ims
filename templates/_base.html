@@ -21,6 +21,11 @@
     {% block css %}
       <link rel="stylesheet" href="{% static 'css/cosmo.min.css' %}">
     {% endblock css %}
+
+    {% comment %} Google Analytics {% endcomment %}
+    {% if GOOGLE_ANALYTICS_ID %}
+      {% include "_google_analytics.html" %}
+    {% endif %}
     </head>
   <body class="d-flex h-100">
     <div class="d-flex h-100 w-100 flex-column mx-auto">
