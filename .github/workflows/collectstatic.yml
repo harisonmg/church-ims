@@ -10,25 +10,8 @@ on:
     branches: [main]
 
 jobs:
-  collectstatic_and_test:
+  collectstatic:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-        # will assign a random free host port
-        - 5432/tcp
-        # needed because the postgres container does not provide a healthcheck
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
@@ -54,7 +37,6 @@ jobs:
     - name: Collect the static files into STATIC_ROOT (Cloud Storage)
       run: |
         pipenv run python manage.py collectstatic --no-input
-        pipenv run coverage run manage.py test
       env:
         # Django Core
         DJANGO_SETTINGS_MODULE: config.settings.production
@@ -62,9 +44,6 @@ jobs:
         # Admin
         ADMINS: ${{ secrets.ADMINS }}
         ADMIN_URL: ${{ secrets.ADMIN_URL }}
-
-        # Database
-        DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:${{ job.services.postgres.ports[5432] }}/${{ secrets.DB_NAME }}
 
         # Email
         DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
