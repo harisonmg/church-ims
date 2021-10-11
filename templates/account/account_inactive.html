@@ -1,12 +1,8 @@
-{% extends "base.html" %}
-
-{% load i18n %}
-
-{% block title %}{% trans "Account Inactive" %} | {{ block.super }}{% endblock title %}
+{% extends '_base.html' %}
 
 {% block content %}
-  <div class="p-3 col-md-8 mx-md-auto">
-    <h1>{% trans "Account Inactive" %}</h1>
-    <p class="lead">{% trans "This account is inactive." %}</p>
+  <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
+    <h1 class="display-5 fw-bold">Account inactive</h1>
+    <p class="lead">This account is inactive.</p>
   </div>
-{% endblock %}
+{% endblock content %}

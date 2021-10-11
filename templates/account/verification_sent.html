@@ -1,17 +1,12 @@
-{% extends "base.html" %}
+{% extends '_base.html' %}
 
-{% load i18n %}
-
-{% block title %}{% trans "Verify Your email address" %} | {{ block.super }} {% endblock title %}
-
-{% block content %}    
-  <div class="p-3 col-md-8 mx-md-auto">
-    <h1>{% trans "Verify your email address" %}</h1>
+{% block content %}
+  <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
+    <h1 class="display-5 fw-bold">Verify your email address</h1>
     <p class="lead">
-      {% blocktrans %}
-        We have sent an e-mail to you for verification. Follow the link provided to finalize the signup process.
-        Please contact us if you do not receive it within a few minutes.
-      {% endblocktrans %}
+      We have sent an e-mail to you for verification.
+      Follow the link provided to finalize the signup process.
+      Please contact us if you do not receive it within a few minutes.
     </p>
   </div>
-{% endblock %}
+{% endblock content %}

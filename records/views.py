@@ -1,56 +1,49 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView
-from django.views.generic.edit import CreateView
+from django.views.generic import CreateView, ListView
+
+from extra_views import SearchableListMixin
 
 from people.models import Person
 
-from .models import BodyTemperature
+from .forms import TemperatureRecordCreationForm
+from .models import TemperatureRecord
 
 
-class BodyTemperatureCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    model = BodyTemperature
-    fields = ("temp",)
-    template_name = "records/body_temperature_form.html"
+class TemperatureRecordsListView(
+    LoginRequiredMixin, PermissionRequiredMixin, SearchableListMixin, ListView
+):
+    context_object_name = "temperature_records"
+    model = TemperatureRecord
+    paginate_by = 10
+    permission_required = "records.view_temperaturerecord"
+    search_fields = ["person__username", "person__full_name"]
+    template_name = "records/temperature_records_list.html"
 
-    def test_func(self):
-        current_user = self.request.user
-        person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        if current_user.is_staff and (current_user.pk != person.pk):
-            return True
-        return False
 
-    def get_object(self):
-        person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        return person
+class TemperatureRecordCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    form_class = TemperatureRecordCreationForm
+    permission_required = "records.add_temperaturerecord"
+    success_url = reverse_lazy("people:people_list")
+    success_message = "A temperature record for %(person)s has been added successfully."
+    template_name = "records/temperature_record_form.html"
+
+    def get_person(self):
+        return get_object_or_404(Person, username=self.kwargs["username"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["person"] = self.get_person()
+        return context
 
     def form_valid(self, form):
-        form.instance.person = self.get_object()
+        form.instance.person = self.get_person()
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    def get_success_url(self):
-        return reverse_lazy("people:person_list")
-
-
-class BodyTemperatureByPersonListView(
-    LoginRequiredMixin, UserPassesTestMixin, ListView
-):
-    model = BodyTemperature
-    context_object_name = "body_temperature"
-    template_name = "records/body_temperature_list.html"
-    paginate_by = 10
-
-    def test_func(self):
-        current_user = get_object_or_404(get_user_model(), pk=self.request.user.pk)
-        person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        if current_user.is_staff or (current_user.person == person):
-            return True
-        return False
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        person = get_object_or_404(Person, username=self.kwargs.get("username"))
-        return queryset.filter(person=person)
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(person=self.object.person)

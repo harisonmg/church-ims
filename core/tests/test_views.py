@@ -1,50 +1,54 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, SimpleTestCase, TestCase
 
+from faker import Faker
+
+from accounts.factories import UserFactory
 from core import views
 
 
 class IndexViewTestCase(SimpleTestCase):
     def setUp(self):
         self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path/")
+        self.view = views.IndexView
 
-    def test_index_view(self):
-        """
-        Test that index view returns a 200 response and uses
-        the correct template
-        """
-        request = self.factory.get("/")
-        response = views.IndexView.as_view()(request)
+    def test_response_status_code(self):
+        response = self.view.as_view()(self.request)
         self.assertEqual(response.status_code, 200)
 
+    def test_template_used(self):
+        response = self.view.as_view()(self.request)
         with self.assertTemplateUsed("core/index.html"):
             response.render()
 
 
 class DashboardViewTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.User = get_user_model()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
-        self.test_user = self.User.objects.create_user(
-            username="testuser", password="testing4321"
-        )
+        cls.url = "/dashboard/"
+        cls.view = views.DashboardView
 
-    def test_redirect_if_not_logged_in(self):
-        """
-        Test that the dashboard view redirects to the login page
-        first when a user is not logged in
-        """
-        response = self.client.get("/dashboard/")
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/accounts/login/?next=/dashboard/")
+    def test_template_used(self):
+        factory = RequestFactory()
+        request = factory.get("dummy_path/")
+        request.user = AnonymousUser
 
-    def test_dashboard_view_if_logged_in(self):
-        """
-        Test that the dashboard view returns a 200 response
-        and uses the correct template when a user is logged in
-        """
-        self.client.login(username="testuser", password="testing4321")
-        response = self.client.get("/dashboard/")
+        response = self.view.as_view()(request)
+        with self.assertTemplateUsed("core/dashboard.html"):
+            response.render()
+
+    def test_view_requires_login(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_logged_in_response_status_code(self):
+        fake = Faker()
+        user_password = fake.password()
+        user = UserFactory(password=user_password)
+
+        self.client.login(email=user.email, password=user_password)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("core/dashboard.html")

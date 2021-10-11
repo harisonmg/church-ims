@@ -1,32 +1,63 @@
-const currentPagePath = document.getElementById("currentPagePath");
-const currentPageUrl = currentPagePath.getAttribute("value");
+// set active class on sidebar links
+let updateSidebarLinks = function(){
+    const currentPath = window.location.pathname;
+    const sidebar = document.getElementById("sidebarMenu");
 
-let navLinkAddActiveClass = function(navLink){
-    navLink.classList.add("active");
-    navLink.classList.remove("text-white");
-    navLink.setAttribute("aria-current", "page");
-};
+    if (sidebar !== null) {
+        let sidebarLinks = sidebar.getElementsByTagName("a");
+        for (let index = 0; index < sidebarLinks.length; index++) {
+            let link = sidebarLinks[index];
+            let linkPath = link.getAttribute("href");
 
-let navigationAddActiveClass = function(nav){
-    document.addEventListener("DOMContentLoaded", function() {
-        let navigationLinks = nav.getElementsByClassName("nav-link")
-        for (var i=0; i < navigationLinks.length; i++){
-            let navLink = navigationLinks[i];
-            if (navLink.classList.contains("dropdown-toggle")) {
-                let navDropDownLinks = navLink.getElementsByClassName("dropdown-item");
-                for (var j=0; j < navDropDownLinks.length; j++){
-                    if (currentPageUrl.includes(navDropDownLinks[j].getAttribute("href"))){
-                        navLinkAddActiveClass(navLink);
-                    }
-                };
-            } else {
-                if (currentPageUrl.includes(navLink.getAttribute("href"))) {
-                    navLinkAddActiveClass(navLink);
-                };
+            // add `active` class to the current page's link
+            if (linkPath === currentPath) {
+                link.classList.add("active");
             };
         };
-    });
+    };
 };
 
-let mainNavigation = document.getElementById("mainNavigation");
-navigationAddActiveClass(mainNavigation);
+updateSidebarLinks();
+
+
+// update parent element's classes
+let updateParentClass = function(){
+    // get all elements with `parent-class` attribute
+    let elements = document.querySelectorAll("[parent-class]");
+    for (let index = 0; index < elements.length; index++) {
+        let element = elements[index];
+        let parent_classes = element.getAttribute("parent-class").split(" ");
+        element.parentElement.classList.add(...parent_classes);
+    };
+};
+
+updateParentClass();
+
+
+// update forms to have floating labels and modify checkbox classes
+const formGroups = document.getElementsByClassName("form-group");
+
+let updateFormElements = function(formElements){
+    for (let index = 0; index < formElements.length; index++) {
+        // get the label and immediate child div
+        let formElement = formElements[index];
+        let label = formElement.getElementsByTagName("label")[0];
+        let childDiv = formElement.getElementsByTagName("div")[0];
+
+        // add margin to the form element
+        formElement.classList.add("mb-3");
+
+        // update checkbox classes
+        if (childDiv.classList.contains("form-check")) {
+            childDiv.classList.add("text-start");
+        };
+
+        // update other inputs
+        if (childDiv.classList.length === 0) {
+            childDiv.classList.add("form-floating");
+            childDiv.appendChild(label);
+        };
+    };
+};
+
+updateFormElements(formGroups);

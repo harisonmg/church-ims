@@ -1,29 +1,14 @@
-{% extends 'base.html' %}
-{% block title %}
-  {% if person %} Update {% else %} Add {% endif %} a person's information | {{ block.super }}
-{% endblock title %}
+{% extends '_base.html' %}
+
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="p-3 col-md-8 mx-md-auto">
-    <form id="person_form" method="POST">
+  <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
+    <h1 class="display-5 fw-bold">{{ action|title }} a person's information</h1>
+    <form id="password_change_form" class="p-2 p-md-3" method="POST">
       {% csrf_token %}
-
-      <fieldset>
-        <h1>
-          {% if person %} Update {% else %} Add {% endif %} a person's information
-        </h1>
-
-        <div class="text-start">
-          {{ form|crispy }}
-        </div>
-      </fieldset>
-
-      <div class="form-group py-3">
-        <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">
-          {% if person %} Update {% else %} Add {% endif %}
-        </button>
-      </div>
+      {{ form|crispy }}
+      <button class="w-100 btn btn-lg btn-primary" type="submit">{{ action|title }}</button>
     </form>
   </div>
 {% endblock content %}

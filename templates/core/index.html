@@ -1,16 +1,27 @@
-{% extends "base.html" %}
+{% extends '_base.html' %}
 
-{% block title %} Home | {{ block.super }} {% endblock title %}
+{% load static %}
 
 {% block content %}
-  <main class="px-3">
-    <h1>StAnds IMS</h1>
-    <p class="lead">
-      Your one-stop shop for accessing church records.
-    </p>
-    <p class="lead">
-      <a href="{% url 'account_signup' %}" class="btn btn-lg btn-outline-secondary fw-bold border-white text-white mx-3">Sign up</a>
-      <a href="{% url 'account_login' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Log in</a>
-    </p>
-  </main>
+  <div class="container col-xxl-8 px-4 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+      <div class="col-10 col-sm-8 col-lg-6">
+        <img src="{% static 'images/undraw_online_connection.svg' %}" class="d-block mx-lg-auto img-fluid" width="700" height="500" loading="lazy">
+      </div>
+      <div class="col-lg-6">
+        <h1 class="display-5 fw-bold lh-1 mb-3">{{ SITE_NAME }}</h1>
+        <p class="lead">{{ SITE_DESCRIPTION }}</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+          <a id="primary_cta" href="{% url 'account_signup' %}"
+           class="btn btn-primary btn-lg px-4 me-md-3">
+            Sign up
+          </a>
+          <a id="secondary_cta" href="{% url 'account_login' %}"
+           class="btn btn-outline-secondary btn-lg px-4">
+            Log in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}

@@ -1,29 +1,18 @@
-{% extends 'base.html' %}
-{% block title %} Sign up | {{ block.super }} {% endblock title %}
+{% extends '_base.html' %}
+
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <div class="p-3 col-md-8 mx-md-auto">
-    <form id='signup_form' method='POST'>
+  <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
+    <h1 class="display-5 fw-bold">Sign up</h1>
+    <form id="signup_form" class="p-2 p-md-3" method="POST">
       {% csrf_token %}
-
-      <fieldset>
-        <h1>Sign up</h1>
-        <div class="text-start">
-          {{ form|crispy }}
-        </div>
-
-        <div class="form-group py-3">
-          <button type="submit" class="btn btn-secondary fw-bold border-white bg-white">Sign up</button>
-        </div>
-      </fieldset>
+      {{ form|crispy }}
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+      <hr class="my-4">
+      <small class="text-muted">
+        Already have an account? <a href="{% url 'account_login' %}">Log in</a>
+      </small>
     </form>
-
-    <div class="border-top">
-      <p>
-        Already have an account?
-        <a href="{% url 'account_login' %}" class="text-white">Login</a>
-      </p>
-    </div>
   </div>
 {% endblock content %}

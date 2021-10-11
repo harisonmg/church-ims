@@ -1,348 +1,235 @@
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
+from django.utils.module_loading import import_string
 
-from people.models import FamilyRelationship, Person, RelationshipType
+from people.constants import GENDER_CHOICES
+from people.factories import PersonFactory
+from people.utils import get_age, get_age_category
 
 
 class PersonModelTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.User = get_user_model()
 
-        cls.admin_user = cls.User.objects.create_superuser(
-            username="Kelvin", email="kelvin@murage.com", password="kelvinpassword"
-        )
+        cls.person = PersonFactory()
+        cls.person_meta = cls.person._meta
 
-        cls.person = Person.objects.get(user=cls.admin_user)
-        cls.person.username = "Kelvin"
-        cls.person.full_name = "Kelvin Murage"
-        cls.person.dob = "1995-06-05"
-        cls.person.gender = "M"
-        cls.person.created_by = cls.admin_user
+    def test_db_table(self):
+        self.assertEqual(self.person_meta.db_table, "people_person")
 
-    def test_person_basic(self):
-        self.assertEqual(self.person.username, "Kelvin")
-        self.assertEqual(self.person.full_name, "Kelvin Murage")
-        self.assertEqual(self.person.dob, "1995-06-05")
-        self.assertEqual(self.person.gender, "M")
-        self.assertEqual(self.person.created_by, self.admin_user)
+    def test_ordering(self):
+        self.assertEqual(self.person_meta.ordering, ["username"])
 
-    # class methods
-    def test_person_object_name_is_username(self):
-        self.assertEqual(self.person.username, str(self.person))
+    def test_verbose_name(self):
+        self.assertEqual(self.person_meta.verbose_name, "person")
 
-    # username
-    def test_username_label(self):
-        username__meta = self.person._meta.get_field("username")
-        self.assertEqual(username__meta.verbose_name, "username")
+    def test_verbose_name_plural(self):
+        self.assertEqual(self.person_meta.verbose_name_plural, "people")
 
-    def test_username_max_length(self):
-        username__meta = self.person._meta.get_field("username")
-        self.assertEqual(username__meta.max_length, 50)
+    def test_string_repr(self):
+        expected_object_name = self.person.username
+        self.assertEqual(str(self.person), expected_object_name)
 
-    def test_username_is_null(self):
-        username__meta = self.person._meta.get_field("username")
-        self.assertFalse(username__meta.null)
+    def test_age(self):
+        self.assertEqual(self.person.age, get_age(self.person.dob))
 
-    def test_username_is_blank(self):
-        username__meta = self.person._meta.get_field("username")
-        self.assertFalse(username__meta.blank)
-
-    # full name
-    def test_full_name_label(self):
-        full_name__meta = self.person._meta.get_field("full_name")
-        self.assertEqual(full_name__meta.verbose_name, "full name")
-
-    def test_full_name_max_length(self):
-        full_name__meta = self.person._meta.get_field("full_name")
-        self.assertEqual(full_name__meta.max_length, 300)
-
-    def test_full_name_is_null(self):
-        full_name__meta = self.person._meta.get_field("full_name")
-        self.assertTrue(full_name__meta.null)
-
-    def test_full_name_is_blank(self):
-        full_name__meta = self.person._meta.get_field("full_name")
-        self.assertFalse(full_name__meta.blank)
-
-    # date of birth
-    def test_dob_label(self):
-        dob__meta = self.person._meta.get_field("dob")
-        self.assertEqual(dob__meta.verbose_name, "date of birth")
-
-    def test_dob_max_length(self):
-        dob__meta = self.person._meta.get_field("dob")
-        self.assertIsNone(dob__meta.max_length)
-
-    def test_dob_is_null(self):
-        dob__meta = self.person._meta.get_field("dob")
-        self.assertTrue(dob__meta.null)
-
-    def test_dob_is_blank(self):
-        dob__meta = self.person._meta.get_field("dob")
-        self.assertFalse(dob__meta.blank)
-
-    # gender
-    def test_gender_label(self):
-        gender__meta = self.person._meta.get_field("gender")
-        self.assertEqual(gender__meta.verbose_name, "gender")
-
-    def test_gender_max_length(self):
-        gender__meta = self.person._meta.get_field("gender")
-        self.assertTrue(gender__meta.max_length, 2)
-
-    def test_gender_is_null(self):
-        gender__meta = self.person._meta.get_field("gender")
-        self.assertTrue(gender__meta.null)
-
-    def test_gender_is_blank(self):
-        gender__meta = self.person._meta.get_field("gender")
-        self.assertFalse(gender__meta.blank)
-
-    # created by
-    def test_created_by_label(self):
-        created_by__meta = self.person._meta.get_field("created_by")
-        self.assertEqual(created_by__meta.verbose_name, "created by")
-
-    def test_created_by_max_length(self):
-        created_by__meta = self.person._meta.get_field("created_by")
-        self.assertIsNone(created_by__meta.max_length)
-
-    def test_created_by_is_null(self):
-        created_by__meta = self.person._meta.get_field("created_by")
-        self.assertTrue(created_by__meta.null)
-
-    def test_created_by_is_blank(self):
-        created_by__meta = self.person._meta.get_field("created_by")
-        self.assertFalse(created_by__meta.blank)
-
-    # updated by
-    def test_updated_by_label(self):
-        updated_by__meta = self.person._meta.get_field("updated_by")
-        self.assertEqual(updated_by__meta.verbose_name, "updated by")
-
-    def test_updated_by_max_length(self):
-        updated_by__meta = self.person._meta.get_field("updated_by")
-        self.assertIsNone(updated_by__meta.max_length)
-
-    def test_updated_by_is_null(self):
-        updated_by__meta = self.person._meta.get_field("updated_by")
-        self.assertTrue(updated_by__meta.null)
-
-    def test_updated_by_is_blank(self):
-        updated_by__meta = self.person._meta.get_field("updated_by")
-        self.assertTrue(updated_by__meta.blank)
+    def test_age_category(self):
+        self.assertEqual(self.person.age_category, get_age_category(self.person.age))
 
 
-class RelationshipTypeTestCase(TestCase):
+class PersonModelFieldsTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.son = RelationshipType.objects.create(name="son")
 
-    def test_relationship_type_basic(self):
-        self.assertEqual(self.son.name, "son")
-
-    def test_relationship_type_object_name_is_name(self):
-        self.assertEqual(self.son.name, str(self.son))
-
-    # name
-    def test_name_label(self):
-        name__meta = self.son._meta.get_field("name")
-        self.assertEqual(name__meta.verbose_name, "name")
-
-    def test_name_max_length(self):
-        name__meta = self.son._meta.get_field("name")
-        self.assertEqual(name__meta.max_length, 50)
-
-    def test_name_is_null(self):
-        name__meta = self.son._meta.get_field("name")
-        self.assertFalse(name__meta.null)
-
-    def test_name_is_blank(self):
-        name__meta = self.son._meta.get_field("name")
-        self.assertFalse(name__meta.blank)
+        person = PersonFactory.build()
+        cls.person_meta = person._meta
 
 
-class FamilyRelationshipModelTestCase(TestCase):
+class PersonUsernameTestCase(PersonModelFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.User = get_user_model()
+        cls.field = cls.person_meta.get_field("username")
 
-        cls.admin_user = cls.User.objects.create_superuser(
-            username="Kelvin", email="kelvin@murage.com", password="kelvinpassword"
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 50)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_unique(self):
+        self.assertTrue(self.field.unique)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.contrib.auth.validators.UnicodeUsernameValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
         )
 
-        cls.alvin_user = cls.User.objects.create_user(
-            username="AlvinMukuna",
-            email="alvin@mukuna.com",
-            phone_number="+254 701 234 567",
-            password="alvinpassword",
-        )
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "username")
 
-        cls.christine_user = cls.User.objects.create_user(
-            username="ChristineKyalo",
-            email="christine@kyalo.com",
-            phone_number="+254 723 456 789",
-            password="christinepassword",
-        )
 
-        cls.kelvin_person = Person.objects.create(
-            username="Kelvin",
-            full_name="Kelvin Murage",
-            dob="1995-06-05",
-            gender="M",
-            created_by=cls.admin_user,
-        )
+class PersonFullNameTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("full_name")
 
-        cls.alvin_person = Person.objects.create(
-            username="AlvinMukuna",
-            full_name="Alvin Mukuna",
-            dob="1984-12-12",
-            gender="M",
-            created_by=cls.alvin_user,
-        )
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
 
-        cls.abigael_person = Person.objects.create(
-            username="AbigaelAuma",
-            full_name="Abigael Auma",
-            dob="2015-05-14",
-            gender="F",
-            created_by=cls.alvin_user,
-        )
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 300)
 
-        cls.christine_person = Person.objects.create(
-            username="ChristineKyalo",
-            full_name="Christine Kyalo",
-            dob="1992-03-21",
-            gender="F",
-            created_by=cls.christine_user,
-        )
+    def test_null(self):
+        self.assertFalse(self.field.null)
 
-        cls.brian_person = Person.objects.create(
-            username="BrianKimani",
-            full_name="Brian Kimani",
-            dob="2018-09-23",
-            gender="M",
-            created_by=cls.christine_user,
-        )
-
-        cls.son = RelationshipType.objects.create(name="son")
-        cls.daughter = RelationshipType.objects.create(name="daughter")
-
-        cls.alvin_daughter = FamilyRelationship(
-            person=cls.alvin_person,
-            relative=cls.abigael_person,
-            relationship_type=cls.daughter,
-            created_by=cls.alvin_user,
-        )
-        cls.alvin_daughter.save()
-
-        cls.christine_son = FamilyRelationship(
-            person=cls.christine_person,
-            relative=cls.brian_person,
-            relationship_type=cls.son,
-            created_by=cls.christine_user,
-        )
-        cls.christine_son.save()
-
-    def test_family_member_relationship_type_object_name(self):
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
         self.assertEqual(
-            f"{self.christine_person}'s {self.son}", str(self.christine_son)
+            self.field.validators[0],
+            import_string("people.validators.validate_full_name"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
         )
 
-    # person
-    def test_person_label(self):
-        person__meta = self.alvin_daughter._meta.get_field("person")
-        self.assertEqual(person__meta.verbose_name, "person")
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "full name")
 
-    def test_person_max_length(self):
-        person__meta = self.alvin_daughter._meta.get_field("person")
-        self.assertIsNone(person__meta.max_length)
 
-    def test_person_is_null(self):
-        person__meta = self.alvin_daughter._meta.get_field("person")
-        self.assertFalse(person__meta.null)
+class PersonGenderTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("gender")
 
-    def test_person_is_blank(self):
-        person__meta = self.alvin_daughter._meta.get_field("person")
-        self.assertFalse(person__meta.blank)
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
 
-    # relative
-    def test_relative_label(self):
-        relative__meta = self.alvin_daughter._meta.get_field("relative")
-        self.assertEqual(relative__meta.verbose_name, "relative")
+    def test_choices(self):
+        self.assertEqual(self.field.choices, GENDER_CHOICES)
 
-    def test_relative_max_length(self):
-        relative__meta = self.alvin_daughter._meta.get_field("relative")
-        self.assertIsNone(relative__meta.max_length)
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 1)
 
-    def test_relative_is_null(self):
-        relative__meta = self.alvin_daughter._meta.get_field("relative")
-        self.assertFalse(relative__meta.null)
+    def test_null(self):
+        self.assertFalse(self.field.null)
 
-    def test_relative_is_blank(self):
-        relative__meta = self.alvin_daughter._meta.get_field("relative")
-        self.assertFalse(relative__meta.blank)
-
-    # relationship type
-    def test_relationship_type_label(self):
-        relationship_type__meta = self.alvin_daughter._meta.get_field(
-            "relationship_type"
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 1)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.core.validators.MaxLengthValidator"),
         )
-        self.assertEqual(relationship_type__meta.verbose_name, "relationship type")
 
-    def test_relationship_type_max_length(self):
-        relationship_type__meta = self.alvin_daughter._meta.get_field(
-            "relationship_type"
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "gender")
+
+
+class PersonDOBTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("dob")
+
+    def test_auto_now(self):
+        self.assertFalse(self.field.auto_now)
+
+    def test_auto_now_add(self):
+        self.assertFalse(self.field.auto_now_add)
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "date of birth")
+
+
+class PersonCreatedByTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("created_by")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_help_text(self):
+        help_text = "The user who created this record."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_one(self):
+        self.assertTrue(self.field.many_to_one)
+
+    def test_null(self):
+        self.assertTrue(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model, import_string("accounts.models.User")
         )
-        self.assertIsNone(relationship_type__meta.max_length)
 
-    def test_relationship_type_is_null(self):
-        relationship_type__meta = self.alvin_daughter._meta.get_field(
-            "relationship_type"
-        )
-        self.assertFalse(relationship_type__meta.null)
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "created by")
 
-    def test_relationship_type_is_blank(self):
-        relationship_type__meta = self.alvin_daughter._meta.get_field(
-            "relationship_type"
-        )
-        self.assertFalse(relationship_type__meta.blank)
 
-        # created by
+class PersonCreatedAtTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("created_at")
 
-    def test_created_by_label(self):
-        created_by__meta = self.alvin_daughter._meta.get_field("created_by")
-        self.assertEqual(created_by__meta.verbose_name, "created by")
+    def test_auto_now(self):
+        self.assertFalse(self.field.auto_now)
 
-    def test_created_by_max_length(self):
-        created_by__meta = self.alvin_daughter._meta.get_field("created_by")
-        self.assertIsNone(created_by__meta.max_length)
+    def test_auto_now_add(self):
+        self.assertTrue(self.field.auto_now_add)
 
-    def test_created_by_is_null(self):
-        created_by__meta = self.alvin_daughter._meta.get_field("created_by")
-        self.assertTrue(created_by__meta.null)
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
 
-    def test_created_by_is_blank(self):
-        created_by__meta = self.alvin_daughter._meta.get_field("created_by")
-        self.assertFalse(created_by__meta.blank)
+    def test_null(self):
+        self.assertFalse(self.field.null)
 
-    # updated by
-    def test_updated_by_label(self):
-        updated_by__meta = self.alvin_daughter._meta.get_field("updated_by")
-        self.assertEqual(updated_by__meta.verbose_name, "updated by")
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "created at")
 
-    def test_updated_by_max_length(self):
-        updated_by__meta = self.alvin_daughter._meta.get_field("updated_by")
-        self.assertIsNone(updated_by__meta.max_length)
 
-    def test_updated_by_is_null(self):
-        updated_by__meta = self.alvin_daughter._meta.get_field("updated_by")
-        self.assertTrue(updated_by__meta.null)
+class PersonLastModifiedTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("last_modified")
 
-    def test_updated_by_is_blank(self):
-        updated_by__meta = self.alvin_daughter._meta.get_field("updated_by")
-        self.assertTrue(updated_by__meta.blank)
+    def test_auto_now(self):
+        self.assertTrue(self.field.auto_now)
+
+    def test_auto_now_add(self):
+        self.assertFalse(self.field.auto_now_add)
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "last modified")

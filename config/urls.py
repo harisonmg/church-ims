@@ -17,18 +17,13 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-site_name = "StAnds IMS"
-admin.site.site_header = f"{site_name} administration"
-admin.site.site_title = f"{site_name} admin"
 admin_url = settings.ADMIN_URL + "/"
 
 urlpatterns = [
-    path(admin_url + "doc/", include("django.contrib.admindocs.urls")),
     path(admin_url, admin.site.urls),
     path("accounts/", include("accounts.urls")),
-    path("accounts/", include("allauth.urls")),
+    path("accounts/", include("allauth.urls")),  # to remove app namespace
     path("people/", include("people.urls")),
     path("records/", include("records.urls")),
-    path("reports/", include("reports.urls")),
     path("", include("core.urls")),
 ]

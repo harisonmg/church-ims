@@ -1,98 +1,326 @@
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
+from django.utils.module_loading import import_string
+
+from accounts.factories import UserFactory
 
 
-class CustomUserModelTestCase(TestCase):
+class UserModelTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.User = get_user_model()
+        cls.user = UserFactory()
+        cls.user_meta = cls.user._meta
 
-        # create a normal user
-        cls.user = cls.User.objects.create_user(
-            username="AlvinMukuna",
-            email="alvin@mukuna.com",
-            phone_number="+254 701 234 567",
-            password="alvinpassword",
+    def test_db_table(self):
+        self.assertEqual(self.user_meta.db_table, "accounts_user")
+
+    def test_ordering(self):
+        self.assertEqual(self.user_meta.ordering, ["email"])
+
+    def test_verbose_name(self):
+        self.assertEqual(self.user_meta.verbose_name, "user")
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(self.user_meta.verbose_name_plural, "users")
+
+    def test_string_repr(self):
+        expected_object_name = self.user.username
+        self.assertEqual(str(self.user), expected_object_name)
+
+
+class UserModelFieldsTestCase(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory.build()
+        cls.user_meta = cls.user._meta
+
+
+class UserUsernameTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("username")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_error_messages(self):
+        error_messages = {"unique": "A user with that username already exists."}
+        self.assertDictContainsSubset(error_messages, self.field.error_messages)
+
+    def test_help_text(self):
+        help_text = (
+            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+        )
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 150)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_unique(self):
+        self.assertTrue(self.field.unique)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.contrib.auth.validators.UnicodeUsernameValidator"),
         )
 
-    def test_user_basic(self):
-        self.assertEqual(self.user.username, "AlvinMukuna")
-        self.assertEqual(self.user.email, "alvin@mukuna.com")
-        self.assertEqual(self.user.phone_number, "+254 701 234 567")
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "username")
 
-    # class methods
-    def test_user_object_name_is_username(self):
-        self.assertEqual(self.user.username, str(self.user))
 
-    # email
-    def test_email_label(self):
-        email__meta = self.user._meta.get_field("email")
-        self.assertEqual(email__meta.verbose_name, "email address")
+class UserEmailTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("email")
 
-    def test_email_is_null(self):
-        email__meta = self.user._meta.get_field("email")
-        self.assertFalse(email__meta.null)
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
 
-    def test_email_is_blank(self):
-        email__meta = self.user._meta.get_field("email")
-        self.assertFalse(email__meta.blank)
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 254)
 
-    # first name
-    def test_first_name_label(self):
-        first_name__meta = self.user._meta.get_field("first_name")
-        self.assertEqual(first_name__meta.verbose_name, "first name")
+    def test_null(self):
+        self.assertFalse(self.field.null)
 
-    def test_first_name_max_length(self):
-        first_name__meta = self.user._meta.get_field("first_name")
-        self.assertEqual(first_name__meta.max_length, 150)
+    def test_unique(self):
+        self.assertFalse(self.field.unique)
 
-    def test_first_name_is_null(self):
-        first_name__meta = self.user._meta.get_field("first_name")
-        self.assertFalse(first_name__meta.null)
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "email address")
 
-    def test_first_name_is_blank(self):
-        first_name__meta = self.user._meta.get_field("first_name")
-        self.assertTrue(first_name__meta.blank)
 
-    # last name
-    def test_last_name_label(self):
-        last_name__meta = self.user._meta.get_field("last_name")
-        self.assertEqual(last_name__meta.verbose_name, "last name")
+class UserPasswordTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("password")
 
-    def test_last_name_max_length(self):
-        last_name__meta = self.user._meta.get_field("last_name")
-        self.assertEqual(last_name__meta.max_length, 150)
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
 
-    def test_last_name_is_null(self):
-        last_name__meta = self.user._meta.get_field("last_name")
-        self.assertFalse(last_name__meta.null)
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 128)
 
-    def test_last_name_is_blank(self):
-        last_name__meta = self.user._meta.get_field("last_name")
-        self.assertTrue(last_name__meta.blank)
+    def test_null(self):
+        self.assertFalse(self.field.null)
 
-    # phone number
-    def test_phone_number_label(self):
-        phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertEqual(phone_number__meta.verbose_name, "phone number")
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "password")
 
-    def test_phone_number_max_length(self):
-        phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertEqual(phone_number__meta.max_length, 50)
 
-    def test_phone_number_help_text(self):
-        phone_number__meta = self.user._meta.get_field("phone_number")
+class UserFirstNameTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("first_name")
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 150)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "first name")
+
+
+class UserLastNameTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("last_name")
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 150)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "last name")
+
+
+class UserIsSuperUserTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("is_superuser")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_default(self):
+        self.assertEqual(self.field.default, False)
+
+    def test_help_text(self):
+        help_text = "Designates that this user has all permissions without"
+        help_text += " explicitly assigning them."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "superuser status")
+
+
+class UserIsStaffTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("is_staff")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_default(self):
+        self.assertEqual(self.field.default, False)
+
+    def test_help_text(self):
+        help_text = "Designates whether the user can log into this admin site."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "staff status")
+
+
+class UserIsActiveTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("is_active")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_default(self):
+        self.assertEqual(self.field.default, True)
+
+    def test_help_text(self):
+        help_text = "Designates whether this user should be treated as active."
+        help_text += " Unselect this instead of deleting accounts."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "active")
+
+
+class UserDateJoinedTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("date_joined")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_default(self):
+        self.assertEqual(self.field.default, import_string("django.utils.timezone.now"))
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "date joined")
+
+
+class UserLastLoginTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("last_login")
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_null(self):
+        self.assertTrue(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "last login")
+
+
+class UserGroupsTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("groups")
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_help_text(self):
+        help_text = "The groups this user belongs to."
+        help_text += " A user will get all permissions granted to each of their groups."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_many(self):
+        self.assertTrue(self.field.many_to_many)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_related_model(self):
         self.assertEqual(
-            phone_number__meta.help_text,
-            "Enter a valid phone number that starts with a country code.",
+            self.field.related_model, import_string("django.contrib.auth.models.Group")
         )
 
-    def test_phone_number_is_null(self):
-        phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertFalse(phone_number__meta.null)
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "groups")
 
-    def test_phone_number_is_blank(self):
-        phone_number__meta = self.user._meta.get_field("phone_number")
-        self.assertFalse(phone_number__meta.blank)
+
+class UserPermissionsTestCase(UserModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.user_meta.get_field("user_permissions")
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_help_text(self):
+        help_text = "Specific permissions for this user."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_many(self):
+        self.assertTrue(self.field.many_to_many)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model,
+            import_string("django.contrib.auth.models.Permission"),
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "user permissions")

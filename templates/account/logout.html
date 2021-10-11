@@ -1,23 +1,12 @@
-{% extends 'base.html' %}
-{% block title %} Log out | {{ block.super }} {% endblock title %}
-{% load crispy_forms_tags %}
+{% extends '_base.html' %}
 
 {% block content %}
-  <div class="p-3 col-md-8 mx-md-auto">
-    <form id='logout_form' method='POST'>
+  <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
+    <h1 class="display-5 fw-bold">Log out</h1>
+    <p class="lead">Are you sure you want to log out?</p>
+    <form id="logout_form" class="p-2 p-md-3" method="POST">
       {% csrf_token %}
-
-      <fieldset>
-        <h1>Log out</h1>
-        <p class="lead">Are you sure you want to log out?</p>
-        <div class="text-start">
-          {{ form|crispy }}
-        </div>
-      </fieldset>
-
-      <div class="form-group py-3">
-        <button type="submit" class="btn btn-danger fw-bold">Log out</button>
-      </div>
+      <button class="w-100 btn btn-lg btn-outline-danger fw-bold" type="submit">Log out</button>
     </form>
   </div>
 {% endblock content %}

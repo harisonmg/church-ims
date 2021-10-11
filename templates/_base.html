@@ -1,0 +1,64 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    {% comment %} Required meta tags {% endcomment %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block seo %}
+      <meta name="description" content="{{ SITE_DESCRIPTION }}">
+    {% endblock seo %}
+
+    <title>
+      {% block title %} {{ SITE_NAME }} {% endblock title %}
+    </title>
+
+    {% comment %} Favicon {% endcomment %}
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+
+    {% comment %} CSS {% endcomment %}
+    {% block css %}
+      <link rel="stylesheet" href="{% static 'css/cosmo.min.css' %}">
+    {% endblock css %}
+
+    {% comment %} Google Analytics {% endcomment %}
+    {% if GOOGLE_ANALYTICS_ID %}
+      {% include "_google_analytics.html" %}
+    {% endif %}
+    </head>
+  <body class="d-flex h-100">
+    <div class="d-flex h-100 w-100 flex-column mx-auto">
+      {% include '_header.html' %}
+
+      {% if messages %}
+        {% include '_messages.html' %}
+      {% endif %}
+
+      <div class="h-100 container-fluid">
+        <div class="h-100 row">
+          {% if user.is_authenticated %}
+            {% include '_sidebar.html' %}
+          {% endif %}
+
+          <main {% if user.is_authenticated %}class="col-md-9 col-lg-10"{% endif %}>
+            {% block content %}{% endblock content %}
+          </main>
+        </div>
+      </div>
+
+      {% if is_paginated %}
+        {% include '_pagination.html' %}
+      {% endif %}
+
+      {% include '_footer.html' %}
+    </div>
+
+    {% comment %} JavaScript {% endcomment %}
+    {% comment %} Bootstrap Bundle with Popper {% endcomment %}
+    {% block javascript %}
+      <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+      <script src="{% static 'js/main.js' %}"></script>
+    {% endblock javascript %}
+  </body>
+</html>

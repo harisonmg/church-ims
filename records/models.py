@@ -2,36 +2,35 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.urls import reverse
 
-from core.models import TimeStampedModel
-from people.models import Person
+from .utils import format_temperature
+from .validators import validate_human_body_temperature
 
 
-class BodyTemperature(TimeStampedModel):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    temp = models.DecimalField(
-        verbose_name="temperature record",
-        help_text="A person's body temperature in degrees celsius",
+class TemperatureRecord(models.Model):
+    id = models.UUIDField(
+        editable=False, default=uuid.uuid4, primary_key=True, verbose_name="ID"
+    )
+    person = models.ForeignKey("people.Person", on_delete=models.PROTECT)
+    body_temperature = models.DecimalField(
         max_digits=4,
         decimal_places=2,
+        validators=[validate_human_body_temperature],
+        help_text="The person's body temperature in degrees celsius.",
     )
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        to=settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
-        related_name="temperature_creators",
         null=True,
+        help_text="The user who created this record.",
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        verbose_name_plural = "body temperature"
-        db_table = "records_body_temperature"
+    class Meta:  # noqa
+        db_table = "records_temperature"
+        ordering = ["person__username", "created_at"]
 
     def __str__(self):
-        return "{}'s temperature at {}".format(
-            self.person, self.created_at.strftime("%d %b %Y %H:%M:%S")
-        )
-
-    def get_absolute_url(self):
-        return reverse("temperature_detail", kwargs={"pk": self.pk})
+        temp = format_temperature(self.body_temperature)
+        return f"{self.person} was {temp} at {self.created_at}"

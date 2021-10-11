@@ -1,23 +1,15 @@
 from django import forms
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
-from core.validators import validate_child, validate_date_of_birth
+from .models import Person
+from .validators import validate_date_of_birth, validate_full_name
 
-from .models import FamilyRelationship, Person
 
+class PersonForm(forms.ModelForm):
+    username = forms.CharField(max_length=25, validators=[UnicodeUsernameValidator()])
+    full_name = forms.CharField(max_length=150, validators=[validate_full_name])
+    dob = forms.DateField(label="Date of birth", validators=[validate_date_of_birth])
 
-class ChildForm(forms.ModelForm):
-    dob = forms.DateField(
-        label="Date of birth",
-        help_text="Please use the following format: <em>DD/MM/YYYY.</em>",
-        validators=[validate_date_of_birth, validate_child],
-    )
-
-    class Meta:
+    class Meta:  # noqa
         model = Person
-        fields = ("username", "full_name", "dob", "gender")
-
-
-class FamilyRelationshipForm(forms.ModelForm):
-    class Meta:
-        model = FamilyRelationship
-        fields = ("relative", "relationship_type")
+        fields = ["username", "full_name", "gender", "dob"]
