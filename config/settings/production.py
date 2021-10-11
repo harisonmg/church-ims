@@ -10,6 +10,22 @@ ADMINS = decouple.config("ADMINS", cast=list_of_tuples)
 
 MANAGERS = ADMINS
 
+SECURE_SSL_REDIRECT = decouple.config("SECURE_SSL_REDIRECT", cast=bool, default=True)
+
+SECURE_HSTS_SECONDS = decouple.config("SECURE_HSTS_SECONDS", cast=int, default=3600)
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = decouple.config(
+    "SECURE_HSTS_INCLUDE_SUBDOMAINS", cast=bool, default=True
+)
+
+SECURE_HSTS_PRELOAD = decouple.config("SECURE_HSTS_PRELOAD", cast=bool, default=True)
+
+SESSION_COOKIE_SECURE = decouple.config(
+    "SESSION_COOKIE_SECURE", cast=bool, default=True
+)
+
+CSRF_COOKIE_SECURE = decouple.config("CSRF_COOKIE_SECURE", cast=bool, default=True)
+
 
 # Third Party Apps Settings
 # =========================
