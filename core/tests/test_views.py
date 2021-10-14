@@ -1,8 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, SimpleTestCase, TestCase
 
-from faker import Faker
-
 from accounts.factories import UserFactory
 from core import views
 
@@ -45,10 +43,7 @@ class DashboardViewTestCase(TestCase):
         self.assertRedirects(response, f"/accounts/login/?next={self.url}")
 
     def test_logged_in_response_status_code(self):
-        fake = Faker()
-        user_password = fake.password()
-        user = UserFactory(password=user_password)
-
-        self.client.login(email=user.email, password=user_password)
+        user = UserFactory()
+        self.client.force_login(user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
