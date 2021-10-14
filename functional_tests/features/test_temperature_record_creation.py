@@ -17,7 +17,7 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         self.password = self.fake.password()
         create_temp = Permission.objects.filter(name="Can add temperature record")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(create_temp) + list(view_person)
+        permissions = create_temp | view_person
         self.user = UserFactory(
             password=self.password, user_permissions=tuple(permissions)
         )

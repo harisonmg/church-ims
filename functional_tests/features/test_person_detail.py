@@ -14,7 +14,7 @@ class PersonUpdateTestCase(FunctionalTestCase):
         self.password = self.fake.password()
         change_person = Permission.objects.filter(name="Can change person")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(change_person) + list(view_person)
+        permissions = change_person | view_person
         self.user = UserFactory(
             password=self.password, user_permissions=tuple(permissions)
         )

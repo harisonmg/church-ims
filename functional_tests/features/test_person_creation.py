@@ -14,7 +14,7 @@ class PersonCreationTestCase(FunctionalTestCase):
         self.password = self.fake.password()
         create_person = Permission.objects.filter(name="Can add person")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(create_person) + list(view_person)
+        permissions = create_person | view_person
         self.user = UserFactory(
             password=self.password, user_permissions=tuple(permissions)
         )
