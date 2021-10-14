@@ -49,7 +49,13 @@ class PasswordResetRequestDonePage(BasePage):
 
 
 class PasswordResetPage(BasePage):
-    PATH = "/accounts/password/reset/key/invalid-token/"
+    def __init__(self, test, token="invalid-token"):
+        super().__init__(test)
+        self.token = token
+
+    @property
+    def PATH(self):
+        return f"/accounts/password/reset/key/{self.token}/"
 
     @property
     def form(self):
@@ -87,7 +93,13 @@ class EmailVerificationRequiredPage(BasePage):
 
 
 class EmailConfirmationPage(BasePage):
-    PATH = "/accounts/confirm-email/invalid-token/"
+    def __init__(self, test, token="invalid-token"):
+        super().__init__(test)
+        self.token = token
+
+    @property
+    def PATH(self):
+        return f"/accounts/confirm-email/{self.token}/"
 
     @property
     def form(self):
