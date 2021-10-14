@@ -41,7 +41,7 @@ class BasePage:
 
     @property
     def messages(self):
-        return components.Messages(self.browser)
+        return components.Messages(self.browser).messages
 
     @property
     def sidebar(self):

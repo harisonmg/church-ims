@@ -96,8 +96,7 @@ class PasswordResetTestCase(FunctionalTestCase):
         self.assertEqual(password_reset_done_page.heading, "Password reset complete")
 
         self.assertEqual(
-            password_reset_done_page.messages.messages[0],
-            "Password successfully changed.",
+            password_reset_done_page.messages[0], "Password successfully changed."
         )
         self.assertEqual(
             password_reset_done_page.main_text[0],

@@ -57,6 +57,6 @@ class PersonCreationTestCase(FunctionalTestCase):
         person_detail_page = pages.PersonDetailPage(self, self.person.username)
         self.assertEqual(self.browser.current_url, person_detail_page.url)
         self.assertEqual(
-            person_detail_page.messages.messages[0],
+            person_detail_page.messages[0],
             f"{self.person.username}'s information has been added successfully.",
         )

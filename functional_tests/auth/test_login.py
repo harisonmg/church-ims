@@ -41,7 +41,7 @@ class LoginTestCase(FunctionalTestCase):
         dashboard = pages.Dashboard(self)
         self.assertEqual(self.browser.current_url, dashboard.url)
         self.assertEqual(
-            dashboard.messages.messages[0],
+            dashboard.messages[0],
             f"Successfully signed in as {self.active_user.username}.",
         )
 

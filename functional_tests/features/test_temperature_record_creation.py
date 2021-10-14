@@ -81,6 +81,6 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         # back to the people list page
         self.assertEqual(self.browser.current_url, people_list_page.url)
         self.assertEqual(
-            people_list_page.messages.messages[0],
+            people_list_page.messages[0],
             f"A temperature record for {username} has been added successfully.",
         )

@@ -37,6 +37,6 @@ class LogoutTestCase(FunctionalTestCase):
         home_page = pages.HomePage(self)
         self.assertEqual(self.browser.current_url, home_page.url)
         self.assertEqual(
-            home_page.messages.messages[0],
+            home_page.messages[0],
             "You have signed out.",
         )
