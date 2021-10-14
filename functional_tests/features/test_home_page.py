@@ -15,8 +15,12 @@ class HomePageTestCase(FunctionalTestCase):
         self.assertEqual(home_page.heading, self.SITE_NAME)
 
         # He sees links for the sign up and login pages
-        self.assertEqual(home_page.primary_cta_link, pages.SignupPage(self).url)
-        self.assertEqual(home_page.secondary_cta_link, pages.LoginPage(self).url)
+        self.assertEqual(
+            home_page.primary_cta_link, {"Sign up": pages.SignupPage(self).url}
+        )
+        self.assertEqual(
+            home_page.secondary_cta_link, {"Log in": pages.LoginPage(self).url}
+        )
 
         # There is also some site information in the footer
         self.assertEqual(home_page.footer.text, "Made with 💙 by Harison Gachuru")

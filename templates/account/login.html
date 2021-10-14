@@ -10,11 +10,11 @@
       {{ form|crispy }}
       <button class="w-100 btn btn-lg btn-primary" type="submit">Log in</button>
       <div class="pt-3">
-        <a href="{% url 'account_reset_password' %}">I don't remember my password</a>
+        <a id="reset_password" href="{% url 'account_reset_password' %}">I don't remember my password</a>
       </div>
       <hr class="my-4">
       <small class="text-muted">
-        Don't have an account? <a href="{% url 'account_signup' %}">Sign up</a>
+        Don't have an account? <a id="signup" href="{% url 'account_signup' %}">Sign up</a>
       </small>
     </form>
   </div>

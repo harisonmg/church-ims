@@ -33,7 +33,9 @@ class SignupTestCase(FunctionalTestCase):
             signup_page.form.password_confirmation_label, "Password (again)*"
         )
         self.assertEqual(signup_page.form.submit_button_label, "Sign up")
-        self.assertEqual(signup_page.form.login_link, pages.LoginPage(self).url)
+        self.assertEqual(
+            signup_page.form.login_link, {"Log in": pages.LoginPage(self).url}
+        )
 
         # She enters her email and password and submits the form
         signup_page.signup(self.user_email, self.password, self.password)
