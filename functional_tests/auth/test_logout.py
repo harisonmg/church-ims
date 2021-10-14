@@ -1,4 +1,3 @@
-from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
 
@@ -7,9 +6,7 @@ class LogoutTestCase(FunctionalTestCase):
     def setUp(self):
         super().setUp()
 
-        self.password = self.fake.password()
-        self.user = UserFactory(password=self.password)
-        self.login(self.user, self.password)
+        self.create_pre_authenticated_session()
 
     def test_authenticated_user_can_logout(self):
         # A user visits the logout page

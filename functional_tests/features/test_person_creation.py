@@ -11,18 +11,16 @@ class PersonCreationTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        self.password = self.fake.password()
         create_person = Permission.objects.filter(name="Can add person")
         view_person = Permission.objects.filter(name="Can view person")
         permissions = create_person | view_person
-        self.user = UserFactory(
-            password=self.password, user_permissions=tuple(permissions)
-        )
+        self.user = UserFactory(user_permissions=tuple(permissions))
 
         # person
         self.person = PersonFactory.build()
 
-        self.login(self.user, self.password)
+        # auth
+        self.create_pre_authenticated_session(self.user)
 
     def test_person_creation(self):
         # An authorized user visits the person creation page.

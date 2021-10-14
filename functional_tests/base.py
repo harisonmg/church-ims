@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.auth import BACKEND_SESSION_KEY, HASH_SESSION_KEY, SESSION_KEY
+from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.test import tag
@@ -7,6 +9,7 @@ import decouple
 from faker import Faker
 from selenium import webdriver
 
+from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.utils.search import find_url
 
@@ -64,3 +67,23 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         login_page = pages.LoginPage(self)
         login_page.visit()
         login_page.login(user.email, password)
+
+    def create_pre_authenticated_session(self, user=None):
+        # create a user
+        if user is None:
+            user = UserFactory()
+
+        # create a session
+        session = SessionStore()
+        session[SESSION_KEY] = user.pk
+        session[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
+        session[HASH_SESSION_KEY] = user.get_session_auth_hash()
+        session.save()
+
+        # to set a cookie, we need to first visit the domain.
+        # 404 pages load the quickest!
+        pages.BasePage(self).visit()
+        cookie_dict = dict(
+            name=settings.SESSION_COOKIE_NAME, value=session.session_key, path="/"
+        )
+        self.browser.add_cookie(cookie_dict=cookie_dict)

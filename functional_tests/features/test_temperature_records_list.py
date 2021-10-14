@@ -16,18 +16,17 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        self.password = self.fake.password()
         permission = Permission.objects.filter(name="Can view temperature record")
-        self.user = UserFactory(
-            password=self.password, user_permissions=tuple(permission)
-        )
+        self.user = UserFactory(user_permissions=tuple(permission))
 
         # temperature records
         temperature_records = TemperatureRecordFactory.create_batch(45)
         self.temperature_records = sorted(
             temperature_records, key=lambda record: record.person.username
         )
-        self.login(self.user, self.password)
+
+        # auth
+        self.create_pre_authenticated_session(self.user)
 
     def test_page_navigation(self):
         # An authorized user visits the temperature records list page
