@@ -22,7 +22,7 @@ class Table(BaseComponent):
     def _row_data(self):
         """Returns table data elements for each row in a list of lists"""
         rows = self.browser.find_elements(*self.ROW)
-        return map(lambda row: row.find_elements(*self.DATA), rows)
+        return list(map(lambda row: row.find_elements(*self.DATA), rows))
 
     @property
     def data(self):
