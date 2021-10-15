@@ -130,3 +130,19 @@ class PersonUpdatePage(BasePage):
             username=username, full_name=full_name, gender=gender, dob=dob
         )
         return self
+
+
+class RelationshipsListPage(BasePage):
+    PATH = "/people/relationships/"
+
+    @property
+    def form(self):
+        return components.SearchForm(self.browser)
+
+    @property
+    def table(self):
+        return components.Table(self.browser)
+
+    def search(self, search_term):
+        self.form.search(search_term=search_term)
+        return self

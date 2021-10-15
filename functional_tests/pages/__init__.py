@@ -18,6 +18,7 @@ from .features import (
     PersonCreationPage,
     PersonDetailPage,
     PersonUpdatePage,
+    RelationshipsListPage,
     TemperatureRecordCreatePage,
     TemperatureRecordsListPage,
 )
