@@ -4,10 +4,11 @@ from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
 from functional_tests.utils.formatting import (
-    RELATIONSHIPS_LIST_COLUMNS,
-    format_relationships_list,
+    INTERPERSONAL_RELATIONSHIPS_LIST_COLUMNS,
+    format_interpersonal_relationships,
 )
-from functional_tests.utils.search import search_relationships
+from functional_tests.utils.search import search_interpersonal_relationships
+
 # from people.factories import RelationshipFactory
 
 
@@ -52,15 +53,16 @@ class RelationshipsListTestCase(FunctionalTestCase):
 
         # He also sees a list of relationships and a page navigation
         self.assertEqual(
-            relationships_list_page.table.columns, RELATIONSHIPS_LIST_COLUMNS
+            relationships_list_page.table.columns,
+            INTERPERSONAL_RELATIONSHIPS_LIST_COLUMNS,
         )
         self.assertEqual(
             relationships_list_page.table.data.get("1"),
-            format_relationships_list(self.relationships[:1]).get("1"),
+            format_interpersonal_relationships(self.relationships[:1]).get("1"),
         )
         self.assertEqual(
             relationships_list_page.table.data,
-            format_relationships_list(self.relationships[:10]),
+            format_interpersonal_relationships(self.relationships[:10]),
         )
         self.assertEqual(
             list(relationships_list_page.pagination.links.keys()),
@@ -80,7 +82,7 @@ class RelationshipsListTestCase(FunctionalTestCase):
 
         self.assertEqual(
             relationships_list_page.table.data,
-            format_relationships_list(self.relationships[40:]),
+            format_interpersonal_relationships(self.relationships[40:]),
         )
         self.assertEqual(
             list(relationships_list_page.pagination.links.keys()),
@@ -98,7 +100,7 @@ class RelationshipsListTestCase(FunctionalTestCase):
 
         self.assertEqual(
             relationships_list_page.table.data,
-            format_relationships_list(self.relationships[20:30]),
+            format_interpersonal_relationships(self.relationships[20:30]),
         )
         self.assertEqual(
             list(relationships_list_page.pagination.links.keys()),
@@ -117,11 +119,12 @@ class RelationshipsListTestCase(FunctionalTestCase):
         relationships_list_page.visit()
 
         self.assertEqual(
-            relationships_list_page.table.columns, RELATIONSHIPS_LIST_COLUMNS
+            relationships_list_page.table.columns,
+            INTERPERSONAL_RELATIONSHIPS_LIST_COLUMNS,
         )
         self.assertEqual(
             relationships_list_page.table.data,
-            format_relationships_list(self.relationships[:10]),
+            format_interpersonal_relationships(self.relationships[:10]),
         )
         self.assertEqual(
             relationships_list_page.form.search_input_placeholder, "Search"
@@ -133,11 +136,12 @@ class RelationshipsListTestCase(FunctionalTestCase):
         search_term = self.relationships[20].person.username
         relationships_list_page.search(search_term)
 
-        search_results = search_relationships(search_term)
+        search_results = search_interpersonal_relationships(search_term)
         self.assertEqual(len(relationships_list_page.table.data), len(search_results))
         self.assertEqual(relationships_list_page.table.data, search_results)
         self.assertEqual(
-            relationships_list_page.table.columns, RELATIONSHIPS_LIST_COLUMNS
+            relationships_list_page.table.columns,
+            INTERPERSONAL_RELATIONSHIPS_LIST_COLUMNS,
         )
 
         # He decides to search for a relationship that doesn't exist
