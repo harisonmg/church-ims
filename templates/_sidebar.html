@@ -8,9 +8,12 @@
         People
       </a>
     {% endif %}
-    <a href="{% url 'people:relationships_list' %}" class="list-group-item list-group-action">
-      Relationships
-    </a>
+    {% if perms.people.view_interpersonalrelationship %}
+      <a href="{% url 'people:relationships_list' %}"
+       class="list-group-item list-group-action">
+        Interpersonal relationships
+      </a>
+    {% endif %}
     {% if perms.records.view_temperaturerecord %}
       <a href="{% url 'records:temperature_records_list' %}"
        class="list-group-item list-group-action">
