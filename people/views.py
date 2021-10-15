@@ -1,17 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import (
-    CreateView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-)
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
 from .forms import PersonForm
-from .models import Person
+from .models import InterpersonalRelationship, Person
 
 
 class PeopleListView(
@@ -74,5 +68,12 @@ class PersonUpdateView(
         return self.success_message % dict(username=cleaned_data["username"])
 
 
-class RelationshipsListView(LoginRequiredMixin, TemplateView):
-    template_name = "people/relationships.html"
+class RelationshipsListView(
+    LoginRequiredMixin, PermissionRequiredMixin, SearchableListMixin, ListView
+):
+    context_object_name = "relationships"
+    model = InterpersonalRelationship
+    paginate_by = 10
+    permission_required = "people.view_interpersonalrelationship"
+    search_fields = ["person__username", "relative__username"]
+    template_name = "people/relationships_list.html"

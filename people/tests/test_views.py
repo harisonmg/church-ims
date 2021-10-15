@@ -1,14 +1,13 @@
-from django.contrib.auth.models import AnonymousUser, Permission
-from django.test import RequestFactory, TestCase
+from django.contrib.auth.models import Permission
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
-from people import views
-from people.factories import PersonFactory
-from people.models import Person
+from people.factories import InterpersonalRelationshipFactory, PersonFactory
+from people.models import InterpersonalRelationship, Person
 
-from .helpers import search_people
+from .helpers import search_interpersonal_relationships, search_people
 
 
 class PeopleListViewTestCase(TestCase):
@@ -309,23 +308,108 @@ class RelationshipsListViewTestCase(TestCase):
         super().setUpClass()
 
         cls.url = "/people/relationships/"
-        cls.view = views.RelationshipsListView
+        cls.table_head = """
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Person</th>
+                <th scope="col">Relative</th>
+                <th scope="col">Relationship</th>
+            </tr>
+        </thead>
+        """
+        # users
+        view_relationships = Permission.objects.filter(
+            name="Can view interpersonal relationship"
+        )
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(view_relationships))
+        cls.staff_user = UserFactory(is_staff=True)
 
-    def test_template_used(self):
-        factory = RequestFactory()
-        request = factory.get("dummy_path/")
-        request.user = AnonymousUser
-
-        response = self.view.as_view()(request)
-        with self.assertTemplateUsed("people/relationships.html"):
-            response.render()
-
-    def test_view_requires_login(self):
+    def test_anonymous_user_response(self):
         response = self.client.get(self.url)
         self.assertRedirects(response, f"/accounts/login/?next={self.url}")
 
-    def test_logged_in_response_status_code(self):
-        user = UserFactory()
-        self.client.force_login(user)
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/relationships_list.html")
+
+    def test_context_data_contains_relationships(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertIn("relationships", response.context)
+
+    def test_is_paginated(self):
+        InterpersonalRelationshipFactory.create_batch(11)
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTrue(response.context.get("is_paginated"))
+        self.assertEqual(len(response.context.get("relationships")), 10)
+
+    def test_pagination_lists_all_items(self):
+        InterpersonalRelationshipFactory.create_batch(12)
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url + "?page=2")
+        expected_relationships = list(InterpersonalRelationship.objects.all())[-2:]
+        people = list(response.context.get("relationships"))
+        self.assertEqual(people, expected_relationships)
+
+    def test_response_with_no_relationships(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        with self.assertRaises(AssertionError):
+            self.assertInHTML(self.table_head, response.content.decode())
+        self.assertInHTML(
+            "There are no interpersonal relationships yet!", response.content.decode()
+        )
+
+    def test_response_with_relationships(self):
+        InterpersonalRelationshipFactory.create_batch(3)
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        with self.assertRaises(AssertionError):
+            self.assertInHTML(
+                "There are no interpersonal relationships yet!",
+                response.content.decode(),
+            )
+        self.assertInHTML(self.table_head, response.content.decode())
+
+    def test_search_results(self):
+        # setup
+        relationships = InterpersonalRelationshipFactory.create_batch(10)
+        search_term = relationships[0].person.username
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.get(f"{self.url}?q={search_term}")
+        search_results = response.context.get("relationships")
+        self.assertQuerysetEqual(
+            search_results, search_interpersonal_relationships(search_term)
+        )
+
+    def test_response_with_no_search_results(self):
+        InterpersonalRelationshipFactory.create_batch(10)
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url + "?q=Does not exist")
+        self.assertEqual(list(response.context.get("relationships")), [])
+        with self.assertRaises(AssertionError):
+            self.assertInHTML(self.table_head, response.content.decode())
+        self.assertInHTML(
+            "Your search didn't yield any results", response.content.decode()
+        )
