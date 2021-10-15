@@ -1,9 +1,10 @@
-from django.contrib.auth.models import Permission
-from django.test import TestCase
+from django.contrib.auth.models import AnonymousUser, Permission
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
+from people import views
 from people.factories import PersonFactory
 from people.models import Person
 
@@ -300,3 +301,31 @@ class PersonUpdateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)
         self.assertRedirects(response, self.person.get_absolute_url())
+
+
+class RelationshipsListViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.url = "/people/relationships/"
+        cls.view = views.RelationshipsListView
+
+    def test_template_used(self):
+        factory = RequestFactory()
+        request = factory.get("dummy_path/")
+        request.user = AnonymousUser
+
+        response = self.view.as_view()(request)
+        with self.assertTemplateUsed("people/relationships.html"):
+            response.render()
+
+    def test_view_requires_login(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_logged_in_response_status_code(self):
+        user = UserFactory()
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)

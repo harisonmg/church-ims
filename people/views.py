@@ -1,6 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
 from extra_views import SearchableListMixin
 
@@ -66,3 +72,7 @@ class PersonUpdateView(
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(username=cleaned_data["username"])
+
+
+class RelationshipsListView(LoginRequiredMixin, TemplateView):
+    template_name = "people/relationships.html"
