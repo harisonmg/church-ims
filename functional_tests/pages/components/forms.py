@@ -238,7 +238,7 @@ class PersonForm(FormComponent):
     def gender_options(self):
         return list(self._gender_options.keys())
 
-    def select_gender_option(self, option):
+    def select_gender(self, option):
         element = self._gender_options.get(option)
         if element is not None:
             element.click()
@@ -261,7 +261,7 @@ class PersonForm(FormComponent):
             self._full_name_input.send_keys(full_name)
 
         if gender is not None:
-            self.select_gender_option(gender)
+            self.select_gender(gender)
 
         if dob is not None:
             self._date_of_birth_input.clear()
