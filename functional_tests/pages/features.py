@@ -56,7 +56,7 @@ class TemperatureRecordsListPage(BasePage):
         return self
 
 
-class TemperatureRecordCreatePage(BasePage):
+class TemperatureRecordCreationPage(BasePage):
     def __init__(self, test, person_username):
         super().__init__(test)
         self.person_username = person_username
