@@ -3,7 +3,12 @@ from django.utils import dateformat, timezone
 from records import utils as record_utils
 
 PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Age category", "Actions"]
-INTERPERSONAL_RELATIONSHIPS_LIST_COLUMNS = ["#", "Person", "Relative", "Relationship"]
+INTERPERSONAL_RELATIONSHIPS_LIST_COLUMNS = [
+    "#",
+    "Person",
+    "Relative",
+    "Relationship type",
+]
 TEMPERATURE_RECORDS_LIST_COLUMNS = ["#", "Username", "Temperature", "Time"]
 
 
@@ -41,6 +46,6 @@ def format_interpersonal_relationships(relationships):
         results[str(i + 1)] = [
             relationship.person.username,
             relationship.relative.username,
-            relationship.get_relation_display(),
+            relationship.get_relation_display().lower(),
         ]
     return results

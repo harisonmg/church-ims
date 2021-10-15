@@ -28,7 +28,7 @@
               <th scope="col">#</th>
               <th scope="col">Person</th>
               <th scope="col">Relative</th>
-              <th scope="col">Relationship</th>
+              <th scope="col">Relationship type</th>
             </tr>
           </thead>
           <tbody>
@@ -37,7 +37,7 @@
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ relationship.person }}</td>
                 <td>{{ relationship.relative }}</td>
-                <td>{{ relationship.get_relation_display }}</td>
+                <td>{{ relationship.get_relation_display|lower }}</td>
               </tr>
             {% endfor %}
           </tbody>

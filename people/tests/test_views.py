@@ -314,7 +314,7 @@ class RelationshipsListViewTestCase(TestCase):
                 <th scope="col">#</th>
                 <th scope="col">Person</th>
                 <th scope="col">Relative</th>
-                <th scope="col">Relationship</th>
+                <th scope="col">Relationship type</th>
             </tr>
         </thead>
         """
