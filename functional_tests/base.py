@@ -63,11 +63,6 @@ class FunctionalTestCase(StaticLiveServerTestCase):
     def header_title(self):
         return {self.SITE_NAME: pages.HomePage(self).url}
 
-    def login(self, user, password):
-        login_page = pages.LoginPage(self)
-        login_page.visit()
-        login_page.login(user.email, password)
-
     def create_pre_authenticated_session(self, user=None):
         # create a user
         if user is None:
