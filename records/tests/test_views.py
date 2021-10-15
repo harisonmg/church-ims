@@ -28,9 +28,9 @@ class TemperatureRecordsListViewTestCase(TestCase):
         </thead>
         """
         # users
-        permission = Permission.objects.filter(name="Can view temperature record")
+        view_temp = Permission.objects.filter(name="Can view temperature record")
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permission))
+        cls.authorized_user = UserFactory(user_permissions=tuple(view_temp))
         cls.staff_user = UserFactory(is_staff=True)
 
     def test_anonymous_user_response(self):
@@ -129,7 +129,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         # users
         create_temp = Permission.objects.filter(name="Can add temperature record")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(create_temp) + list(view_person)
+        permissions = create_temp | view_person
         cls.user = UserFactory()
         cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
         cls.staff_user = UserFactory(is_staff=True)

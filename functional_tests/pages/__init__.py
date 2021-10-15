@@ -10,6 +10,7 @@ from .auth import (
     PasswordResetRequestPage,
     SignupPage,
 )
+from .base import BasePage
 from .features import (
     Dashboard,
     HomePage,

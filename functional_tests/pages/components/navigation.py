@@ -76,17 +76,17 @@ class Pagination(NavigationComponent):
     @property
     def active_links(self):
         active = {}
-        for link, classes in self._link_classes.items():
+        for name, classes in self._link_classes.items():
             if "active" in classes:
-                active[link] = self.links[link]
+                active[name] = self.links[name]
         return active
 
     @property
     def disabled_links(self):
         disabled = []
-        for link, classes in self._link_classes.items():
+        for name, classes in self._link_classes.items():
             if "disabled" in classes:
-                disabled.append(link)
+                disabled.append(name)
         return disabled
 
 
@@ -96,7 +96,7 @@ class Sidebar(NavigationComponent):
     @property
     def active_links(self):
         active = {}
-        for link, element in self._link_elements.items():
+        for name, element in self._link_elements.items():
             if "active" in element.get_attribute("class"):
-                active[link] = self.links[link]
+                active[name] = self.links[name]
         return active

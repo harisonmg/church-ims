@@ -33,7 +33,9 @@ class SignupTestCase(FunctionalTestCase):
             signup_page.form.password_confirmation_label, "Password (again)*"
         )
         self.assertEqual(signup_page.form.submit_button_label, "Sign up")
-        self.assertEqual(signup_page.form.login_link, pages.LoginPage(self).url)
+        self.assertEqual(
+            signup_page.form.login_link, {"Log in": pages.LoginPage(self).url}
+        )
 
         # She enters her email and password and submits the form
         signup_page.signup(self.user_email, self.password, self.password)
@@ -48,7 +50,7 @@ class SignupTestCase(FunctionalTestCase):
         self.assertEqual(email_verification_page.heading, "Verify your email address")
 
         self.assertEqual(
-            email_verification_page.messages.messages[0],
+            email_verification_page.messages[0],
             f"Confirmation e-mail sent to {self.user_email}.",
         )
         self.assertEqual(
@@ -91,7 +93,7 @@ class SignupTestCase(FunctionalTestCase):
         login_page = pages.LoginPage(self)
         self.assertEqual(self.browser.current_url, login_page.url)
         self.assertEqual(
-            login_page.messages.messages[0], f"You have confirmed {self.user_email}."
+            login_page.messages[0], f"You have confirmed {self.user_email}."
         )
 
     def test_invalid_email_confirmation_link(self):

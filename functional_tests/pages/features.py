@@ -6,24 +6,18 @@ from .base import BasePage
 
 class HomePage(BasePage):
     PATH = "/"
-    PRIMARY_CTA = (By.ID, "primary_cta")
-    SECONDARY_CTA = (By.ID, "secondary_cta")
+    SIGN_UP_LINK = (By.ID, "signup")
+    LOGIN_LINK = (By.ID, "login")
 
     @property
-    def _primary_cta(self):
-        return self.browser.find_element(*self.PRIMARY_CTA)
+    def signup_link(self):
+        element = self.browser.find_element(*self.SIGN_UP_LINK)
+        return {element.text: element.get_attribute("href")}
 
     @property
-    def _secondary_cta(self):
-        return self.browser.find_element(*self.SECONDARY_CTA)
-
-    @property
-    def primary_cta_link(self):
-        return self._primary_cta.get_attribute("href")
-
-    @property
-    def secondary_cta_link(self):
-        return self._secondary_cta.get_attribute("href")
+    def login_link(self):
+        element = self.browser.find_element(*self.LOGIN_LINK)
+        return {element.text: element.get_attribute("href")}
 
 
 class Dashboard(BasePage):

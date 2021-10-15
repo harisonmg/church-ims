@@ -3,7 +3,10 @@ from django.contrib.auth.models import Permission
 from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
-from functional_tests.utils.formatting import format_temperature_records
+from functional_tests.utils.formatting import (
+    TEMPERATURE_RECORD_LIST_COLUMNS,
+    format_temperature_records,
+)
 from functional_tests.utils.search import search_temperature_records
 from records.factories import TemperatureRecordFactory
 
@@ -13,18 +16,17 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        self.password = self.fake.password()
         permission = Permission.objects.filter(name="Can view temperature record")
-        self.user = UserFactory(
-            password=self.password, user_permissions=tuple(permission)
-        )
+        self.user = UserFactory(user_permissions=tuple(permission))
 
         # temperature records
         temperature_records = TemperatureRecordFactory.create_batch(45)
         self.temperature_records = sorted(
             temperature_records, key=lambda record: record.person.username
         )
-        self.login(self.user, self.password)
+
+        # auth
+        self.create_pre_authenticated_session(self.user)
 
     def test_page_navigation(self):
         # An authorized user visits the temperature records list page
@@ -53,8 +55,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
 
         # He also sees a list of temperature records and a page navigation
         self.assertEqual(
-            temp_records_list_page.table.columns,
-            ["#", "Username", "Temperature", "Time"],
+            temp_records_list_page.table.columns, TEMPERATURE_RECORD_LIST_COLUMNS
         )
         self.assertEqual(
             temp_records_list_page.table.data.get("1"),
@@ -117,8 +118,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         temp_records_list_page.visit()
 
         self.assertEqual(
-            temp_records_list_page.table.columns,
-            ["#", "Username", "Temperature", "Time"],
+            temp_records_list_page.table.columns, TEMPERATURE_RECORD_LIST_COLUMNS
         )
         self.assertEqual(
             temp_records_list_page.table.data,
@@ -136,8 +136,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         self.assertEqual(len(temp_records_list_page.table.data), len(search_results))
         self.assertEqual(temp_records_list_page.table.data, search_results)
         self.assertEqual(
-            temp_records_list_page.table.columns,
-            ["#", "Username", "Temperature", "Time"],
+            temp_records_list_page.table.columns, TEMPERATURE_RECORD_LIST_COLUMNS
         )
 
         # He decides to search temperature records for a person that doesn't exist

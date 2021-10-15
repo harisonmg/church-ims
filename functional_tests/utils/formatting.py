@@ -3,6 +3,7 @@ from django.utils import dateformat, timezone
 from records import utils as record_utils
 
 PEOPLE_LIST_COLUMNS = ["#", "Username", "Full name", "Age category", "Actions"]
+TEMPERATURE_RECORD_LIST_COLUMNS = ["#", "Username", "Temperature", "Time"]
 
 
 def format_datetime(dt, fmt="j M Y, P"):

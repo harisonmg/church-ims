@@ -11,17 +11,16 @@ class PersonUpdateTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        self.password = self.fake.password()
         change_person = Permission.objects.filter(name="Can change person")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(change_person) + list(view_person)
-        self.user = UserFactory(
-            password=self.password, user_permissions=tuple(permissions)
-        )
+        permissions = change_person | view_person
+        self.user = UserFactory(user_permissions=tuple(permissions))
 
         # person
         self.person = PersonFactory()
-        self.login(self.user, self.password)
+
+        # auth
+        self.create_pre_authenticated_session(self.user)
 
     def test_person_creation(self):
         # An authorized user visits a person's detail page.

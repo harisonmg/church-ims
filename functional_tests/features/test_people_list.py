@@ -13,16 +13,15 @@ class PeopleListTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        self.password = self.fake.password()
         permission = Permission.objects.filter(name="Can view person")
-        self.user = UserFactory(
-            password=self.password, user_permissions=tuple(permission)
-        )
+        self.user = UserFactory(user_permissions=tuple(permission))
 
         # people
         people = PersonFactory.create_batch(45)
         self.people = sorted(people, key=lambda p: p.username)
-        self.login(self.user, self.password)
+
+        # auth
+        self.create_pre_authenticated_session(self.user)
 
     def test_page_navigation(self):
         # An authorized user visits the people list page

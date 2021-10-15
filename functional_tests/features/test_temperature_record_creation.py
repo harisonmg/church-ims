@@ -14,18 +14,17 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        self.password = self.fake.password()
         create_temp = Permission.objects.filter(name="Can add temperature record")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(create_temp) + list(view_person)
-        self.user = UserFactory(
-            password=self.password, user_permissions=tuple(permissions)
-        )
+        permissions = create_temp | view_person
+        self.user = UserFactory(user_permissions=tuple(permissions))
 
         # people
         people = PersonFactory.create_batch(21)
         self.people = sorted(people, key=lambda p: p.username)
-        self.login(self.user, self.password)
+
+        # auth
+        self.create_pre_authenticated_session(self.user)
 
         # body temperature
         self.body_temperature = TemperatureRecordFactory.build().body_temperature
@@ -81,6 +80,6 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         # back to the people list page
         self.assertEqual(self.browser.current_url, people_list_page.url)
         self.assertEqual(
-            people_list_page.messages.messages[0],
+            people_list_page.messages[0],
             f"A temperature record for {username} has been added successfully.",
         )

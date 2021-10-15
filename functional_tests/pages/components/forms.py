@@ -46,8 +46,8 @@ class LoginForm(FormComponent):
     PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password']")
     REMEMBER_CHECKBOX = (By.CSS_SELECTOR, "input#id_remember")
     REMEMBER_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_remember']")
-    SIGN_UP_LINK = (By.LINK_TEXT, "Sign up")
-    PASSWORD_RESET_LINK = (By.LINK_TEXT, "I don't remember my password")
+    SIGN_UP_LINK = (By.ID, "signup")
+    PASSWORD_RESET_LINK = (By.ID, "reset_password")
 
     @property
     def _email_input(self):
@@ -75,13 +75,13 @@ class LoginForm(FormComponent):
 
     @property
     def signup_link(self):
-        link_element = self.browser.find_element(*self.SIGN_UP_LINK)
-        return link_element.get_attribute("href")
+        element = self.browser.find_element(*self.SIGN_UP_LINK)
+        return {element.text: element.get_attribute("href")}
 
     @property
     def password_reset_link(self):
-        link_element = self.browser.find_element(*self.PASSWORD_RESET_LINK)
-        return link_element.get_attribute("href")
+        element = self.browser.find_element(*self.PASSWORD_RESET_LINK)
+        return {element.text: element.get_attribute("href")}
 
     def send_keys(self, email, password, remember=False):
         self._email_input.send_keys(email)
@@ -143,7 +143,7 @@ class SignupForm(FormComponent):
     PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
     PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
     PASSWORD_CONFIRMATION_LABEL = (By.CSS_SELECTOR, "label[for='id_password2']")
-    LOGIN_LINK = (By.LINK_TEXT, "Log in")
+    LOGIN_LINK = (By.ID, "login")
 
     @property
     def _email_input(self):
@@ -171,8 +171,8 @@ class SignupForm(FormComponent):
 
     @property
     def login_link(self):
-        link_element = self.browser.find_element(*self.LOGIN_LINK)
-        return link_element.get_attribute("href")
+        element = self.browser.find_element(*self.LOGIN_LINK)
+        return {element.text: element.get_attribute("href")}
 
     def send_keys(self, email, password1, password2):
         self._email_input.send_keys(email)

@@ -28,9 +28,9 @@ class PeopleListViewTestCase(TestCase):
         </thead>
         """
         # users
-        permission = Permission.objects.filter(name="Can view person")
+        view_person = Permission.objects.filter(name="Can view person")
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permission))
+        cls.authorized_user = UserFactory(user_permissions=tuple(view_person))
         cls.staff_user = UserFactory(is_staff=True)
 
     def test_anonymous_user_response(self):
@@ -125,7 +125,7 @@ class PersonCreateViewTestCase(TestCase):
         # users
         create_person = Permission.objects.filter(name="Can add person")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(create_person) + list(view_person)
+        permissions = create_person | view_person
         cls.user = UserFactory()
         cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
         cls.staff_user = UserFactory(is_staff=True)
@@ -246,7 +246,7 @@ class PersonUpdateViewTestCase(TestCase):
         # users
         update_person = Permission.objects.filter(name="Can change person")
         view_person = Permission.objects.filter(name="Can view person")
-        permissions = list(update_person) + list(view_person)
+        permissions = update_person | view_person
         cls.user = UserFactory()
         cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
         cls.staff_user = UserFactory(is_staff=True)
