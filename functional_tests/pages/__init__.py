@@ -14,11 +14,11 @@ from .base import BasePage
 from .features import (
     Dashboard,
     HomePage,
+    InterpersonalRelationshipsListPage,
     PeopleListPage,
     PersonCreationPage,
     PersonDetailPage,
     PersonUpdatePage,
-    RelationshipsListPage,
     TemperatureRecordCreatePage,
     TemperatureRecordsListPage,
 )

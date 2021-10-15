@@ -132,7 +132,7 @@ class PersonUpdatePage(BasePage):
         return self
 
 
-class RelationshipsListPage(BasePage):
+class InterpersonalRelationshipsListPage(BasePage):
     PATH = "/people/relationships/"
 
     @property

@@ -18,3 +18,10 @@ def search_people(search_term):
 def search_temperature_records(search_term):
     search_results = records_helpers.search_temperature_records(search_term=search_term)
     return formatting.format_temperature_records(search_results)
+
+
+def search_interpersonal_relationships(search_term):
+    search_results = people_helpers.search_interpersonal_relationships(
+        search_term=search_term
+    )
+    return formatting.format_interpersonal_relationships(search_results)

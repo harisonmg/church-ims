@@ -8,8 +8,7 @@ from functional_tests.utils.formatting import (
     format_interpersonal_relationships,
 )
 from functional_tests.utils.search import search_interpersonal_relationships
-
-# from people.factories import RelationshipFactory
+from people.factories import InterpersonalRelationshipFactory
 
 
 class RelationshipsListTestCase(FunctionalTestCase):
@@ -17,26 +16,28 @@ class RelationshipsListTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        permission = Permission.objects.filter(name="Can view relationship")
+        permission = Permission.objects.filter(
+            name="Can view interpersonal relationship"
+        )
         self.user = UserFactory(user_permissions=tuple(permission))
 
         # relationships
-        # relationships = RelationshipFactory.create_batch(45)
-        # self.relationships = sorted(relationships, key=lambda r: r.person.username)
+        relationships = InterpersonalRelationshipFactory.create_batch(45)
+        self.relationships = sorted(relationships, key=lambda r: r.person.username)
 
         # auth
         self.create_pre_authenticated_session(self.user)
 
     def test_page_navigation(self):
         # An authorized user visits the relationships list page
-        relationships_list_page = pages.RelationshipsListPage(self)
+        relationships_list_page = pages.InterpersonalRelationshipsListPage(self)
         relationships_list_page.visit()
 
         # He knows he's in the right place because he can see the name
         # of the site in the title, header and heading
         self.assertEqual(relationships_list_page.title, self.SITE_NAME)
         self.assertEqual(relationships_list_page.header.title, self.header_title)
-        self.assertEqual(relationships_list_page.heading, "Relationships")
+        self.assertEqual(relationships_list_page.heading, "Interpersonal relationships")
 
         # The site header an account dropdown menu as well
         relationships_list_page.header.toggle_account_dropdown()
@@ -48,7 +49,7 @@ class RelationshipsListTestCase(FunctionalTestCase):
         # He can also see a sidebar navigation, with the relationships link highlighted
         self.assertEqual(
             relationships_list_page.sidebar.active_links,
-            {"Relationships": self.browser.current_url},
+            {"Interpersonal relationships": self.browser.current_url},
         )
 
         # He also sees a list of relationships and a page navigation
@@ -115,7 +116,7 @@ class RelationshipsListTestCase(FunctionalTestCase):
     def test_search(self):
         # An authorized user visits the relationships list page.
         # He sees a list of relationships and a search form
-        relationships_list_page = pages.RelationshipsListPage(self)
+        relationships_list_page = pages.InterpersonalRelationshipsListPage(self)
         relationships_list_page.visit()
 
         self.assertEqual(
