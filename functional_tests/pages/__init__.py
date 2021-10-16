@@ -14,6 +14,7 @@ from .base import BasePage
 from .features import (
     Dashboard,
     HomePage,
+    InterpersonalRelationshipCreationPage,
     InterpersonalRelationshipsListPage,
     PeopleListPage,
     PersonCreationPage,

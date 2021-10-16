@@ -146,3 +146,19 @@ class InterpersonalRelationshipsListPage(BasePage):
     def search(self, search_term):
         self.form.search(search_term=search_term)
         return self
+
+
+class InterpersonalRelationshipCreationPage(BasePage):
+    PATH = "/people/relationships/add/"
+
+    @property
+    def form(self):
+        return components.InterpersonalRelationshipForm(self.browser)
+
+    def add_relationship(self, person_username, relative_username, relationship_type):
+        self.form.send_keys(
+            person_username=person_username,
+            relative_username=relative_username,
+            relationship_type=relationship_type,
+        )
+        return self
