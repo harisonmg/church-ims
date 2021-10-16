@@ -23,7 +23,9 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         # relationship
         self.person = PersonFactory()
         self.relative = PersonFactory()
-        self.relationship_type = InterpersonalRelationshipFactory.build().relation
+        relationship = InterpersonalRelationshipFactory.build()
+        self.relationship_type = relationship.get_relation_display()
+        self.people = f"{self.person} and {self.relative}"
 
         # auth
         self.create_pre_authenticated_session(self.user)
@@ -44,11 +46,12 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         # He sees the inputs of the relationship form, including labels
         # and placeholders.
         self.assertEqual(
-            relationship_creation_page.form.person_username_label, "Person's username*"
+            relationship_creation_page.form.person_username_label,
+            "The person's username*",
         )
         self.assertEqual(
             relationship_creation_page.form.relative_username_label,
-            "Relative's username*",
+            "The relative's username*",
         )
         self.assertEqual(
             relationship_creation_page.form.relationship_type_label,
@@ -57,10 +60,10 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         self.assertEqual(relationship_creation_page.form.submit_button_label, "Add")
 
         # He enters the required information and submits the form
-        relationship_creation_page.add_person(
+        relationship_creation_page.add_relationship(
             self.person.username,
-            self.relative.full_name,
-            self.relationship_type.get_relation_display(),
+            self.relative.username,
+            self.relationship_type,
         )
 
         # The relationship was added successfully and he is redirected to the
@@ -69,5 +72,5 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         self.assertEqual(self.browser.current_url, relationship_list_page.url)
         self.assertEqual(
             relationship_list_page.messages[0],
-            f"{self.relationship} has been added successfully.",
+            f"The relationship between {self.people} has been added successfully.",
         )
