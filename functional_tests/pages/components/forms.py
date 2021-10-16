@@ -269,13 +269,13 @@ class PersonForm(FormComponent):
         return self.submit()
 
 
-class InterpersonalRelationshipForm(FormComponent):
-    PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person_username")
-    PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person_username']")
-    RELATIVE_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_relative_username")
-    RELATIVE_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_relative_username']")
-    RELATIONSHIP_TYPE_OPTION = (By.CSS_SELECTOR, "select#id_relationship_type option")
-    RELATIONSHIP_TYPE_LABEL = (By.CSS_SELECTOR, "label[for='id_relationship_type']")
+class InterpersonalRelationshipCreationForm(FormComponent):
+    PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
+    PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
+    RELATIVE_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_relative")
+    RELATIVE_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_relative']")
+    RELATIONSHIP_TYPE_OPTION = (By.CSS_SELECTOR, "select#id_relation option")
+    RELATIONSHIP_TYPE_LABEL = (By.CSS_SELECTOR, "label[for='id_relation']")
 
     @property
     def _person_username_input(self):

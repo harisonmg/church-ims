@@ -1,7 +1,7 @@
 from .base import Messages
 from .forms import (
     FormComponent,
-    InterpersonalRelationshipForm,
+    InterpersonalRelationshipCreationForm,
     LoginForm,
     PasswordResetForm,
     PasswordResetRequestForm,

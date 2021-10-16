@@ -153,7 +153,7 @@ class InterpersonalRelationshipCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.InterpersonalRelationshipForm(self.browser)
+        return components.InterpersonalRelationshipCreationForm(self.browser)
 
     def add_relationship(self, person_username, relative_username, relationship_type):
         self.form.send_keys(
