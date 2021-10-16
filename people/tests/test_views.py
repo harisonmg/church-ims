@@ -3,11 +3,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
 
-from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
-
-from people import views
-
 from accounts.factories import UserFactory
 from people.factories import InterpersonalRelationshipFactory, PersonFactory
 from people.models import InterpersonalRelationship, Person
@@ -184,8 +179,8 @@ class PersonCreateViewTestCase(TestCase):
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        temp_record = Person.objects.first()
-        self.assertEqual(temp_record.created_by, self.authorized_user)
+        person = Person.objects.first()
+        self.assertEqual(person.created_by, self.authorized_user)
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
@@ -426,23 +421,72 @@ class RelationshipCreateViewTestCase(TestCase):
         super().setUpClass()
 
         cls.url = "/people/relationships/add/"
-        cls.view = views.RelationshipCreateView
 
-    def test_template_used(self):
-        factory = RequestFactory()
-        request = factory.get("dummy_path/")
-        request.user = AnonymousUser
+        # users
+        create_relationship = Permission.objects.filter(
+            name="Can add interpersonal relationship"
+        )
+        view_relationship = Permission.objects.filter(
+            name="Can view interpersonal relationship"
+        )
+        permissions = create_relationship | view_relationship
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
+        cls.staff_user = UserFactory(is_staff=True)
 
-        response = self.view.as_view()(request)
-        with self.assertTemplateUsed("people/relationship_form.html"):
-            response.render()
+        # POST data
+        cls.person = PersonFactory()
+        cls.relative = PersonFactory()
+        cls.relation = InterpersonalRelationshipFactory.build().relation
+        cls.data = {
+            "person": cls.person.username,
+            "relative": cls.relative.username,
+            "relation": cls.relation,
+        }
 
-    def test_view_requires_login(self):
+    def test_anonymous_user_response(self):
         response = self.client.get(self.url)
         self.assertRedirects(response, f"/accounts/login/?next={self.url}")
 
-    def test_logged_in_response_status_code(self):
-        user = UserFactory()
-        self.client.force_login(user)
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/relationship_form.html")
+
+    def test_form_class(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(
+            form.__class__.__name__, "InterpersonalRelationshipCreationForm"
+        )
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+        self.assertIsInstance(
+            form, import_string("people.forms.InterpersonalRelationshipCreationForm")
+        )
+
+    def test_form_valid(self):
+        self.client.force_login(self.authorized_user)
+        self.client.post(self.url, self.data)
+        relationship = InterpersonalRelationship.objects.first()
+        self.assertEqual(relationship.created_by, self.authorized_user)
+
+    def test_success_url(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(response, reverse("people:relationships_list"))

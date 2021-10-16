@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
-from django.views.generic import TemplateView
 
 from extra_views import SearchableListMixin
 
-from .forms import PersonForm
+from .forms import InterpersonalRelationshipCreationForm, PersonForm
 from .models import InterpersonalRelationship, Person
 
 
@@ -80,5 +80,18 @@ class RelationshipsListView(
     template_name = "people/relationships_list.html"
 
 
-class RelationshipCreateView(LoginRequiredMixin, TemplateView):
+class RelationshipCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    form_class = InterpersonalRelationshipCreationForm
+    permission_required = "people.add_interpersonalrelationship"
+    success_message = "%(relationship)s has been added successfully."
+    success_url = reverse_lazy("people:relationships_list")
     template_name = "people/relationship_form.html"
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(relationship=self.object)
