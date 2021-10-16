@@ -85,7 +85,7 @@ class RelationshipCreateView(
 ):
     form_class = InterpersonalRelationshipCreationForm
     permission_required = "people.add_interpersonalrelationship"
-    success_message = "%(relationship)s has been added successfully."
+    success_message = "The relationship between %(people)s has been added successfully."
     success_url = reverse_lazy("people:relationships_list")
     template_name = "people/relationship_form.html"
 
@@ -94,4 +94,7 @@ class RelationshipCreateView(
         return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % dict(relationship=self.object)
+        person = cleaned_data["person"]
+        relative = cleaned_data["relative"]
+        people = f"{person.username} and {relative.username}"
+        return self.success_message % dict(people=people)
