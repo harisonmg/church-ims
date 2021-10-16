@@ -5,6 +5,11 @@ from . import views
 app_name = "people"
 urlpatterns = [
     path(
+        "relationships/add/",
+        views.RelationshipCreateView.as_view(),
+        name="relationship_create",
+    ),
+    path(
         "relationships/",
         views.RelationshipsListView.as_view(),
         name="relationships_list",

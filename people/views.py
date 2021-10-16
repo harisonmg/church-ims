@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import TemplateView
 
 from extra_views import SearchableListMixin
 
@@ -77,3 +78,7 @@ class RelationshipsListView(
     permission_required = "people.view_interpersonalrelationship"
     search_fields = ["person__username", "relative__username"]
     template_name = "people/relationships_list.html"
+
+
+class RelationshipCreateView(LoginRequiredMixin, TemplateView):
+    template_name = "people/relationship_form.html"

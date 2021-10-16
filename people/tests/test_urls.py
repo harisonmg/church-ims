@@ -55,3 +55,14 @@ class RelationshipsListURLTestCase(SimpleTestCase):
 
     def test_view_name(self):
         self.assertEqual(self.match.view_name, "people:relationships_list")
+
+
+class RelationshipCreateURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/people/relationships/add/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "RelationshipCreateView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "people:relationship_create")
