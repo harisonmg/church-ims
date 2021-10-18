@@ -78,7 +78,7 @@ class PersonUsernameTestCase(PersonFormFieldsTestCase):
         # test
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
-        errors = {"username": ["Person with this Username already exists."]}
+        errors = {"username": ["A person with that username already exists."]}
         self.assertEqual(form.errors, errors)
 
     def test_value_with_spaces(self):
@@ -256,7 +256,7 @@ class AdultUsernameTestCase(AdultFormFieldsTestCase):
         # test
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
-        errors = {"username": ["Person with this Username already exists."]}
+        errors = {"username": ["A person with that username already exists."]}
         self.assertEqual(form.errors, errors)
 
     def test_value_with_spaces(self):

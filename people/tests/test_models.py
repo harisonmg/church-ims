@@ -55,6 +55,12 @@ class PersonUsernameTestCase(PersonModelFieldsTestCase):
     def test_blank(self):
         self.assertFalse(self.field.blank)
 
+    def test_error_messages(self):
+        self.assertEqual(
+            self.field.error_messages.get("unique"),
+            "A person with that username already exists.",
+        )
+
     def test_max_length(self):
         self.assertEqual(self.field.max_length, 50)
 
