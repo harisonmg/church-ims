@@ -58,6 +58,14 @@ class ValidateAdultTestCase(TestCase):
             validators.validate_adult(child_dob)
 
 
+class ValidateChildTestCase(TestCase):
+    def test_child_dob(self):
+        error_message = f"Date of birth must be after {get_todays_adult_dob()}"
+        with self.assertRaisesRegex(ValidationError, error_message):
+            adult_dob = get_todays_adult_dob() - timedelta(days=1)
+            validators.validate_child(adult_dob)
+
+
 class ValidatePersonUsernameTestCase(TestCase):
     def test_non_existent_username(self):
         username = "does-not-exist"

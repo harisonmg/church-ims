@@ -28,6 +28,11 @@ def validate_adult(dob):
         raise ValidationError(f"Date of birth must be before {get_todays_adult_dob()}")
 
 
+def validate_child(dob):
+    if get_age(dob=dob) >= AGE_OF_MAJORITY:
+        raise ValidationError(f"Date of birth must be after {get_todays_adult_dob()}")
+
+
 def validate_person_username(username):
     try:
         from .models import Person
