@@ -30,6 +30,13 @@ class AdultForm(PersonForm):
     )
 
 
+class ChildForm(PersonForm):
+    dob = forms.DateField(
+        label="Date of birth",
+        validators=[validators.validate_date_of_birth, validators.validate_adult],
+    )
+
+
 class InterpersonalRelationshipCreationForm(forms.ModelForm):
     person = forms.CharField(
         label="The person's username",

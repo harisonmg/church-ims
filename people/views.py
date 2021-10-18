@@ -5,7 +5,12 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
-from .forms import AdultForm, InterpersonalRelationshipCreationForm, PersonForm
+from .forms import (
+    AdultForm,
+    ChildForm,
+    InterpersonalRelationshipCreationForm,
+    PersonForm,
+)
 from .models import InterpersonalRelationship, Person
 
 
@@ -47,6 +52,15 @@ class AdultCreateView(PersonCreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["age_category"] = "an adult"
+        return context
+
+
+class ChildCreateView(PersonCreateView):
+    form_class = ChildForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["age_category"] = "a child"
         return context
 
 
