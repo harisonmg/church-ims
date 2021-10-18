@@ -23,7 +23,7 @@ class AdultFactory(PersonFactory):
 
 
 class ChildFactory(PersonFactory):
-    dob = Faker("date_of_birth", maximum_age=constants.AGE_OF_MAJORITY)
+    dob = Faker("date_of_birth", maximum_age=constants.AGE_OF_MAJORITY - 1)
 
 
 class InterpersonalRelationshipFactory(DjangoModelFactory):
