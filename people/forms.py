@@ -23,6 +23,10 @@ class PersonForm(forms.ModelForm):
         fields = ["username", "full_name", "gender", "dob"]
 
 
+class AdultForm(PersonForm):
+    pass
+
+
 class InterpersonalRelationshipCreationForm(forms.ModelForm):
     person = forms.CharField(
         label="The person's username",

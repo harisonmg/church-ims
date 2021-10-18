@@ -5,7 +5,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
-from .forms import InterpersonalRelationshipCreationForm, PersonForm
+from .forms import AdultForm, InterpersonalRelationshipCreationForm, PersonForm
 from .models import InterpersonalRelationship, Person
 
 
@@ -39,6 +39,15 @@ class PersonCreateView(
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(username=cleaned_data["username"])
+
+
+class AdultCreateView(PersonCreateView):
+    form_class = AdultForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["age_category"] = "an adult"
+        return context
 
 
 class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):

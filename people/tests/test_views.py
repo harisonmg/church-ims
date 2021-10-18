@@ -4,7 +4,11 @@ from django.urls import reverse
 from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
-from people.factories import InterpersonalRelationshipFactory, PersonFactory
+from people.factories import (
+    AdultFactory,
+    InterpersonalRelationshipFactory,
+    PersonFactory,
+)
 from people.models import InterpersonalRelationship, Person
 
 from .helpers import search_interpersonal_relationships, search_people
@@ -175,6 +179,88 @@ class PersonCreateViewTestCase(TestCase):
         self.assertEqual(form.__class__.__name__, "PersonForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.PersonForm"))
+
+    def test_form_valid(self):
+        self.client.force_login(self.authorized_user)
+        self.client.post(self.url, self.data)
+        person = Person.objects.first()
+        self.assertEqual(person.created_by, self.authorized_user)
+
+    def test_success_url(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(
+            response,
+            reverse("people:person_detail", kwargs={"username": self.data["username"]}),
+        )
+
+
+class AdultCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.url = "/people/add/adult/"
+
+        # users
+        create_person = Permission.objects.filter(name="Can add person")
+        view_person = Permission.objects.filter(name="Can view person")
+        permissions = create_person | view_person
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
+        cls.staff_user = UserFactory(is_staff=True)
+
+        # POST data
+        person = AdultFactory.build()
+        cls.data = {
+            "username": person.username,
+            "full_name": person.full_name,
+            "gender": person.gender,
+            "dob": person.dob,
+        }
+
+    def test_anonymous_user_response(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_response(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/person_form.html")
+
+    def test_context_data_contains_action(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("action"), "add")
+
+    def test_context_data_contains_age_category(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("age_category"), "an adult")
+
+    def test_form_class(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(form.__class__.__name__, "AdultForm")
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
+        self.assertIsInstance(form, import_string("people.forms.AdultForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
