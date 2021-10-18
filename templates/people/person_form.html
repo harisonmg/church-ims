@@ -4,7 +4,10 @@
 
 {% block content %}
   <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
-    <h1 class="display-5 fw-bold">{{ action|title }} a person's information</h1>
+    <h1 class="display-5 fw-bold">
+      {{ action|title }}
+      {% if age_category %}{{ age_category }}{% else %}a person{% endif %}'s information
+    </h1>
     <form id="person_form" class="p-2 p-md-3" method="POST">
       {% csrf_token %}
       {{ form|crispy }}
