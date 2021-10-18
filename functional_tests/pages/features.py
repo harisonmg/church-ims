@@ -92,6 +92,10 @@ class AdultCreationPage(PersonCreationPage):
     PATH = "/people/add/adult/"
 
 
+class ChildCreationPage(PersonCreationPage):
+    PATH = "/people/add/child/"
+
+
 class PersonDetailPage(BasePage):
     UPDATE_LINK = (By.ID, "update")
 
