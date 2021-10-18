@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.exceptions import ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 from . import constants, validators
 from .models import InterpersonalRelationship, Person
 
 SELF_RELATIONSHIPS_ERROR = "Self relationships are not allowed!"
+DUPLICATE_RELATIONSHIPS_ERROR = "This interpersonal relationship already exists"
 
 
 class PersonForm(forms.ModelForm):
@@ -42,6 +43,11 @@ class InterpersonalRelationshipCreationForm(forms.ModelForm):
     class Meta:  # noqa
         model = InterpersonalRelationship
         fields = ["person", "relative", "relation"]
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                "unique_together": DUPLICATE_RELATIONSHIPS_ERROR,
+            }
+        }
 
     def clean(self):
         cleaned_data = super().clean()

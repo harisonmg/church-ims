@@ -243,6 +243,13 @@ class InterpersonalRelationshipModelTestCase(TestCase):
         cls.relationship = InterpersonalRelationshipFactory()
         cls.relationship_meta = cls.relationship._meta
 
+    def test_constraints(self):
+        self.assertEqual(len(self.relationship_meta.constraints), 1)
+        self.assertIsInstance(
+            self.relationship_meta.constraints[0],
+            import_string("django.db.models.UniqueConstraint"),
+        )
+
     def test_db_table(self):
         self.assertEqual(self.relationship_meta.db_table, "people_relationship")
 

@@ -205,6 +205,18 @@ class InterpersonalRelationshipCreationFormTestCase(TestCase):
         errors = {"__all__": [forms.SELF_RELATIONSHIPS_ERROR]}
         self.assertEqual(form.errors, errors)
 
+    def test_duplicate_relationship(self):
+        relationship = InterpersonalRelationshipFactory()
+        data = {
+            "person": relationship.person.username,
+            "relative": relationship.relative.username,
+            "relation": relationship.relation,
+        }
+        form = forms.InterpersonalRelationshipCreationForm(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"__all__": [forms.DUPLICATE_RELATIONSHIPS_ERROR]}
+        self.assertEqual(form.errors, errors)
+
 
 class InterpersonalRelationshipCreationFormFieldsTestCase(TestCase):
     @classmethod

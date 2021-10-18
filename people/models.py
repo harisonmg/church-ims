@@ -70,6 +70,12 @@ class InterpersonalRelationship(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     class Meta:  # noqa
+        constraints = [
+            models.UniqueConstraint(
+                fields=["person", "relative"],
+                name="%(app_label)s_unique_%(class)s",
+            )
+        ]
         db_table = "people_relationship"
         ordering = ["person__username"]
 
