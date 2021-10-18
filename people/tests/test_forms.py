@@ -6,9 +6,11 @@ from django.utils.module_loading import import_string
 from people import constants, forms, validators
 from people.factories import (
     AdultFactory,
+    ChildFactory,
     InterpersonalRelationshipFactory,
     PersonFactory,
 )
+from people.utils import get_todays_adult_dob
 
 
 class PersonFormTestCase(SimpleTestCase):
@@ -337,10 +339,14 @@ class AdultDOBTestCase(AdultFormFieldsTestCase):
         self.assertTrue(self.field.required)
 
     def test_validators(self):
-        self.assertEqual(len(self.field.validators), 1)
+        self.assertEqual(len(self.field.validators), 2)
         self.assertEqual(
             self.field.validators[0],
             import_string("people.validators.validate_date_of_birth"),
+        )
+        self.assertEqual(
+            self.field.validators[1],
+            import_string("people.validators.validate_adult"),
         )
 
     def test_date_in_future(self):
@@ -351,8 +357,9 @@ class AdultDOBTestCase(AdultFormFieldsTestCase):
         # test
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
-        errors = {"dob": [validators.DOB_IN_FUTURE_ERROR]}
-        self.assertEqual(form.errors, errors)
+        dob_errors = form.errors.get("dob")
+        self.assertEqual(len(dob_errors), 2)
+        self.assertEqual(dob_errors[0], validators.DOB_IN_FUTURE_ERROR)
 
     def test_date_in_distant_past(self):
         # setup
@@ -364,6 +371,17 @@ class AdultDOBTestCase(AdultFormFieldsTestCase):
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
         errors = {"dob": [validators.DOB_IN_DISTANT_PAST_ERROR]}
+        self.assertEqual(form.errors, errors)
+
+    def test_child_dob(self):
+        # setup
+        data = self.data.copy()
+        data["dob"] = ChildFactory.build().dob
+
+        # test
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"dob": [f"Date of birth must be before {get_todays_adult_dob()}"]}
         self.assertEqual(form.errors, errors)
 
 
