@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
-from .constants import MAX_HUMAN_AGE
-from .utils import get_age
+from .constants import AGE_OF_MAJORITY, MAX_HUMAN_AGE
+from .utils import get_age, get_todays_adult_dob
 
 INVALID_FULL_NAME_ERROR = "Ensure you've entered your full name."
 DOB_IN_FUTURE_ERROR = "Date of birth can't be in the future"
@@ -21,6 +21,11 @@ def validate_date_of_birth(dob):
 
     if age > MAX_HUMAN_AGE:
         raise ValidationError(DOB_IN_DISTANT_PAST_ERROR)
+
+
+def validate_adult(dob):
+    if get_age(dob=dob) < AGE_OF_MAJORITY:
+        raise ValidationError(f"Date of birth must be before {get_todays_adult_dob()}")
 
 
 def validate_person_username(username):
