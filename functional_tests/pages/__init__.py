@@ -12,6 +12,7 @@ from .auth import (
 )
 from .base import BasePage
 from .features import (
+    AdultCreationPage,
     Dashboard,
     HomePage,
     InterpersonalRelationshipCreationPage,

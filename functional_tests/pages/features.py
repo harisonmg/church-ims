@@ -88,6 +88,10 @@ class PersonCreationPage(BasePage):
         return self
 
 
+class AdultCreationPage(PersonCreationPage):
+    PATH = "/people/add/adult/"
+
+
 class PersonDetailPage(BasePage):
     UPDATE_LINK = (By.ID, "update")
 
