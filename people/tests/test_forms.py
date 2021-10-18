@@ -404,7 +404,7 @@ class ChildFormFieldsTestCase(TestCase):
 
         cls.form = forms.ChildForm
         cls.form_fields = cls.form().fields
-        cls.person = AdultFactory.build()
+        cls.person = ChildFactory.build()
         cls.data = {
             "username": cls.person.username,
             "full_name": cls.person.full_name,
@@ -540,7 +540,7 @@ class ChildDOBTestCase(ChildFormFieldsTestCase):
         )
         self.assertEqual(
             self.field.validators[1],
-            import_string("people.validators.validate_adult"),
+            import_string("people.validators.validate_child"),
         )
 
     def test_date_in_future(self):
@@ -551,9 +551,8 @@ class ChildDOBTestCase(ChildFormFieldsTestCase):
         # test
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
-        dob_errors = form.errors.get("dob")
-        self.assertEqual(len(dob_errors), 2)
-        self.assertEqual(dob_errors[0], validators.DOB_IN_FUTURE_ERROR)
+        errors = {"dob": [validators.DOB_IN_FUTURE_ERROR]}
+        self.assertEqual(form.errors, errors)
 
     def test_date_in_distant_past(self):
         # setup
@@ -564,8 +563,9 @@ class ChildDOBTestCase(ChildFormFieldsTestCase):
         # test
         form = self.form(data=data)
         self.assertFalse(form.is_valid())
-        errors = {"dob": [validators.DOB_IN_DISTANT_PAST_ERROR]}
-        self.assertEqual(form.errors, errors)
+        dob_errors = form.errors.get("dob")
+        self.assertEqual(len(dob_errors), 2)
+        self.assertEqual(dob_errors[0], validators.DOB_IN_DISTANT_PAST_ERROR)
 
     def test_adult_dob(self):
         # setup

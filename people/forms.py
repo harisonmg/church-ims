@@ -33,7 +33,7 @@ class AdultForm(PersonForm):
 class ChildForm(PersonForm):
     dob = forms.DateField(
         label="Date of birth",
-        validators=[validators.validate_date_of_birth, validators.validate_adult],
+        validators=[validators.validate_date_of_birth, validators.validate_child],
     )
 
 
