@@ -218,6 +218,7 @@ class AdultCreateViewTestCase(TestCase):
             "full_name": person.full_name,
             "gender": person.gender,
             "dob": person.dob,
+            "phone_number": person.phone_number,
         }
 
     def test_anonymous_user_response(self):
