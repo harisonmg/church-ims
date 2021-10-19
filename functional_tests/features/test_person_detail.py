@@ -6,7 +6,7 @@ from functional_tests.base import FunctionalTestCase
 from people.factories import PersonFactory
 
 
-class PersonUpdateTestCase(FunctionalTestCase):
+class PersonDetailTestCase(FunctionalTestCase):
     def setUp(self):
         super().setUp()
 
@@ -22,7 +22,7 @@ class PersonUpdateTestCase(FunctionalTestCase):
         # auth
         self.create_pre_authenticated_session(self.user)
 
-    def test_person_creation(self):
+    def test_person_detail(self):
         # An authorized user visits a person's detail page.
         person_detail_page = pages.PersonDetailPage(self, self.person.username)
         person_detail_page.visit()

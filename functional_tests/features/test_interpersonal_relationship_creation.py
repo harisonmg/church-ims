@@ -30,7 +30,7 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         # auth
         self.create_pre_authenticated_session(self.user)
 
-    def test_person_creation(self):
+    def test_relationship_creation(self):
         # An authorized user visits the relationship creation page.
         relationship_creation_page = pages.InterpersonalRelationshipCreationPage(self)
         relationship_creation_page.visit()
