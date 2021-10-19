@@ -18,7 +18,8 @@ class PersonFormTestCase(SimpleTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = forms.PersonForm()
+        cls.form_class = forms.PersonForm
+        cls.form = cls.form_class()
 
     def test_fields(self):
         fields = self.form.fields.keys()
@@ -584,7 +585,8 @@ class InterpersonalRelationshipCreationFormTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = forms.InterpersonalRelationshipCreationForm()
+        cls.form_class = forms.InterpersonalRelationshipCreationForm
+        cls.form = cls.form_class()
 
     def test_fields(self):
         fields = self.form.fields.keys()
@@ -594,7 +596,7 @@ class InterpersonalRelationshipCreationFormTestCase(TestCase):
         username = PersonFactory().username
         relationship = InterpersonalRelationshipFactory.build().relation
         data = {"person": username, "relative": username, "relation": relationship}
-        form = forms.InterpersonalRelationshipCreationForm(data=data)
+        form = self.form_class(data=data)
         self.assertFalse(form.is_valid())
         errors = {"__all__": [forms.SELF_RELATIONSHIPS_ERROR]}
         self.assertEqual(form.errors, errors)
@@ -606,7 +608,7 @@ class InterpersonalRelationshipCreationFormTestCase(TestCase):
             "relative": relationship.relative.username,
             "relation": relationship.relation,
         }
-        form = forms.InterpersonalRelationshipCreationForm(data=data)
+        form = self.form_class(data=data)
         self.assertFalse(form.is_valid())
         errors = {"__all__": [forms.DUPLICATE_RELATIONSHIPS_ERROR]}
         self.assertEqual(form.errors, errors)
