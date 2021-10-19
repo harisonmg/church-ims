@@ -1,7 +1,11 @@
 from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
-from people.constants import GENDER_CHOICES, INTERPERSONAL_RELATIONSHIP_CHOICES
+from people.constants import (
+    AGE_OF_MAJORITY,
+    GENDER_CHOICES,
+    INTERPERSONAL_RELATIONSHIP_CHOICES,
+)
 from people.factories import InterpersonalRelationshipFactory, PersonFactory
 from people.utils import get_age, get_age_category
 
@@ -35,6 +39,9 @@ class PersonModelTestCase(TestCase):
 
     def test_age_category(self):
         self.assertEqual(self.person.age_category, get_age_category(self.person.age))
+
+    def test_is_adult(self):
+        self.assertEqual(self.person.is_adult, self.person.age >= AGE_OF_MAJORITY)
 
 
 class PersonModelFieldsTestCase(SimpleTestCase):
@@ -164,6 +171,44 @@ class PersonDOBTestCase(PersonModelFieldsTestCase):
 
     def test_verbose_name(self):
         self.assertEqual(self.field.verbose_name, "date of birth")
+
+
+class PersonPhoneNumberTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("phone_number")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_class(self):
+        self.assertEqual(self.field.__class__.__name__, "PhoneNumberField")
+        self.assertIsInstance(
+            self.field, import_string("phonenumber_field.modelfields.PhoneNumberField")
+        )
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 128)
+
+    def test_null(self):
+        self.assertTrue(self.field.null)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 2)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string(
+                "phonenumber_field.validators.validate_international_phonenumber"
+            ),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "phone number")
 
 
 class PersonCreatedByTestCase(PersonModelFieldsTestCase):

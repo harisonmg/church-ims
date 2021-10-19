@@ -38,14 +38,16 @@ class AdultCreationTestCase(FunctionalTestCase):
         self.assertEqual(adult_creation_page.form.full_name_label, "Full name*")
         self.assertEqual(adult_creation_page.form.gender_label, "Gender*")
         self.assertEqual(adult_creation_page.form.date_of_birth_label, "Date of birth*")
+        self.assertEqual(adult_creation_page.form.phone_number_label, "Phone number*")
         self.assertEqual(adult_creation_page.form.submit_button_label, "Add")
 
-        # He enters the person's username and full name and submits the form
+        # He enters the person's details and submits the form
         adult_creation_page.add_person(
             self.person.username,
             self.person.full_name,
             self.person.get_gender_display(),
             str(self.person.dob),
+            str(self.person.phone_number),
         )
 
         # The person's information was added successfully and he is redirected

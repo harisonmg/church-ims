@@ -218,6 +218,7 @@ class AdultCreateViewTestCase(TestCase):
             "full_name": person.full_name,
             "gender": person.gender,
             "dob": person.dob,
+            "phone_number": person.phone_number,
         }
 
     def test_anonymous_user_response(self):
@@ -451,6 +452,11 @@ class PersonUpdateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "people/person_form.html")
+
+    def test_context_data_contains_person(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("person"), self.person)
 
     def test_context_data_contains_action(self):
         self.client.force_login(self.authorized_user)

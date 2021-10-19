@@ -5,7 +5,13 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.urls import reverse
 
-from .constants import GENDER_CHOICES, INTERPERSONAL_RELATIONSHIP_CHOICES
+from phonenumber_field.modelfields import PhoneNumberField
+
+from .constants import (
+    AGE_OF_MAJORITY,
+    GENDER_CHOICES,
+    INTERPERSONAL_RELATIONSHIP_CHOICES,
+)
 from .utils import get_age, get_age_category
 from .validators import validate_full_name
 
@@ -20,6 +26,7 @@ class Person(models.Model):
     full_name = models.CharField(max_length=300, validators=[validate_full_name])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     dob = models.DateField(verbose_name="date of birth")
+    phone_number = PhoneNumberField(null=True)
     created_by = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -46,6 +53,10 @@ class Person(models.Model):
     @property
     def age_category(self):
         return get_age_category(self.age)
+
+    @property
+    def is_adult(self):
+        return self.age >= AGE_OF_MAJORITY
 
 
 class InterpersonalRelationship(models.Model):

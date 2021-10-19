@@ -2,7 +2,7 @@ import faker
 from factory import Sequence, SubFactory
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyAttribute, FuzzyChoice
 
 from . import constants
 from .models import InterpersonalRelationship, Person
@@ -18,8 +18,13 @@ class PersonFactory(DjangoModelFactory):
     dob = Faker("date_of_birth", maximum_age=constants.MAX_HUMAN_AGE)
 
 
+def get_kenyan_phone_number():
+    return "+2547" + faker.Faker().msisdn()[:8]
+
+
 class AdultFactory(PersonFactory):
     dob = Faker("date_of_birth", minimum_age=constants.AGE_OF_MAJORITY)
+    phone_number = FuzzyAttribute(get_kenyan_phone_number)
 
 
 class ChildFactory(PersonFactory):

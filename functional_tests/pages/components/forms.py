@@ -269,6 +269,29 @@ class PersonForm(FormComponent):
         return self.submit()
 
 
+class AdultForm(PersonForm):
+    PHONE_NUMBER_INPUT = (By.CSS_SELECTOR, "input#id_phone_number")
+    PHONE_NUMBER_LABEL = (By.CSS_SELECTOR, "label[for='id_phone_number']")
+
+    @property
+    def _phone_number_input(self):
+        return self.browser.find_element(*self.PHONE_NUMBER_INPUT)
+
+    @property
+    def phone_number_label(self):
+        return self.browser.find_element(*self.PHONE_NUMBER_LABEL).text
+
+    def send_keys(
+        self, username=None, full_name=None, gender=None, dob=None, phone_number=None
+    ):
+        if phone_number is not None:
+            self._phone_number_input.clear()
+            self._phone_number_input.send_keys(phone_number)
+
+        kwargs = dict(username=username, full_name=full_name, gender=gender, dob=dob)
+        return super().send_keys(**kwargs)
+
+
 class InterpersonalRelationshipCreationForm(FormComponent):
     PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
     PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")

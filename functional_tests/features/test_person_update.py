@@ -34,7 +34,9 @@ class PersonUpdateTestCase(FunctionalTestCase):
         # of the site in the title and header
         self.assertEqual(person_update_page.title, self.SITE_NAME)
         self.assertEqual(person_update_page.header.title, self.header_title)
-        self.assertEqual(person_update_page.heading, "Update a person's information")
+        self.assertEqual(
+            person_update_page.heading, f"Update {self.person.username}'s information"
+        )
 
         # He sees the inputs of the person form, including labels and placeholders.
         self.assertEqual(person_update_page.form.username_label, "Username*")

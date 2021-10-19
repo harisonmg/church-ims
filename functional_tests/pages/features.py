@@ -91,6 +91,20 @@ class PersonCreationPage(BasePage):
 class AdultCreationPage(PersonCreationPage):
     PATH = "/people/add/adult/"
 
+    @property
+    def form(self):
+        return components.AdultForm(self.browser)
+
+    def add_person(self, username, full_name, gender, dob, phone_number):
+        self.form.send_keys(
+            username=username,
+            full_name=full_name,
+            gender=gender,
+            dob=dob,
+            phone_number=phone_number,
+        )
+        return self
+
 
 class ChildCreationPage(PersonCreationPage):
     PATH = "/people/add/child/"
