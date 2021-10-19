@@ -41,7 +41,7 @@ class PersonModelTestCase(TestCase):
         self.assertEqual(self.person.age_category, get_age_category(self.person.age))
 
     def test_is_adult(self):
-        self.assertEqual(self.person.is_adult, self.person.age > AGE_OF_MAJORITY)
+        self.assertEqual(self.person.is_adult, self.person.age >= AGE_OF_MAJORITY)
 
 
 class PersonModelFieldsTestCase(SimpleTestCase):
