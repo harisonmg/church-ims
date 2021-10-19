@@ -453,6 +453,11 @@ class PersonUpdateViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "people/person_form.html")
 
+    def test_context_data_contains_person(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("person"), self.person)
+
     def test_context_data_contains_action(self):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
