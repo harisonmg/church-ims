@@ -3,7 +3,7 @@ from random import randint
 from unittest import TestCase
 
 from people import utils
-from people.constants import MAX_HUMAN_AGE
+from people.constants import AGE_OF_MAJORITY, MAX_HUMAN_AGE
 
 
 class GetAgeTestCase(TestCase):
@@ -16,6 +16,12 @@ class GetAgeTestCase(TestCase):
         days_lived = round(365.25 * 1)
         dob = date.today() - timedelta(days=days_lived)
         self.assertEqual(utils.get_age(dob), 1)
+
+
+class GetTodaysAdultDOBTestCase(TestCase):
+    def test_age(self):
+        dob = utils.get_todays_adult_dob()
+        self.assertEqual(utils.get_age(dob), AGE_OF_MAJORITY)
 
 
 class GetAgeGroupTestCase(TestCase):

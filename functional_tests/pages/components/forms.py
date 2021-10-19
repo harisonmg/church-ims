@@ -238,7 +238,7 @@ class PersonForm(FormComponent):
     def gender_options(self):
         return list(self._gender_options.keys())
 
-    def select_gender_option(self, option):
+    def select_gender(self, option):
         element = self._gender_options.get(option)
         if element is not None:
             element.click()
@@ -261,9 +261,59 @@ class PersonForm(FormComponent):
             self._full_name_input.send_keys(full_name)
 
         if gender is not None:
-            self.select_gender_option(gender)
+            self.select_gender(gender)
 
         if dob is not None:
             self._date_of_birth_input.clear()
             self._date_of_birth_input.send_keys(dob)
+        return self.submit()
+
+
+class InterpersonalRelationshipCreationForm(FormComponent):
+    PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
+    PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
+    RELATIVE_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_relative")
+    RELATIVE_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_relative']")
+    RELATIONSHIP_TYPE_OPTION = (By.CSS_SELECTOR, "select#id_relation option")
+    RELATIONSHIP_TYPE_LABEL = (By.CSS_SELECTOR, "label[for='id_relation']")
+
+    @property
+    def _person_username_input(self):
+        return self.browser.find_element(*self.PERSON_USERNAME_INPUT)
+
+    @property
+    def person_username_label(self):
+        return self.browser.find_element(*self.PERSON_USERNAME_LABEL).text
+
+    @property
+    def _relative_username_input(self):
+        return self.browser.find_element(*self.RELATIVE_USERNAME_INPUT)
+
+    @property
+    def relative_username_label(self):
+        return self.browser.find_element(*self.RELATIVE_USERNAME_LABEL).text
+
+    @property
+    def relationship_type_label(self):
+        return self.browser.find_element(*self.RELATIONSHIP_TYPE_LABEL).text
+
+    @property
+    def _relationship_type_options(self):
+        elements = self.browser.find_elements(*self.RELATIONSHIP_TYPE_OPTION)
+        options = map(lambda el: el.text, elements)
+        return dict(zip(options, elements))
+
+    @property
+    def relationship_type_options(self):
+        return list(self._relationship_type_options.keys())
+
+    def select_relationship_type(self, option):
+        element = self._relationship_type_options.get(option)
+        if element is not None:
+            element.click()
+
+    def send_keys(self, person_username, relative_username, relationship_type):
+        self._person_username_input.send_keys(person_username)
+        self._relative_username_input.send_keys(relative_username)
+        self.select_relationship_type(relationship_type)
         return self.submit()

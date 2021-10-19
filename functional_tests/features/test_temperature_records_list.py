@@ -4,7 +4,7 @@ from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
 from functional_tests.utils.formatting import (
-    TEMPERATURE_RECORD_LIST_COLUMNS,
+    TEMPERATURE_RECORDS_LIST_COLUMNS,
     format_temperature_records,
 )
 from functional_tests.utils.search import search_temperature_records
@@ -55,7 +55,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
 
         # He also sees a list of temperature records and a page navigation
         self.assertEqual(
-            temp_records_list_page.table.columns, TEMPERATURE_RECORD_LIST_COLUMNS
+            temp_records_list_page.table.columns, TEMPERATURE_RECORDS_LIST_COLUMNS
         )
         self.assertEqual(
             temp_records_list_page.table.data.get("1"),
@@ -118,7 +118,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         temp_records_list_page.visit()
 
         self.assertEqual(
-            temp_records_list_page.table.columns, TEMPERATURE_RECORD_LIST_COLUMNS
+            temp_records_list_page.table.columns, TEMPERATURE_RECORDS_LIST_COLUMNS
         )
         self.assertEqual(
             temp_records_list_page.table.data,
@@ -136,7 +136,7 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         self.assertEqual(len(temp_records_list_page.table.data), len(search_results))
         self.assertEqual(temp_records_list_page.table.data, search_results)
         self.assertEqual(
-            temp_records_list_page.table.columns, TEMPERATURE_RECORD_LIST_COLUMNS
+            temp_records_list_page.table.columns, TEMPERATURE_RECORDS_LIST_COLUMNS
         )
 
         # He decides to search temperature records for a person that doesn't exist

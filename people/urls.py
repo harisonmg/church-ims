@@ -4,6 +4,18 @@ from . import views
 
 app_name = "people"
 urlpatterns = [
+    path(
+        "relationships/add/",
+        views.RelationshipCreateView.as_view(),
+        name="relationship_create",
+    ),
+    path(
+        "relationships/",
+        views.RelationshipsListView.as_view(),
+        name="relationships_list",
+    ),
+    path("add/adult/", views.AdultCreateView.as_view(), name="adult_create"),
+    path("add/child/", views.ChildCreateView.as_view(), name="child_create"),
     path("add/", views.PersonCreateView.as_view(), name="person_create"),
     path(
         "<str:username>/update/", views.PersonUpdateView.as_view(), name="person_update"

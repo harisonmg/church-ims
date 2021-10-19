@@ -57,7 +57,7 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
         username = people_list_page.table.get_cell_data("1", "Username")
         people_list_page.table.add_temperature_for_person(username)
 
-        temp_record_creation_page = pages.TemperatureRecordCreatePage(self, username)
+        temp_record_creation_page = pages.TemperatureRecordCreationPage(self, username)
         self.assertEqual(self.browser.current_url, temp_record_creation_page.url)
         self.assertEqual(temp_record_creation_page.title, self.SITE_NAME)
         self.assertEqual(temp_record_creation_page.header.title, self.header_title)

@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, timedelta
+from math import ceil
 
 from . import constants
 
@@ -19,6 +20,12 @@ def get_age(dob):
     age = today.year - dob.year
     age -= (today.month, today.day) < (dob.month, dob.day)
     return age
+
+
+def get_todays_adult_dob():
+    days_lived = ceil(365.25 * constants.AGE_OF_MAJORITY)
+    dob = date.today() - timedelta(days=days_lived)
+    return dob
 
 
 def get_age_category(age):

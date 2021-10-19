@@ -1,11 +1,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
-from .forms import PersonForm
-from .models import Person
+from .forms import (
+    AdultForm,
+    ChildForm,
+    InterpersonalRelationshipCreationForm,
+    PersonForm,
+)
+from .models import InterpersonalRelationship, Person
 
 
 class PeopleListView(
@@ -40,6 +46,24 @@ class PersonCreateView(
         return self.success_message % dict(username=cleaned_data["username"])
 
 
+class AdultCreateView(PersonCreateView):
+    form_class = AdultForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["age_category"] = "an adult"
+        return context
+
+
+class ChildCreateView(PersonCreateView):
+    form_class = ChildForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["age_category"] = "a child"
+        return context
+
+
 class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Person
     permission_required = "people.view_person"
@@ -66,3 +90,34 @@ class PersonUpdateView(
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(username=cleaned_data["username"])
+
+
+class RelationshipsListView(
+    LoginRequiredMixin, PermissionRequiredMixin, SearchableListMixin, ListView
+):
+    context_object_name = "relationships"
+    model = InterpersonalRelationship
+    paginate_by = 10
+    permission_required = "people.view_interpersonalrelationship"
+    search_fields = ["person__username", "relative__username"]
+    template_name = "people/relationships_list.html"
+
+
+class RelationshipCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
+    form_class = InterpersonalRelationshipCreationForm
+    permission_required = "people.add_interpersonalrelationship"
+    success_message = "The relationship between %(people)s has been added successfully."
+    success_url = reverse_lazy("people:relationships_list")
+    template_name = "people/relationship_form.html"
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        person = cleaned_data["person"]
+        relative = cleaned_data["relative"]
+        people = f"{person.username} and {relative.username}"
+        return self.success_message % dict(people=people)

@@ -12,12 +12,16 @@ from .auth import (
 )
 from .base import BasePage
 from .features import (
+    AdultCreationPage,
+    ChildCreationPage,
     Dashboard,
     HomePage,
+    InterpersonalRelationshipCreationPage,
+    InterpersonalRelationshipsListPage,
     PeopleListPage,
     PersonCreationPage,
     PersonDetailPage,
     PersonUpdatePage,
-    TemperatureRecordCreatePage,
+    TemperatureRecordCreationPage,
     TemperatureRecordsListPage,
 )

@@ -24,6 +24,28 @@ class PersonCreateURLTestCase(SimpleTestCase):
         self.assertEqual(self.match.view_name, "people:person_create")
 
 
+class AdultCreateURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/people/add/adult/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "AdultCreateView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "people:adult_create")
+
+
+class ChildCreateURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/people/add/child/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "ChildCreateView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "people:child_create")
+
+
 class PersonDetailURLTestCase(SimpleTestCase):
     def setUp(self):
         self.match = resolve("/people/username/")
@@ -44,3 +66,25 @@ class PersonUpdateURLTestCase(SimpleTestCase):
 
     def test_view_name(self):
         self.assertEqual(self.match.view_name, "people:person_update")
+
+
+class RelationshipsListURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/people/relationships/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "RelationshipsListView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "people:relationships_list")
+
+
+class RelationshipCreateURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/people/relationships/add/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "RelationshipCreateView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "people:relationship_create")

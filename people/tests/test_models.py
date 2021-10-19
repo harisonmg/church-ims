@@ -1,8 +1,8 @@
 from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
-from people.constants import GENDER_CHOICES
-from people.factories import PersonFactory
+from people.constants import GENDER_CHOICES, INTERPERSONAL_RELATIONSHIP_CHOICES
+from people.factories import InterpersonalRelationshipFactory, PersonFactory
 from people.utils import get_age, get_age_category
 
 
@@ -54,6 +54,12 @@ class PersonUsernameTestCase(PersonModelFieldsTestCase):
 
     def test_blank(self):
         self.assertFalse(self.field.blank)
+
+    def test_error_messages(self):
+        self.assertEqual(
+            self.field.error_messages.get("unique"),
+            "A person with that username already exists.",
+        )
 
     def test_max_length(self):
         self.assertEqual(self.field.max_length, 50)
@@ -218,6 +224,255 @@ class PersonLastModifiedTestCase(PersonModelFieldsTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.field = cls.person_meta.get_field("last_modified")
+
+    def test_auto_now(self):
+        self.assertTrue(self.field.auto_now)
+
+    def test_auto_now_add(self):
+        self.assertFalse(self.field.auto_now_add)
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "last modified")
+
+
+class InterpersonalRelationshipModelTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.relationship = InterpersonalRelationshipFactory()
+        cls.relationship_meta = cls.relationship._meta
+
+    def test_constraints(self):
+        self.assertEqual(len(self.relationship_meta.constraints), 1)
+        self.assertIsInstance(
+            self.relationship_meta.constraints[0],
+            import_string("django.db.models.UniqueConstraint"),
+        )
+
+    def test_db_table(self):
+        self.assertEqual(self.relationship_meta.db_table, "people_relationship")
+
+    def test_ordering(self):
+        self.assertEqual(self.relationship_meta.ordering, ["person__username"])
+
+    def test_verbose_name(self):
+        self.assertEqual(
+            self.relationship_meta.verbose_name, "interpersonal relationship"
+        )
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(
+            self.relationship_meta.verbose_name_plural, "interpersonal relationships"
+        )
+
+    def test_string_repr(self):
+        people = f"{self.relationship.person} and {self.relationship.relative}"
+        relation = self.relationship.get_relation_display().lower()
+        expected_object_name = f"{people} have a {relation} relationship"
+        self.assertEqual(str(self.relationship), expected_object_name)
+
+
+class InterpersonalRelationshipModelFieldsTestCase(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        InterpersonalRelationship = InterpersonalRelationshipFactory.build()
+        cls.relationship_meta = InterpersonalRelationship._meta
+
+
+class InterpersonalRelationshipIDTestCase(InterpersonalRelationshipModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("id")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_class_name(self):
+        self.assertEqual(self.field.__class__.__name__, "UUIDField")
+
+    def test_default(self):
+        self.assertEqual(self.field.default, import_string("uuid.uuid4"))
+
+    def test_editable(self):
+        self.assertFalse(self.field.editable)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_primary_key(self):
+        self.assertTrue(self.field.primary_key)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "ID")
+
+
+class InterpersonalRelationshipPersonTestCase(
+    InterpersonalRelationshipModelFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("person")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_one(self):
+        self.assertTrue(self.field.many_to_one)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model, import_string("people.models.Person")
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "person")
+
+
+class InterpersonalRelationshipRelativeTestCase(
+    InterpersonalRelationshipModelFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("relative")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_one(self):
+        self.assertTrue(self.field.many_to_one)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model, import_string("people.models.Person")
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "relative")
+
+
+class InterpersonalRelationshipRelationTestCase(
+    InterpersonalRelationshipModelFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("relation")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_choices(self):
+        self.assertEqual(self.field.choices, INTERPERSONAL_RELATIONSHIP_CHOICES)
+
+    def test_help_text(self):
+        help_text = "How the person and the relative are associated."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 2)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 1)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "relation")
+
+
+class InterpersonalRelationshipCreatedByTestCase(
+    InterpersonalRelationshipModelFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("created_by")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_help_text(self):
+        help_text = "The user who created this record."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_many_to_one(self):
+        self.assertTrue(self.field.many_to_one)
+
+    def test_null(self):
+        self.assertTrue(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model, import_string("accounts.models.User")
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "created by")
+
+
+class InterpersonalRelationshipCreatedAtTestCase(
+    InterpersonalRelationshipModelFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("created_at")
+
+    def test_auto_now(self):
+        self.assertFalse(self.field.auto_now)
+
+    def test_auto_now_add(self):
+        self.assertTrue(self.field.auto_now_add)
+
+    def test_blank(self):
+        self.assertTrue(self.field.blank)
+
+    def test_null(self):
+        self.assertFalse(self.field.null)
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "created at")
+
+
+class InterpersonalRelationshipLastModifiedTestCase(
+    InterpersonalRelationshipModelFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.relationship_meta.get_field("last_modified")
 
     def test_auto_now(self):
         self.assertTrue(self.field.auto_now)

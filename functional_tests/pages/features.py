@@ -56,7 +56,7 @@ class TemperatureRecordsListPage(BasePage):
         return self
 
 
-class TemperatureRecordCreatePage(BasePage):
+class TemperatureRecordCreationPage(BasePage):
     def __init__(self, test, person_username):
         super().__init__(test)
         self.person_username = person_username
@@ -86,6 +86,14 @@ class PersonCreationPage(BasePage):
             username=username, full_name=full_name, gender=gender, dob=dob
         )
         return self
+
+
+class AdultCreationPage(PersonCreationPage):
+    PATH = "/people/add/adult/"
+
+
+class ChildCreationPage(PersonCreationPage):
+    PATH = "/people/add/child/"
 
 
 class PersonDetailPage(BasePage):
@@ -128,5 +136,37 @@ class PersonUpdatePage(BasePage):
     def update_person(self, username=None, full_name=None, gender=None, dob=None):
         self.form.send_keys(
             username=username, full_name=full_name, gender=gender, dob=dob
+        )
+        return self
+
+
+class InterpersonalRelationshipsListPage(BasePage):
+    PATH = "/people/relationships/"
+
+    @property
+    def form(self):
+        return components.SearchForm(self.browser)
+
+    @property
+    def table(self):
+        return components.Table(self.browser)
+
+    def search(self, search_term):
+        self.form.search(search_term=search_term)
+        return self
+
+
+class InterpersonalRelationshipCreationPage(BasePage):
+    PATH = "/people/relationships/add/"
+
+    @property
+    def form(self):
+        return components.InterpersonalRelationshipCreationForm(self.browser)
+
+    def add_relationship(self, person_username, relative_username, relationship_type):
+        self.form.send_keys(
+            person_username=person_username,
+            relative_username=relative_username,
+            relationship_type=relationship_type,
         )
         return self
