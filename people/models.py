@@ -7,7 +7,11 @@ from django.urls import reverse
 
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .constants import GENDER_CHOICES, INTERPERSONAL_RELATIONSHIP_CHOICES
+from .constants import (
+    AGE_OF_MAJORITY,
+    GENDER_CHOICES,
+    INTERPERSONAL_RELATIONSHIP_CHOICES,
+)
 from .utils import get_age, get_age_category
 from .validators import validate_full_name
 
@@ -49,6 +53,10 @@ class Person(models.Model):
     @property
     def age_category(self):
         return get_age_category(self.age)
+
+    @property
+    def is_adult(self):
+        return self.age >= AGE_OF_MAJORITY
 
 
 class InterpersonalRelationship(models.Model):

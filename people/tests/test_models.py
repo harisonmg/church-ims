@@ -1,7 +1,11 @@
 from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
-from people.constants import GENDER_CHOICES, INTERPERSONAL_RELATIONSHIP_CHOICES
+from people.constants import (
+    AGE_OF_MAJORITY,
+    GENDER_CHOICES,
+    INTERPERSONAL_RELATIONSHIP_CHOICES,
+)
 from people.factories import InterpersonalRelationshipFactory, PersonFactory
 from people.utils import get_age, get_age_category
 
@@ -35,6 +39,9 @@ class PersonModelTestCase(TestCase):
 
     def test_age_category(self):
         self.assertEqual(self.person.age_category, get_age_category(self.person.age))
+
+    def test_is_adult(self):
+        self.assertEqual(self.person.is_adult, self.person.age > AGE_OF_MAJORITY)
 
 
 class PersonModelFieldsTestCase(SimpleTestCase):
