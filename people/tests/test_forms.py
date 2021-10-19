@@ -201,7 +201,9 @@ class AdultFormTestCase(SimpleTestCase):
 
     def test_fields(self):
         fields = self.form.fields.keys()
-        self.assertEqual(list(fields), ["username", "full_name", "gender", "dob"])
+        self.assertEqual(
+            list(fields), ["username", "full_name", "gender", "dob", "phone_number"]
+        )
 
 
 class AdultFormFieldsTestCase(TestCase):
@@ -217,6 +219,7 @@ class AdultFormFieldsTestCase(TestCase):
             "full_name": cls.person.full_name,
             "gender": cls.person.gender,
             "dob": cls.person.dob,
+            "phone_number": cls.person.phone_number,
         }
 
 
@@ -384,6 +387,45 @@ class AdultDOBTestCase(AdultFormFieldsTestCase):
         self.assertFalse(form.is_valid())
         errors = {"dob": [f"Date of birth must be before {get_todays_adult_dob()}"]}
         self.assertEqual(form.errors, errors)
+
+
+class AdultPhoneNumberTestCase(AdultFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.form_fields.get("phone_number")
+
+    def test_label(self):
+        self.assertEqual(self.field.label, "Phone number")
+
+    def test_class(self):
+        self.assertEqual(self.field.__class__.__name__, "PhoneNumberField")
+        self.assertIsInstance(
+            self.field, import_string("phonenumber_field.formfields.PhoneNumberField")
+        )
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 128)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 3)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string(
+                "phonenumber_field.validators.validate_international_phonenumber"
+            ),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[2],
+            import_string("django.core.validators.ProhibitNullCharactersValidator"),
+        )
 
 
 class ChildFormTestCase(SimpleTestCase):

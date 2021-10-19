@@ -29,6 +29,9 @@ class AdultForm(PersonForm):
         validators=[validators.validate_date_of_birth, validators.validate_adult],
     )
 
+    class Meta(PersonForm.Meta):  # noqa
+        fields = ["username", "full_name", "gender", "dob", "phone_number"]
+
 
 class ChildForm(PersonForm):
     dob = forms.DateField(
