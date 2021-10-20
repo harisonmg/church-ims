@@ -55,6 +55,12 @@ class AdultCreateView(PersonCreateView):
         return context
 
 
+class AdultSelfRegisterView(AdultCreateView):
+    permission_required = ()
+    success_url = reverse_lazy("core:dashboard")
+    template_name = "people/self_register_form.html"
+
+
 class ChildCreateView(PersonCreateView):
     form_class = ChildForm
 

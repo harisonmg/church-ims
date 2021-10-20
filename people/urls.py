@@ -14,6 +14,11 @@ urlpatterns = [
         views.RelationshipsListView.as_view(),
         name="relationships_list",
     ),
+    path(
+        "register/self/",
+        views.AdultSelfRegisterView.as_view(),
+        name="adult_self_register",
+    ),
     path("add/adult/", views.AdultCreateView.as_view(), name="adult_create"),
     path("add/child/", views.ChildCreateView.as_view(), name="child_create"),
     path("add/", views.PersonCreateView.as_view(), name="person_create"),
