@@ -113,15 +113,19 @@ class AdultSelfRegistrationPage(AdultCreationPage):
 class ChildCreationPage(PersonCreationPage):
     PATH = "/people/add/child/"
 
-
-class ChildSelfRegistrationPage(ChildCreationPage):
-    def __init__(self, test, person_username):
-        super().__init__(test)
-        self.person_username = person_username
-
     @property
-    def PATH(self):
-        return f"/people/register/{self.person_username}/child/"
+    def form(self):
+        return components.ChildForm(self.browser)
+
+    def add_person(self, username, full_name, gender, dob, is_parent=False):
+        self.form.send_keys(
+            username=username,
+            full_name=full_name,
+            gender=gender,
+            dob=dob,
+            is_parent=is_parent,
+        )
+        return self
 
 
 class PersonDetailPage(BasePage):

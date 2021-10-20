@@ -1,6 +1,7 @@
 from .base import Messages
 from .forms import (
     AdultForm,
+    ChildForm,
     FormComponent,
     InterpersonalRelationshipCreationForm,
     LoginForm,

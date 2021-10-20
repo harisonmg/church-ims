@@ -15,7 +15,6 @@ from .features import (
     AdultCreationPage,
     AdultSelfRegistrationPage,
     ChildCreationPage,
-    ChildSelfRegistrationPage,
     Dashboard,
     HomePage,
     InterpersonalRelationshipCreationPage,

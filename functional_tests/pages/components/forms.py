@@ -292,6 +292,27 @@ class AdultForm(PersonForm):
         return super().send_keys(**kwargs)
 
 
+class ChildForm(PersonForm):
+    IS_PARENT_CHECKBOX = (By.CSS_SELECTOR, "input#id_is_parent")
+    IS_PARENT_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_is_parent']")
+
+    @property
+    def _is_parent_checkbox(self):
+        return self.browser.find_element(*self.IS_PARENT_CHECKBOX)
+
+    @property
+    def is_parent_checkbox_label(self):
+        return self.browser.find_element(*self.IS_PARENT_CHECKBOX_LABEL).text
+
+    def send_keys(
+        self, username=None, full_name=None, gender=None, dob=None, is_parent=False
+    ):
+        if is_parent:
+            self._is_parent_checkbox.click()
+        kwargs = dict(username=username, full_name=full_name, gender=gender, dob=dob)
+        return super().send_keys(**kwargs)
+
+
 class InterpersonalRelationshipCreationForm(FormComponent):
     PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
     PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")

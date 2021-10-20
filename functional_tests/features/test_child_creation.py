@@ -1,9 +1,7 @@
-from django.contrib.auth.models import Permission
-
 from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
-from people.factories import ChildFactory
+from people.factories import AdultFactory, ChildFactory
 
 
 class ChildCreationTestCase(FunctionalTestCase):
@@ -11,19 +9,17 @@ class ChildCreationTestCase(FunctionalTestCase):
         super().setUp()
 
         # user
-        create_person = Permission.objects.filter(name="Can add person")
-        view_person = Permission.objects.filter(name="Can view person")
-        permissions = create_person | view_person
-        self.user = UserFactory(user_permissions=tuple(permissions))
+        self.user = UserFactory()
 
-        # person
-        self.person = ChildFactory.build()
+        # child
+        self.parent = AdultFactory(user_account=self.user)
+        self.child = ChildFactory.build()
 
         # auth
         self.create_pre_authenticated_session(self.user)
 
-    def test_child_creation(self):
-        # An authorized user visits the child creation page.
+    def test_child_creation_by_parent(self):
+        # A parent visits the child creation page.
         child_creation_page = pages.ChildCreationPage(self)
         child_creation_page.visit()
 
@@ -38,21 +34,30 @@ class ChildCreationTestCase(FunctionalTestCase):
         self.assertEqual(child_creation_page.form.full_name_label, "Full name*")
         self.assertEqual(child_creation_page.form.gender_label, "Gender*")
         self.assertEqual(child_creation_page.form.date_of_birth_label, "Date of birth*")
+        self.assertEqual(
+            child_creation_page.form.is_parent_checkbox_label, "I am the child's parent"
+        )
         self.assertEqual(child_creation_page.form.submit_button_label, "Add")
 
-        # He enters the person's username and full name and submits the form
-        child_creation_page.add_person(
-            self.person.username,
-            self.person.full_name,
-            self.person.get_gender_display(),
-            str(self.person.dob),
+        # He enters the child's username and full name and submits the form
+        child_creation_page.add_child(
+            self.child.username,
+            self.child.full_name,
+            self.child.get_gender_display(),
+            str(self.child.dob),
+            True,
         )
 
-        # The person's information was added successfully and he is redirected
-        # to the interpersonal relationships creation page
-        person_detail_page = pages.PersonDetailPage(self, self.person.username)
-        self.assertEqual(self.browser.current_url, person_detail_page.url)
+        # The child's information was added successfully and he is redirected
+        # to the his dashboard
+        dashboard = pages.Dashboard(self)
+        self.assertEqual(self.browser.current_url, dashboard.url)
         self.assertEqual(
-            person_detail_page.messages[0],
-            f"{self.person.username}'s information has been added successfully.",
+            dashboard.messages[0],
+            f"{self.child.username}'s information has been added successfully.",
+        )
+        people = f"{self.parent.username} and {self.child.username}"
+        self.assertEqual(
+            dashboard.messages[0],
+            f"The relationship between {people} has been added successfully.",
         )
