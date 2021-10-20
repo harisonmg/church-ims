@@ -13,36 +13,33 @@ from people.factories import (
 from people.utils import get_todays_adult_dob
 
 
-class PersonFormTestCase(SimpleTestCase):
+class PersonUpdateFormTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form_class = forms.PersonForm
-        cls.form = cls.form_class()
+        cls.form = forms.PersonUpdateForm()
 
     def test_fields(self):
         fields = self.form.fields.keys()
-        self.assertEqual(list(fields), ["username", "full_name", "gender", "dob"])
+        self.assertEqual(list(fields), ["username", "full_name"])
 
 
-class PersonFormFieldsTestCase(TestCase):
+class PersonUpdateFormFieldsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = forms.PersonForm
+        cls.form = forms.PersonUpdateForm
         cls.form_fields = cls.form().fields
-        cls.person = PersonFactory.build()
+        cls.person = ChildFactory.build()
         cls.data = {
             "username": cls.person.username,
             "full_name": cls.person.full_name,
-            "gender": cls.person.gender,
-            "dob": cls.person.dob,
         }
 
 
-class PersonUsernameTestCase(PersonFormFieldsTestCase):
+class PersonUpdateUsernameTestCase(PersonUpdateFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -95,7 +92,7 @@ class PersonUsernameTestCase(PersonFormFieldsTestCase):
         self.assertEqual(form.errors, {"username": [username_error]})
 
 
-class PersonFullNameTestCase(PersonFormFieldsTestCase):
+class PersonUpdateFullNameTestCase(PersonUpdateFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -132,7 +129,126 @@ class PersonFullNameTestCase(PersonFormFieldsTestCase):
         self.assertEqual(form.errors, errors)
 
 
-class PersonGenderTestCase(PersonFormFieldsTestCase):
+class PersonCreationFormTestCase(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form_class = forms.PersonCreationForm
+        cls.form = cls.form_class()
+
+    def test_fields(self):
+        fields = self.form.fields.keys()
+        self.assertEqual(list(fields), ["username", "full_name", "gender", "dob"])
+
+
+class PersonCreationFormFieldsTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form = forms.PersonCreationForm
+        cls.form_fields = cls.form().fields
+        cls.person = PersonFactory.build()
+        cls.data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+        }
+
+
+class PersonCreationUsernameTestCase(PersonCreationFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.field = cls.form_fields.get("username")
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 25)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 3)
+        self.assertIsInstance(
+            self.field.validators[0],
+            import_string("django.contrib.auth.validators.UnicodeUsernameValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[2],
+            import_string("django.core.validators.ProhibitNullCharactersValidator"),
+        )
+
+    def test_non_unique_value(self):
+        # setup
+        person = PersonFactory()
+        data = self.data.copy()
+        data["username"] = person.username
+
+        # test
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"username": ["A person with that username already exists."]}
+        self.assertEqual(form.errors, errors)
+
+    def test_value_with_spaces(self):
+        # setup
+        data = self.data.copy()
+        data["username"] = data["full_name"]
+
+        # test
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        username_error = "Enter a valid username. This value may contain only letters, "
+        username_error += "numbers, and @/./+/-/_ characters."
+        self.assertEqual(form.errors, {"username": [username_error]})
+
+
+class PersonCreationFullNameTestCase(PersonCreationFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.field = cls.form_fields.get("full_name")
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 150)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 3)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string("people.validators.validate_full_name"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[2],
+            import_string("django.core.validators.ProhibitNullCharactersValidator"),
+        )
+
+    def test_value_with_one_name(self):
+        data = self.data.copy()
+        data["full_name"] = data["username"]
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {"full_name": [validators.INVALID_FULL_NAME_ERROR]}
+        self.assertEqual(form.errors, errors)
+
+
+class PersonCreationGenderTestCase(PersonCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -149,7 +265,7 @@ class PersonGenderTestCase(PersonFormFieldsTestCase):
         self.assertTrue(self.field.required)
 
 
-class PersonDOBTestCase(PersonFormFieldsTestCase):
+class PersonCreationDOBTestCase(PersonCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -192,12 +308,12 @@ class PersonDOBTestCase(PersonFormFieldsTestCase):
         self.assertEqual(form.errors, errors)
 
 
-class AdultFormTestCase(SimpleTestCase):
+class AdultCreationFormTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = forms.AdultForm()
+        cls.form = forms.AdultCreationForm()
 
     def test_fields(self):
         fields = self.form.fields.keys()
@@ -206,12 +322,12 @@ class AdultFormTestCase(SimpleTestCase):
         )
 
 
-class AdultFormFieldsTestCase(TestCase):
+class AdultCreationFormFieldsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = forms.AdultForm
+        cls.form = forms.AdultCreationForm
         cls.form_fields = cls.form().fields
         cls.person = AdultFactory.build()
         cls.data = {
@@ -223,7 +339,7 @@ class AdultFormFieldsTestCase(TestCase):
         }
 
 
-class AdultUsernameTestCase(AdultFormFieldsTestCase):
+class AdultCreationUsernameTestCase(AdultCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -276,7 +392,7 @@ class AdultUsernameTestCase(AdultFormFieldsTestCase):
         self.assertEqual(form.errors, {"username": [username_error]})
 
 
-class AdultFullNameTestCase(AdultFormFieldsTestCase):
+class AdultCreationFullNameTestCase(AdultCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -313,7 +429,7 @@ class AdultFullNameTestCase(AdultFormFieldsTestCase):
         self.assertEqual(form.errors, errors)
 
 
-class AdultGenderTestCase(AdultFormFieldsTestCase):
+class AdultCreationGenderTestCase(AdultCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -330,7 +446,7 @@ class AdultGenderTestCase(AdultFormFieldsTestCase):
         self.assertTrue(self.field.required)
 
 
-class AdultDOBTestCase(AdultFormFieldsTestCase):
+class AdultCreationDOBTestCase(AdultCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -389,7 +505,7 @@ class AdultDOBTestCase(AdultFormFieldsTestCase):
         self.assertEqual(form.errors, errors)
 
 
-class AdultPhoneNumberTestCase(AdultFormFieldsTestCase):
+class AdultCreationPhoneNumberTestCase(AdultCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -428,24 +544,12 @@ class AdultPhoneNumberTestCase(AdultFormFieldsTestCase):
         )
 
 
-class ChildFormTestCase(SimpleTestCase):
+class ChildCreationFormFieldsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.form = forms.ChildForm()
-
-    def test_fields(self):
-        fields = self.form.fields.keys()
-        self.assertEqual(list(fields), ["username", "full_name", "gender", "dob"])
-
-
-class ChildFormFieldsTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.form = forms.ChildForm
+        cls.form = forms.ChildCreationForm
         cls.form_fields = cls.form().fields
         cls.person = ChildFactory.build()
         cls.data = {
@@ -456,7 +560,7 @@ class ChildFormFieldsTestCase(TestCase):
         }
 
 
-class ChildUsernameTestCase(ChildFormFieldsTestCase):
+class ChildCreationUsernameTestCase(ChildCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -509,7 +613,7 @@ class ChildUsernameTestCase(ChildFormFieldsTestCase):
         self.assertEqual(form.errors, {"username": [username_error]})
 
 
-class ChildFullNameTestCase(ChildFormFieldsTestCase):
+class ChildCreationFullNameTestCase(ChildCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -546,7 +650,7 @@ class ChildFullNameTestCase(ChildFormFieldsTestCase):
         self.assertEqual(form.errors, errors)
 
 
-class ChildGenderTestCase(ChildFormFieldsTestCase):
+class ChildCreationGenderTestCase(ChildCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -563,7 +667,7 @@ class ChildGenderTestCase(ChildFormFieldsTestCase):
         self.assertTrue(self.field.required)
 
 
-class ChildDOBTestCase(ChildFormFieldsTestCase):
+class ChildCreationDOBTestCase(ChildCreationFormFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

@@ -177,9 +177,9 @@ class PersonCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "PersonForm")
+        self.assertEqual(form.__class__.__name__, "PersonCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
+        self.assertIsInstance(form, import_string("people.forms.PersonCreationForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
@@ -259,10 +259,9 @@ class AdultCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "AdultForm")
+        self.assertEqual(form.__class__.__name__, "AdultCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
-        self.assertIsInstance(form, import_string("people.forms.AdultForm"))
+        self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
@@ -342,10 +341,9 @@ class AdultSelfRegisterViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "AdultForm")
+        self.assertEqual(form.__class__.__name__, "AdultCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
-        self.assertIsInstance(form, import_string("people.forms.AdultForm"))
+        self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
@@ -422,10 +420,9 @@ class ChildCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "ChildForm")
+        self.assertEqual(form.__class__.__name__, "ChildCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
-        self.assertIsInstance(form, import_string("people.forms.ChildForm"))
+        self.assertIsInstance(form, import_string("people.forms.ChildCreationForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
@@ -548,9 +545,9 @@ class PersonUpdateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "PersonForm")
+        self.assertEqual(form.__class__.__name__, "PersonUpdateForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
+        self.assertIsInstance(form, import_string("people.forms.PersonUpdateForm"))
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)

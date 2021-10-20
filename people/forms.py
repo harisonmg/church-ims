@@ -9,31 +9,37 @@ SELF_RELATIONSHIPS_ERROR = "Self relationships are not allowed!"
 DUPLICATE_RELATIONSHIPS_ERROR = "This interpersonal relationship already exists"
 
 
-class PersonForm(forms.ModelForm):
+class PersonUpdateForm(forms.ModelForm):
     username = forms.CharField(max_length=25, validators=[UnicodeUsernameValidator()])
     full_name = forms.CharField(
         max_length=150, validators=[validators.validate_full_name]
     )
+
+    class Meta:  # noqa
+        model = Person
+        fields = ["username", "full_name"]
+
+
+class PersonCreationForm(PersonUpdateForm):
     dob = forms.DateField(
         label="Date of birth", validators=[validators.validate_date_of_birth]
     )
 
-    class Meta:  # noqa
-        model = Person
+    class Meta(PersonUpdateForm.Meta):  # noqa
         fields = ["username", "full_name", "gender", "dob"]
 
 
-class AdultForm(PersonForm):
+class AdultCreationForm(PersonCreationForm):
     dob = forms.DateField(
         label="Date of birth",
         validators=[validators.validate_date_of_birth, validators.validate_adult],
     )
 
-    class Meta(PersonForm.Meta):  # noqa
+    class Meta(PersonCreationForm.Meta):  # noqa
         fields = ["username", "full_name", "gender", "dob", "phone_number"]
 
 
-class ChildForm(PersonForm):
+class ChildCreationForm(PersonCreationForm):
     dob = forms.DateField(
         label="Date of birth",
         validators=[validators.validate_date_of_birth, validators.validate_child],

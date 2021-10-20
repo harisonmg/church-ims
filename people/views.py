@@ -6,10 +6,11 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from extra_views import SearchableListMixin
 
 from .forms import (
-    AdultForm,
-    ChildForm,
+    AdultCreationForm,
+    ChildCreationForm,
     InterpersonalRelationshipCreationForm,
-    PersonForm,
+    PersonCreationForm,
+    PersonUpdateForm,
 )
 from .models import InterpersonalRelationship, Person
 
@@ -28,7 +29,7 @@ class PeopleListView(
 class PersonCreateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
 ):
-    form_class = PersonForm
+    form_class = PersonCreationForm
     permission_required = "people.add_person"
     success_message = "%(username)s's information has been added successfully."
     template_name = "people/person_form.html"
@@ -47,7 +48,7 @@ class PersonCreateView(
 
 
 class AdultCreateView(PersonCreateView):
-    form_class = AdultForm
+    form_class = AdultCreationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -66,7 +67,7 @@ class AdultSelfRegisterView(AdultCreateView):
 
 
 class ChildCreateView(PersonCreateView):
-    form_class = ChildForm
+    form_class = ChildCreationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -85,7 +86,7 @@ class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 class PersonUpdateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
 ):
-    form_class = PersonForm
+    form_class = PersonUpdateForm
     model = Person
     permission_required = "people.change_person"
     slug_field = "username"
