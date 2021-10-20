@@ -106,6 +106,10 @@ class AdultCreationPage(PersonCreationPage):
         return self
 
 
+class AdultSelfRegistrationPage(AdultCreationPage):
+    PATH = "/people/register/self/"
+
+
 class ChildCreationPage(PersonCreationPage):
     PATH = "/people/add/child/"
 
