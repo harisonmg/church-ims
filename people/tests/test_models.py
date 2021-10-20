@@ -211,6 +211,37 @@ class PersonPhoneNumberTestCase(PersonModelFieldsTestCase):
         self.assertEqual(self.field.verbose_name, "phone number")
 
 
+class PersonUserAccountTestCase(PersonModelFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.person_meta.get_field("user_account")
+
+    def test_blank(self):
+        self.assertFalse(self.field.blank)
+
+    def test_help_text(self):
+        help_text = "This person's user account."
+        self.assertEqual(self.field.help_text, help_text)
+
+    def test_is_relation(self):
+        self.assertTrue(self.field.is_relation)
+
+    def test_one_to_one(self):
+        self.assertTrue(self.field.one_to_one)
+
+    def test_null(self):
+        self.assertTrue(self.field.null)
+
+    def test_related_model(self):
+        self.assertEqual(
+            self.field.related_model, import_string("accounts.models.User")
+        )
+
+    def test_verbose_name(self):
+        self.assertEqual(self.field.verbose_name, "user account")
+
+
 class PersonCreatedByTestCase(PersonModelFieldsTestCase):
     @classmethod
     def setUpClass(cls):
