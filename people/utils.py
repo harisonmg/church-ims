@@ -1,6 +1,8 @@
 from datetime import date, timedelta
 from math import ceil
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from . import constants
 
 NEGATIVE_AGE_ERROR = "Age can't be negative!"
@@ -45,3 +47,12 @@ def get_age_category(age):
         return "senior citizen"
     else:
         raise ValueError(MAX_HUMAN_AGE_EXCEEDED_ERROR)
+
+
+def get_personal_details(user):
+    from .models import Person
+
+    try:
+        return Person.objects.get(user_account=user)
+    except ObjectDoesNotExist:
+        return None
