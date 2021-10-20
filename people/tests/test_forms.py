@@ -726,6 +726,95 @@ class ChildCreationDOBTestCase(ChildCreationFormFieldsTestCase):
         self.assertEqual(form.errors, errors)
 
 
+class ChildCreationIsParentTestCase(ChildCreationFormFieldsTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.form_fields.get("is_parent")
+
+    def test_label(self):
+        label = "I am the child's parent"
+        self.assertEqual(self.field.label, label)
+
+    def test_required(self):
+        self.assertFalse(self.field.required)
+
+
+class ParentChildRelationshipCreationFormTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form_class = forms.ParentChildRelationshipCreationForm
+        cls.form = cls.form_class()
+
+    def test_fields(self):
+        fields = self.form.fields.keys()
+        self.assertEqual(list(fields), ["person"])
+
+
+class ParentChildRelationshipCreationFormFieldsTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form = forms.ParentChildRelationshipCreationForm
+        cls.form_fields = cls.form().fields
+        cls.person = PersonFactory()
+        cls.relative = PersonFactory()
+        cls.relation = InterpersonalRelationshipFactory.build().relation
+        cls.data = {
+            "person": str(cls.person.username),
+            "relative": str(cls.relative.username),
+            "relation": cls.relation,
+        }
+
+
+class ParentChildRelationshipCreationPersonTestCase(
+    ParentChildRelationshipCreationFormFieldsTestCase
+):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.field = cls.form_fields.get("person")
+
+    def test_label(self):
+        self.assertEqual(self.field.label, "The parent's username")
+
+    def test_max_length(self):
+        self.assertEqual(self.field.max_length, 25)
+
+    def test_required(self):
+        self.assertTrue(self.field.required)
+
+    def test_validators(self):
+        self.assertEqual(len(self.field.validators), 3)
+        self.assertEqual(
+            self.field.validators[0],
+            import_string("people.validators.validate_person_username"),
+        )
+        self.assertIsInstance(
+            self.field.validators[1],
+            import_string("django.core.validators.MaxLengthValidator"),
+        )
+        self.assertIsInstance(
+            self.field.validators[2],
+            import_string("django.core.validators.ProhibitNullCharactersValidator"),
+        )
+
+    def test_non_existent_person(self):
+        data = self.data.copy()
+        data["person"] = "does-not-exist"
+        form = self.form(data=data)
+        self.assertFalse(form.is_valid())
+        errors = {
+            "person": [
+                validators.PERSON_DOES_NOT_EXIST_ERROR % dict(username=data["person"])
+            ]
+        }
+        self.assertEqual(form.errors, errors)
+
+
 class InterpersonalRelationshipCreationFormTestCase(TestCase):
     @classmethod
     def setUpClass(cls):

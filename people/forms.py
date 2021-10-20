@@ -44,9 +44,26 @@ class ChildCreationForm(PersonCreationForm):
         label="Date of birth",
         validators=[validators.validate_date_of_birth, validators.validate_child],
     )
+    is_parent = forms.BooleanField(label="I am the child's parent", required=False)
 
 
-class InterpersonalRelationshipCreationForm(forms.ModelForm):
+class ParentChildRelationshipCreationForm(forms.ModelForm):
+    person = forms.CharField(
+        label="The parent's username",
+        max_length=25,
+        validators=[validators.validate_person_username],
+    )
+
+    class Meta:  # noqa
+        model = InterpersonalRelationship
+        fields = ["person"]
+
+    def clean_person(self):
+        person = self.cleaned_data["person"]
+        return Person.objects.get(username=person)
+
+
+class InterpersonalRelationshipCreationForm(ParentChildRelationshipCreationForm):
     person = forms.CharField(
         label="The person's username",
         max_length=25,
@@ -63,8 +80,7 @@ class InterpersonalRelationshipCreationForm(forms.ModelForm):
         initial=constants.FAMILIAL_RELATIONSHIPS[0],
     )
 
-    class Meta:  # noqa
-        model = InterpersonalRelationship
+    class Meta(ParentChildRelationshipCreationForm.Meta):  # noqa
         fields = ["person", "relative", "relation"]
         error_messages = {
             NON_FIELD_ERRORS: {
@@ -76,10 +92,6 @@ class InterpersonalRelationshipCreationForm(forms.ModelForm):
         cleaned_data = super().clean()
         if cleaned_data.get("person") == cleaned_data.get("relative"):
             raise ValidationError(SELF_RELATIONSHIPS_ERROR)
-
-    def clean_person(self):
-        person = self.cleaned_data["person"]
-        return Person.objects.get(username=person)
 
     def clean_relative(self):
         relative = self.cleaned_data["relative"]
