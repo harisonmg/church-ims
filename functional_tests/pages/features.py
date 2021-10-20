@@ -114,6 +114,16 @@ class ChildCreationPage(PersonCreationPage):
     PATH = "/people/add/child/"
 
 
+class ChildSelfRegistrationPage(ChildCreationPage):
+    def __init__(self, test, person_username):
+        super().__init__(test)
+        self.person_username = person_username
+
+    @property
+    def PATH(self):
+        return f"/people/register/{self.person_username}/child/"
+
+
 class PersonDetailPage(BasePage):
     UPDATE_LINK = (By.ID, "update")
 
