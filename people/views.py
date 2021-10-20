@@ -60,6 +60,10 @@ class AdultSelfRegisterView(AdultCreateView):
     success_url = reverse_lazy("core:dashboard")
     template_name = "people/self_register_form.html"
 
+    def form_valid(self, form):
+        form.instance.user_account = self.request.user
+        return super().form_valid(form)
+
 
 class ChildCreateView(PersonCreateView):
     form_class = ChildForm

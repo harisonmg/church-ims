@@ -351,15 +351,13 @@ class AdultSelfRegisterViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
         person = Person.objects.first()
+        self.assertEqual(person.user_account, self.authorized_user)
         self.assertEqual(person.created_by, self.authorized_user)
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)
-        self.assertRedirects(
-            response,
-            reverse("core:dashboard")
-        )
+        self.assertRedirects(response, reverse("core:dashboard"))
 
 
 class ChildCreateViewTestCase(TestCase):
