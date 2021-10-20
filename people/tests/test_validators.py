@@ -1,7 +1,7 @@
 from datetime import date, timedelta
-from unittest import TestCase
 
 from django.core.exceptions import ValidationError
+from django.test import SimpleTestCase, TestCase
 
 from people import validators
 from people.constants import MAX_HUMAN_AGE
@@ -9,7 +9,7 @@ from people.factories import PersonFactory
 from people.utils import get_todays_adult_dob
 
 
-class ValidateFullNameTestCase(TestCase):
+class ValidateFullNameTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -35,7 +35,7 @@ class ValidateFullNameTestCase(TestCase):
             validators.validate_full_name(f"{self.person.username} ")
 
 
-class ValidateDateOfBirthTestCase(TestCase):
+class ValidateDateOfBirthTestCase(SimpleTestCase):
     def test_date_in_future(self):
         with self.assertRaisesRegex(ValidationError, validators.DOB_IN_FUTURE_ERROR):
             tomorrow = date.today() + timedelta(days=1)
@@ -50,7 +50,7 @@ class ValidateDateOfBirthTestCase(TestCase):
             validators.validate_date_of_birth(long_ago)
 
 
-class ValidateAdultTestCase(TestCase):
+class ValidateAdultTestCase(SimpleTestCase):
     def test_child_dob(self):
         error_message = f"Date of birth must be before {get_todays_adult_dob()}"
         with self.assertRaisesRegex(ValidationError, error_message):
@@ -58,7 +58,7 @@ class ValidateAdultTestCase(TestCase):
             validators.validate_adult(child_dob)
 
 
-class ValidateChildTestCase(TestCase):
+class ValidateChildTestCase(SimpleTestCase):
     def test_child_dob(self):
         error_message = f"Date of birth must be after {get_todays_adult_dob()}"
         with self.assertRaisesRegex(ValidationError, error_message):
@@ -72,3 +72,18 @@ class ValidatePersonUsernameTestCase(TestCase):
         error_message = validators.PERSON_DOES_NOT_EXIST_ERROR % dict(username=username)
         with self.assertRaisesRegex(ValidationError, error_message):
             validators.validate_person_username(username)
+
+
+class ValidateUniqueCaseInsensitiveUsernameTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+
+        cls.person = PersonFactory()
+
+    def test_swapcase(self):
+        username = self.person.username.swapcase()
+        with self.assertRaisesRegex(
+            ValidationError, validators.NON_UNIQUE_USERNAME_ERROR
+        ):
+            validators.validate_unique_case_insensitive_username(username)
