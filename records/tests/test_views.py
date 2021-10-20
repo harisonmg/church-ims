@@ -191,7 +191,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        temp_record = TemperatureRecord.objects.first()
+        temp_record = TemperatureRecord.objects.get(person=self.person)
         self.assertEqual(temp_record.created_by, self.authorized_user)
 
     def test_success_url(self):
