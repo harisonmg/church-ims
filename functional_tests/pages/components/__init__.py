@@ -5,6 +5,7 @@ from .forms import (
     FormComponent,
     InterpersonalRelationshipCreationForm,
     LoginForm,
+    ParentChildRelationshipCreationForm,
     PasswordResetForm,
     PasswordResetRequestForm,
     PersonForm,

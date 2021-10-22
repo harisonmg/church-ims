@@ -19,6 +19,7 @@ from .features import (
     HomePage,
     InterpersonalRelationshipCreationPage,
     InterpersonalRelationshipsListPage,
+    ParentChildRelationshipCreationPage,
     PeopleListPage,
     PersonCreationPage,
     PersonDetailPage,

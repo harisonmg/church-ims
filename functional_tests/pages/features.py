@@ -202,3 +202,21 @@ class InterpersonalRelationshipCreationPage(BasePage):
             relationship_type=relationship_type,
         )
         return self
+
+
+class ParentChildRelationshipCreationPage(BasePage):
+    def __init__(self, test, child_username):
+        super().__init__(test)
+        self.child_username = child_username
+
+    @property
+    def PATH(self):
+        return f"/people/relationships/parent-child/add/?child={self.child_username}"
+
+    @property
+    def form(self):
+        return components.ParentChildRelationshipCreationForm(self.browser)
+
+    def add_parent(self, parent_username):
+        self.form.send_keys(parent_username=parent_username)
+        return self

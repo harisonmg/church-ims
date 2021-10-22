@@ -361,3 +361,20 @@ class InterpersonalRelationshipCreationForm(FormComponent):
         self._relative_username_input.send_keys(relative_username)
         self.select_relationship_type(relationship_type)
         return self.submit()
+
+
+class ParentChildRelationshipCreationForm(FormComponent):
+    PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_parent")
+    PARENT_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_parent']")
+
+    @property
+    def _parent_username_input(self):
+        return self.browser.find_element(*self.PARENT_USERNAME_INPUT)
+
+    @property
+    def parent_username_label(self):
+        return self.browser.find_element(*self.PARENT_USERNAME_LABEL).text
+
+    def send_keys(self, parent_username):
+        self._parent_username_input.send_keys(parent_username)
+        return self.submit()
