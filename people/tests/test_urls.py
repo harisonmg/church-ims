@@ -103,7 +103,7 @@ class RelationshipCreateURLTestCase(SimpleTestCase):
 
 class ParentChildRelationshipCreateURLTestCase(SimpleTestCase):
     def setUp(self):
-        self.match = resolve("/people/relationships/parent-child/add/?child=username")
+        self.match = resolve("/people/relationships/add/username/parent/")
 
     def test_view_func(self):
         self.assertEqual(self.match.func.__name__, "ParentChildRelationshipCreateView")

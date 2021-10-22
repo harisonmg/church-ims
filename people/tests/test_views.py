@@ -771,7 +771,7 @@ class ParentChildRelationshipCreateViewTestCase(TestCase):
         cls.person = AdultFactory(user_account=cls.authorized_user)
         cls.parent = AdultFactory()
         cls.child = ChildFactory()
-        cls.url = f"/people/relationships/parent-child/add/?child={cls.child.username}"
+        cls.url = f"/people/relationships/add/{cls.child.username}/parent/"
 
         # POST data
         cls.data = {"person": cls.parent.username}

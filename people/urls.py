@@ -5,7 +5,7 @@ from . import views
 app_name = "people"
 urlpatterns = [
     path(
-        "relationships/parent-child/add/",
+        "relationships/add/<str:username>/parent/",
         views.ParentChildRelationshipCreateView.as_view(),
         name="parent_child_relationship_create",
     ),

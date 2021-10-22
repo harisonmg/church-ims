@@ -211,7 +211,7 @@ class ParentChildRelationshipCreationPage(BasePage):
 
     @property
     def PATH(self):
-        return f"/people/relationships/parent-child/add/?child={self.child_username}"
+        return f"/people/relationships/add/{self.child_username}/parent/"
 
     @property
     def form(self):
