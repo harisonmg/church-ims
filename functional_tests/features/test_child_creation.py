@@ -59,7 +59,7 @@ class ChildCreationTestCase(FunctionalTestCase):
         people = f"{self.parent.username} and {self.child.username}"
         self.assertEqual(
             dashboard.messages[1],
-            f"The relationship between {people} has been added successfully.",
+            f"A parent-child relationship between {people} has been added.",
         )
 
     def test_child_creation_by_non_parent(self):

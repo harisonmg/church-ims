@@ -422,16 +422,10 @@ class ChildCreateViewTestCase(TestCase):
         data["is_parent"] = True
         self.client.force_login(self.authorized_user)
 
-        # test person
+        # test
         self.client.post(self.url, self.data)
         person = Person.objects.get(username=self.data["username"])
         self.assertEqual(person.created_by, self.authorized_user)
-
-        # test relationship
-        relationship = InterpersonalRelationship.objects.get(person=self.parent)
-        self.assertEqual(relationship.relative, person)
-        self.assertEqual(relationship.relation, "PC")
-        self.assertEqual(relationship.created_by, self.authorized_user)
 
     def test_not_parent_form_valid(self):
         self.client.force_login(self.authorized_user)
