@@ -4,7 +4,14 @@
 
 {% block content %}
   <div class="col-md-8 col-lg-4 p-3 mx-auto text-center" parent-class="my-auto">
-    <h1 class="display-5 fw-bold">Add an interpersonal relationship</h1>
+    <h1 class="display-5 fw-bold">
+      Add 
+      {% if child %}
+        {{ child }}'s parent
+      {% else %}
+        an interpersonal relationship
+      {% endif %}
+    </h1>
     <form id="interpersonal_relationship_form" class="p-2 p-md-3" method="POST">
       {% csrf_token %}
       {{ form|crispy }}
