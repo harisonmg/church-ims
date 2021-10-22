@@ -5,6 +5,11 @@ from . import views
 app_name = "people"
 urlpatterns = [
     path(
+        "relationships/parent-child/add/",
+        views.ParentChildRelationshipCreateView.as_view(),
+        name="parent_child_relationship_create",
+    ),
+    path(
         "relationships/add/",
         views.RelationshipCreateView.as_view(),
         name="relationship_create",
