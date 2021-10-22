@@ -178,7 +178,7 @@ class ParentChildRelationshipCreateView(RelationshipCreateView, UserPassesTestMi
         return self.request.user.personal_details is not None
 
     def get_child(self):
-        return get_object_or_404(Person, username=self.request.GET["child"])
+        return get_object_or_404(Person, username=self.kwargs["username"])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
