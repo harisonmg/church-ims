@@ -760,14 +760,8 @@ class ParentChildRelationshipCreationFormFieldsTestCase(TestCase):
 
         cls.form = forms.ParentChildRelationshipCreationForm
         cls.form_fields = cls.form().fields
-        cls.person = PersonFactory()
-        cls.relative = PersonFactory()
-        cls.relation = InterpersonalRelationshipFactory.build().relation
-        cls.data = {
-            "person": str(cls.person.username),
-            "relative": str(cls.relative.username),
-            "relation": cls.relation,
-        }
+        cls.parent = AdultFactory()
+        cls.data = {"person": str(cls.parent.username)}
 
 
 class ParentChildRelationshipCreationPersonTestCase(
