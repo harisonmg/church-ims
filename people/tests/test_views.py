@@ -416,7 +416,24 @@ class ChildCreateViewTestCase(TestCase):
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.ChildCreationForm"))
 
-    def test_form_valid(self):
+    def test_is_parent_form_valid(self):
+        # setup
+        data = self.data.copy()
+        data["is_parent"] = True
+        self.client.force_login(self.authorized_user)
+
+        # test person
+        self.client.post(self.url, self.data)
+        person = Person.objects.get(username=self.data["username"])
+        self.assertEqual(person.created_by, self.authorized_user)
+
+        # test relationship
+        relationship = InterpersonalRelationship.objects.get(person=self.parent)
+        self.assertEqual(relationship.relative, person)
+        self.assertEqual(relationship.relation, "PC")
+        self.assertEqual(relationship.created_by, self.authorized_user)
+
+    def test_not_parent_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
         person = Person.objects.get(username=self.data["username"])
@@ -426,16 +443,16 @@ class ChildCreateViewTestCase(TestCase):
         # setup
         data = self.data.copy()
         data["is_parent"] = True
+        self.client.force_login(self.authorized_user)
 
         # test
-        self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, data)
         self.assertRedirects(response, reverse("core:dashboard"))
 
     def test_not_parent_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, reverse("people:relationship_create"))
+        self.assertRedirects(response, reverse("core:dashboard"))
 
 
 class PersonDetailViewTestCase(TestCase):
