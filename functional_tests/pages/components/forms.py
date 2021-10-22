@@ -364,8 +364,8 @@ class InterpersonalRelationshipCreationForm(FormComponent):
 
 
 class ParentChildRelationshipCreationForm(FormComponent):
-    PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_parent")
-    PARENT_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_parent']")
+    PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
+    PARENT_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
 
     @property
     def _parent_username_input(self):
