@@ -1,6 +1,6 @@
+from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
-from accounts.factories import UserFactory
 from people.factories import AdultFactory
 
 
