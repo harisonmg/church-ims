@@ -218,7 +218,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 ACCOUNT_LOGOUT_REDIRECT_URL = "core:index"
 
-LOGIN_REDIRECT_URL = "core:dashboard"
+LOGIN_REDIRECT_URL = "core:login_redirect"
 
 
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs

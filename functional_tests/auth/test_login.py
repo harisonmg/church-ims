@@ -1,6 +1,7 @@
 from accounts.factories import UserFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
+from people.factories import AdultFactory
 
 
 class LoginTestCase(FunctionalTestCase):
@@ -8,10 +9,14 @@ class LoginTestCase(FunctionalTestCase):
         super().setUp()
 
         self.password = self.fake.password()
-        self.active_user = UserFactory(password=self.password)
+        self.fully_registered_user = UserFactory(password=self.password)
+        self.partially_registered_user = UserFactory(password=self.password)
         self.inactive_user = UserFactory(password=self.password, is_active=False)
 
-    def test_active_user_can_login(self):
+        # personal details
+        AdultFactory(user_account=self.fully_registered_user)
+
+    def test_active_user_with_personal_details(self):
         # A user visits the login page
         login_page = pages.LoginPage(self)
         login_page.visit()
@@ -37,17 +42,34 @@ class LoginTestCase(FunctionalTestCase):
         )
 
         # He enters his email and password and submits the form
-        login_page.login(self.active_user.email, self.password, True)
+        login_page.login(self.fully_registered_user.email, self.password, True)
 
         # The login was successful and he is redirected to his dashboard
         dashboard = pages.Dashboard(self)
         self.assertEqual(self.browser.current_url, dashboard.url)
         self.assertEqual(
             dashboard.messages[0],
-            f"Successfully signed in as {self.active_user.username}.",
+            f"Successfully signed in as {self.fully_registered_user.username}.",
         )
 
-    def test_inactive_user_cannot_login(self):
+    def test_active_user_without_personal_details(self):
+        # A user visits the login page
+        login_page = pages.LoginPage(self)
+        login_page.visit()
+
+        # He enters his email and password and submits the form
+        login_page.login(self.partially_registered_user.email, self.password)
+
+        # The login was successful and he is redirected to the adult
+        # self registration page
+        adult_registration_page = pages.AdultSelfRegistrationPage(self)
+        self.assertEqual(self.browser.current_url, adult_registration_page.url)
+        self.assertEqual(
+            adult_registration_page.messages[0],
+            f"Successfully signed in as {self.partially_registered_user.username}.",
+        )
+
+    def test_inactive_user(self):
         # An inactive user visits the login page
         login_page = pages.LoginPage(self)
         login_page.visit()
