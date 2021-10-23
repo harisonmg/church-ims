@@ -57,4 +57,7 @@ class BasePage:
 
     def visit(self):
         self.browser.get(self.url)
+
+        if self.PATH != BasePage.PATH:
+            self.test.take_screenshot()
         return self
