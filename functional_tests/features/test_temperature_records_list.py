@@ -46,11 +46,10 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
             self.account_dropdown_links,
         )
 
-        # He can also see a sidebar navigation, with the temperature records
-        # link highlighted
+        # He can also see a sidebar navigation, with the current page link highlighted
         self.assertEqual(
             temp_records_list_page.sidebar.active_links,
-            {"Temperature records": self.browser.current_url},
+            {"All temperature records": self.browser.current_url},
         )
 
         # He also sees a list of temperature records and a page navigation

@@ -29,6 +29,12 @@ class ChildCreationTestCase(FunctionalTestCase):
         self.assertEqual(child_creation_page.header.title, self.header_title)
         self.assertEqual(child_creation_page.heading, "Add a child's information")
 
+        # He can also see a sidebar navigation, with the current page link highlighted
+        self.assertEqual(
+            child_creation_page.sidebar.active_links,
+            {"Add a child": self.browser.current_url},
+        )
+
         # He sees the inputs of the child form, including labels and placeholders.
         self.assertEqual(child_creation_page.form.username_label, "Username*")
         self.assertEqual(child_creation_page.form.full_name_label, "Full name*")

@@ -43,6 +43,12 @@ class RelationshipCreationTestCase(FunctionalTestCase):
             relationship_creation_page.heading, "Add an interpersonal relationship"
         )
 
+        # He can also see a sidebar navigation, with the current page link highlighted
+        self.assertEqual(
+            relationship_creation_page.sidebar.active_links,
+            {"Add an interpersonal relationship": self.browser.current_url},
+        )
+
         # He sees the inputs of the relationship form, including labels
         # and placeholders.
         self.assertEqual(

@@ -7,19 +7,35 @@
     {% endif %}
     {% if perms.people.view_person %}
       <a href="{% url 'people:people_list' %}" class="list-group-item list-group-action">
-        People
+        All people
+      </a>
+    {% endif %}
+    {% if perms.people.add_person %}
+      <a href="{% url 'people:adult_create' %}" class="list-group-item list-group-action">
+        Add an adult
+      </a>
+    {% endif %}
+    {% if user.personal_details %}
+      <a href="{% url 'people:child_create' %}" class="list-group-item list-group-action">
+        Add a child
       </a>
     {% endif %}
     {% if perms.people.view_interpersonalrelationship %}
       <a href="{% url 'people:relationships_list' %}"
        class="list-group-item list-group-action">
-        Interpersonal relationships
+        All interpersonal relationships
+      </a>
+    {% endif %}
+    {% if perms.people.add_interpersonalrelationship %}
+      <a href="{% url 'people:relationship_create' %}"
+       class="list-group-item list-group-action">
+        Add an interpersonal relationship
       </a>
     {% endif %}
     {% if perms.records.view_temperaturerecord %}
       <a href="{% url 'records:temperature_records_list' %}"
        class="list-group-item list-group-action">
-        Temperature records
+        All temperature records
       </a>
     {% endif %}
   </div>
