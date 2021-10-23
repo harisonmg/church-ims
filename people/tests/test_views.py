@@ -286,12 +286,7 @@ class AdultSelfRegisterViewTestCase(TestCase):
         cls.url = "/people/register/self/"
 
         # users
-        create_person = Permission.objects.filter(name="Can add person")
-        view_person = Permission.objects.filter(name="Can view person")
-        permissions = create_person | view_person
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
-        cls.staff_user = UserFactory(is_staff=True)
 
         # POST data
         person = AdultFactory.build()
@@ -312,33 +307,23 @@ class AdultSelfRegisterViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
     def test_template_used(self):
-        self.client.force_login(self.authorized_user)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "people/self_register_form.html")
 
     def test_context_data_contains_action(self):
-        self.client.force_login(self.authorized_user)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.context.get("action"), "add")
 
     def test_context_data_contains_age_category(self):
-        self.client.force_login(self.authorized_user)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.context.get("age_category"), "an adult")
 
     def test_form_class(self):
-        self.client.force_login(self.authorized_user)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         form = response.context.get("form")
         self.assertEqual(form.__class__.__name__, "AdultCreationForm")
@@ -346,14 +331,14 @@ class AdultSelfRegisterViewTestCase(TestCase):
         self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
 
     def test_form_valid(self):
-        self.client.force_login(self.authorized_user)
+        self.client.force_login(self.user)
         self.client.post(self.url, self.data)
         person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.user_account, self.authorized_user)
-        self.assertEqual(person.created_by, self.authorized_user)
+        self.assertEqual(person.user_account, self.user)
+        self.assertEqual(person.created_by, self.user)
 
     def test_success_url(self):
-        self.client.force_login(self.authorized_user)
+        self.client.force_login(self.user)
         response = self.client.post(self.url, self.data)
         self.assertRedirects(response, reverse("core:dashboard"))
 
