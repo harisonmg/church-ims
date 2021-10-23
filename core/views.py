@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.views.generic import RedirectView, TemplateView
 
@@ -16,5 +16,8 @@ class LoginRedirectView(LoginRequiredMixin, RedirectView):
         return url
 
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class DashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "core/dashboard.html"
+
+    def test_func(self):
+        return self.request.user.personal_details is not None

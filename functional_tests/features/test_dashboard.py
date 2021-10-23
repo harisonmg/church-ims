@@ -1,14 +1,18 @@
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
+from accounts.factories import UserFactory
+from people.factories import AdultFactory
 
 
 class DashboardTestCase(FunctionalTestCase):
     def setUp(self):
         super().setUp()
 
-        self.create_pre_authenticated_session()
+        self.user = UserFactory()
+        self.person = AdultFactory(user_account=self.user)
+        self.create_pre_authenticated_session(self.user)
 
-    def test_authenticated_user_can_access_dashboard(self):
+    def test_fully_registered_user(self):
         # A user visits their dashboard
         dashboard = pages.Dashboard(self)
         dashboard.visit()

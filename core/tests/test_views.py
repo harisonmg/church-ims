@@ -1,4 +1,3 @@
-from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 
@@ -58,23 +57,22 @@ class DashboardViewTestCase(TestCase):
         super().setUpClass()
 
         cls.url = "/dashboard/"
-        cls.view = views.DashboardView
+        cls.fully_registered_user = UserFactory()
+        cls.partially_registered_user = UserFactory()
 
-    def test_template_used(self):
-        factory = RequestFactory()
-        request = factory.get("dummy_path/")
-        request.user = AnonymousUser
+        # personal details
+        AdultFactory(user_account=cls.fully_registered_user)
 
-        response = self.view.as_view()(request)
-        with self.assertTemplateUsed("core/dashboard.html"):
-            response.render()
-
-    def test_view_requires_login(self):
+    def test_anonymous_user_response(self):
         response = self.client.get(self.url)
         self.assertRedirects(response, f"/accounts/login/?next={self.url}")
 
-    def test_logged_in_response_status_code(self):
-        user = UserFactory()
-        self.client.force_login(user)
+    def test_fully_registered_user_response(self):
+        self.client.force_login(self.fully_registered_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_partially_registered_user_response(self):
+        self.client.force_login(self.partially_registered_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
