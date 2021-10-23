@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import (
     UserPassesTestMixin,
 )
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -77,7 +78,6 @@ class AdultSelfRegisterView(AdultCreateView):
 class ChildCreateView(PersonCreateView, UserPassesTestMixin):
     form_class = ChildCreationForm
     permission_required = ()
-    success_url = reverse_lazy("core:dashboard")
 
     def test_func(self):
         return self.request.user.personal_details is not None
@@ -87,26 +87,33 @@ class ChildCreateView(PersonCreateView, UserPassesTestMixin):
         context["age_category"] = "a child"
         return context
 
-    def create_relationship(self, child):
+    def get_success_url(self, is_parent=False):
+        if is_parent:
+            url = reverse_lazy("core:dashboard")
+        else:
+            url = reverse_lazy(
+                "people:parent_child_relationship_create",
+                kwargs={"username": self.object.username},
+            )
+        return url
+
+    def create_relationship(self):
         relationship = InterpersonalRelationship.objects.create(
             person=self.request.user.personal_details,
-            relative=child,
+            relative=self.object,
             relation="PC",
             created_by=self.request.user,
         )
-        people = f"{relationship.person} and {child}"
-        relation = relationship.get_relation_display().lower()
-        message = f"A {relation} relationship between {people} has been added."
+        people = f"{relationship.person} and {relationship.relative}"
+        message = f"A parent-child relationship between {people} has been added."
         messages.info(self.request, message)
 
     def form_valid(self, form):
-        if form.data.get("is_parent"):
-            response = super().form_valid(form)
-            child = Person.objects.get(username=form.instance.username)
-            self.create_relationship(child)
-            return response
-        else:
-            return super().form_valid(form)
+        super().form_valid(form)
+        is_parent = form.cleaned_data["is_parent"]
+        if is_parent:
+            self.create_relationship()
+        return HttpResponseRedirect(self.get_success_url(is_parent))
 
 
 class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):

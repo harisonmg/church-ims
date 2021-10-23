@@ -92,10 +92,12 @@ class ChildCreationTestCase(FunctionalTestCase):
         )
 
         # The child's information was added successfully and he is redirected
-        # to the his dashboard
-        dashboard = pages.Dashboard(self)
-        self.assertEqual(self.browser.current_url, dashboard.url)
+        # to the parent-child relationship creation page
+        relationship_creation_page = pages.ParentChildRelationshipCreationPage(
+            self, self.child.username
+        )
+        self.assertEqual(self.browser.current_url, relationship_creation_page.url)
         self.assertEqual(
-            dashboard.messages[0],
+            relationship_creation_page.messages[0],
             f"{self.child.username}'s information has been added successfully.",
         )

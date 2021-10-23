@@ -424,14 +424,14 @@ class ChildCreateViewTestCase(TestCase):
 
         # test
         self.client.post(self.url, self.data)
-        person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.created_by, self.authorized_user)
+        child = Person.objects.get(username=self.data["username"])
+        self.assertEqual(child.created_by, self.authorized_user)
 
     def test_not_parent_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.created_by, self.authorized_user)
+        child = Person.objects.get(username=self.data["username"])
+        self.assertEqual(child.created_by, self.authorized_user)
 
     def test_is_parent_success_url(self):
         # setup
@@ -446,7 +446,13 @@ class ChildCreateViewTestCase(TestCase):
     def test_not_parent_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, reverse("core:dashboard"))
+        self.assertRedirects(
+            response,
+            reverse(
+                "people:parent_child_relationship_create",
+                kwargs={"username": self.data["username"]},
+            ),
+        )
 
 
 class PersonDetailViewTestCase(TestCase):
