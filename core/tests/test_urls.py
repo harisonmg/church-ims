@@ -13,6 +13,17 @@ class IndexURLTestCase(SimpleTestCase):
         self.assertEqual(self.match.view_name, "core:index")
 
 
+class LoginRedirectURLTestCase(SimpleTestCase):
+    def setUp(self):
+        self.match = resolve("/login/redirect/")
+
+    def test_view_func(self):
+        self.assertEqual(self.match.func.__name__, "LoginRedirectView")
+
+    def test_view_name(self):
+        self.assertEqual(self.match.view_name, "core:login_redirect")
+
+
 class DashboardURLTestCase(SimpleTestCase):
     def setUp(self):
         self.match = resolve("/dashboard/")

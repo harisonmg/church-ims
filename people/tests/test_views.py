@@ -177,14 +177,14 @@ class PersonCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "PersonForm")
+        self.assertEqual(form.__class__.__name__, "PersonCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
+        self.assertIsInstance(form, import_string("people.forms.PersonCreationForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        person = Person.objects.first()
+        person = Person.objects.get(username=self.data["username"])
         self.assertEqual(person.created_by, self.authorized_user)
 
     def test_success_url(self):
@@ -259,15 +259,14 @@ class AdultCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "AdultForm")
+        self.assertEqual(form.__class__.__name__, "AdultCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
-        self.assertIsInstance(form, import_string("people.forms.AdultForm"))
+        self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        person = Person.objects.first()
+        person = Person.objects.get(username=self.data["username"])
         self.assertEqual(person.created_by, self.authorized_user)
 
     def test_success_url(self):
@@ -279,6 +278,71 @@ class AdultCreateViewTestCase(TestCase):
         )
 
 
+class AdultSelfRegisterViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.url = "/people/register/self/"
+
+        # users
+        cls.user = UserFactory()
+
+        # POST data
+        person = AdultFactory.build()
+        cls.data = {
+            "username": person.username,
+            "full_name": person.full_name,
+            "gender": person.gender,
+            "dob": person.dob,
+            "phone_number": person.phone_number,
+        }
+
+    def test_anonymous_user_response(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_template_used(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/self_register_form.html")
+
+    def test_context_data_contains_action(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("action"), "add")
+
+    def test_context_data_contains_age_category(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("age_category"), "an adult")
+
+    def test_form_class(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(form.__class__.__name__, "AdultCreationForm")
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+        self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
+
+    def test_form_valid(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, self.data)
+        person = Person.objects.get(username=self.data["username"])
+        self.assertEqual(person.user_account, self.user)
+        self.assertEqual(person.created_by, self.user)
+
+    def test_success_url(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(response, reverse("core:dashboard"))
+
+
 class ChildCreateViewTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -287,20 +351,17 @@ class ChildCreateViewTestCase(TestCase):
         cls.url = "/people/add/child/"
 
         # users
-        create_person = Permission.objects.filter(name="Can add person")
-        view_person = Permission.objects.filter(name="Can view person")
-        permissions = create_person | view_person
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
-        cls.staff_user = UserFactory(is_staff=True)
+        cls.authorized_user = UserFactory()
 
         # POST data
-        person = ChildFactory.build()
+        cls.parent = AdultFactory(user_account=cls.authorized_user)
+        child = ChildFactory.build()
         cls.data = {
-            "username": person.username,
-            "full_name": person.full_name,
-            "gender": person.gender,
-            "dob": person.dob,
+            "username": child.username,
+            "full_name": child.full_name,
+            "gender": child.gender,
+            "dob": child.dob,
         }
 
     def test_anonymous_user_response(self):
@@ -316,11 +377,6 @@ class ChildCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
 
     def test_template_used(self):
         self.client.force_login(self.authorized_user)
@@ -341,23 +397,46 @@ class ChildCreateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "ChildForm")
+        self.assertEqual(form.__class__.__name__, "ChildCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
-        self.assertIsInstance(form, import_string("people.forms.ChildForm"))
+        self.assertIsInstance(form, import_string("people.forms.ChildCreationForm"))
 
-    def test_form_valid(self):
+    def test_is_parent_form_valid(self):
+        # setup
+        data = self.data.copy()
+        data["is_parent"] = True
+        self.client.force_login(self.authorized_user)
+
+        # test
+        self.client.post(self.url, self.data)
+        child = Person.objects.get(username=self.data["username"])
+        self.assertEqual(child.created_by, self.authorized_user)
+
+    def test_not_parent_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        person = Person.objects.first()
-        self.assertEqual(person.created_by, self.authorized_user)
+        child = Person.objects.get(username=self.data["username"])
+        self.assertEqual(child.created_by, self.authorized_user)
 
-    def test_success_url(self):
+    def test_is_parent_success_url(self):
+        # setup
+        data = self.data.copy()
+        data["is_parent"] = True
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, data)
+        self.assertRedirects(response, reverse("core:dashboard"))
+
+    def test_not_parent_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)
         self.assertRedirects(
             response,
-            reverse("people:person_detail", kwargs={"username": self.data["username"]}),
+            reverse(
+                "people:parent_child_relationship_create",
+                kwargs={"username": self.data["username"]},
+            ),
         )
 
 
@@ -467,9 +546,9 @@ class PersonUpdateViewTestCase(TestCase):
         self.client.force_login(self.authorized_user)
         response = self.client.get(self.url)
         form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "PersonForm")
+        self.assertEqual(form.__class__.__name__, "PersonUpdateForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonForm"))
+        self.assertIsInstance(form, import_string("people.forms.PersonUpdateForm"))
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
@@ -658,10 +737,83 @@ class RelationshipCreateViewTestCase(TestCase):
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
-        relationship = InterpersonalRelationship.objects.first()
+        relationship = InterpersonalRelationship.objects.get(
+            person__username=self.data["person"]
+        )
         self.assertEqual(relationship.created_by, self.authorized_user)
 
     def test_success_url(self):
         self.client.force_login(self.authorized_user)
         response = self.client.post(self.url, self.data)
         self.assertRedirects(response, reverse("people:relationships_list"))
+
+
+class ParentChildRelationshipCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # users
+        cls.user = UserFactory()
+        cls.authorized_user = UserFactory()
+        cls.staff_user = UserFactory(is_staff=True)
+
+        # people
+        cls.person = AdultFactory(user_account=cls.authorized_user)
+        cls.parent = AdultFactory()
+        cls.child = ChildFactory()
+        cls.url = f"/people/relationships/add/{cls.child.username}/parent/"
+
+        # POST data
+        cls.data = {"person": cls.parent.username}
+
+    def test_anonymous_user_response(self):
+        response = self.client.get(self.url)
+        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+
+    def test_authenticated_user_response(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_authorized_user_response(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_template_used(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "people/relationship_form.html")
+
+    def test_response_with_nonexistent_child(self):
+        self.client.force_login(self.authorized_user)
+        url = self.url.replace(self.child.username, "nonexistent-child")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_context_data_contains_child(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.context.get("child"), self.child)
+
+    def test_form_class(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.get(self.url)
+        form = response.context.get("form")
+        self.assertEqual(form.__class__.__name__, "ParentChildRelationshipCreationForm")
+        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
+        self.assertIsInstance(
+            form, import_string("people.forms.ParentChildRelationshipCreationForm")
+        )
+
+    def test_form_valid(self):
+        self.client.force_login(self.authorized_user)
+        self.client.post(self.url, self.data)
+        relationship = InterpersonalRelationship.objects.get(relative=self.child)
+        self.assertEqual(relationship.created_by, self.authorized_user)
+
+    def test_success_url(self):
+        self.client.force_login(self.authorized_user)
+        response = self.client.post(self.url, self.data)
+        self.assertRedirects(response, reverse("core:dashboard"))

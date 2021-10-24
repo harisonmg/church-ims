@@ -1,5 +1,21 @@
 {% extends '_base.html' %}
 
 {% block content %}
-  <h1>Dashboard</h1>
+  <div class="mx-auto text-center" parent-class="my-auto">
+    <h1 class="fw-bold mb-3">Dashboard</h1>
+    <p class="lead"><span class="fw-bold">
+      Username: </span>{{ user.person.username }}
+    </p>
+    <p class="lead"><span class="fw-bold">Name: </span>{{ user.person.full_name }}</p>
+    <p class="lead">
+      <span class="fw-bold">Gender: </span>{{ user.person.get_gender_display }}
+    </p>
+    <p class="lead"><span class="fw-bold">Age: </span>{{ user.person.age }}</p>
+    <p class="lead">
+      <span class="fw-bold">Phone number: </span>{{ user.person.phone_number }}
+    </p>
+    <p class="lead">
+      <span class="fw-bold">Email address: </span>{{ user.email }}
+    </p>
+  </div>
 {% endblock content %}

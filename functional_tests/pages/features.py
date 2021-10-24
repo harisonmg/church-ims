@@ -106,8 +106,26 @@ class AdultCreationPage(PersonCreationPage):
         return self
 
 
+class AdultSelfRegistrationPage(AdultCreationPage):
+    PATH = "/people/register/self/"
+
+
 class ChildCreationPage(PersonCreationPage):
     PATH = "/people/add/child/"
+
+    @property
+    def form(self):
+        return components.ChildForm(self.browser)
+
+    def add_person(self, username, full_name, gender, dob, is_parent=False):
+        self.form.send_keys(
+            username=username,
+            full_name=full_name,
+            gender=gender,
+            dob=dob,
+            is_parent=is_parent,
+        )
+        return self
 
 
 class PersonDetailPage(BasePage):
@@ -183,4 +201,22 @@ class InterpersonalRelationshipCreationPage(BasePage):
             relative_username=relative_username,
             relationship_type=relationship_type,
         )
+        return self
+
+
+class ParentChildRelationshipCreationPage(BasePage):
+    def __init__(self, test, child_username):
+        super().__init__(test)
+        self.child_username = child_username
+
+    @property
+    def PATH(self):
+        return f"/people/relationships/add/{self.child_username}/parent/"
+
+    @property
+    def form(self):
+        return components.ParentChildRelationshipCreationForm(self.browser)
+
+    def add_parent(self, parent_username):
+        self.form.send_keys(parent_username=parent_username)
         return self

@@ -1,15 +1,25 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib import messages
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
+from .constants import FAMILIAL_RELATIONSHIPS
 from .forms import (
-    AdultForm,
-    ChildForm,
+    AdultCreationForm,
+    ChildCreationForm,
     InterpersonalRelationshipCreationForm,
-    PersonForm,
+    ParentChildRelationshipCreationForm,
+    PersonCreationForm,
+    PersonUpdateForm,
 )
 from .models import InterpersonalRelationship, Person
 
@@ -28,7 +38,7 @@ class PeopleListView(
 class PersonCreateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
 ):
-    form_class = PersonForm
+    form_class = PersonCreationForm
     permission_required = "people.add_person"
     success_message = "%(username)s's information has been added successfully."
     template_name = "people/person_form.html"
@@ -47,7 +57,7 @@ class PersonCreateView(
 
 
 class AdultCreateView(PersonCreateView):
-    form_class = AdultForm
+    form_class = AdultCreationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -55,13 +65,55 @@ class AdultCreateView(PersonCreateView):
         return context
 
 
-class ChildCreateView(PersonCreateView):
-    form_class = ChildForm
+class AdultSelfRegisterView(AdultCreateView):
+    permission_required = ()
+    success_url = reverse_lazy("core:dashboard")
+    template_name = "people/self_register_form.html"
+
+    def form_valid(self, form):
+        form.instance.user_account = self.request.user
+        return super().form_valid(form)
+
+
+class ChildCreateView(PersonCreateView, UserPassesTestMixin):
+    form_class = ChildCreationForm
+    permission_required = ()
+
+    def test_func(self):
+        return self.request.user.personal_details is not None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["age_category"] = "a child"
         return context
+
+    def get_success_url(self, is_parent=False):
+        if is_parent:
+            url = reverse_lazy("core:dashboard")
+        else:
+            url = reverse_lazy(
+                "people:parent_child_relationship_create",
+                kwargs={"username": self.object.username},
+            )
+        return url
+
+    def create_relationship(self):
+        relationship = InterpersonalRelationship.objects.create(
+            person=self.request.user.personal_details,
+            relative=self.object,
+            relation="PC",
+            created_by=self.request.user,
+        )
+        people = f"{relationship.person} and {relationship.relative}"
+        message = f"A parent-child relationship between {people} has been added."
+        messages.info(self.request, message)
+
+    def form_valid(self, form):
+        super().form_valid(form)
+        is_parent = form.cleaned_data["is_parent"]
+        if is_parent:
+            self.create_relationship()
+        return HttpResponseRedirect(self.get_success_url(is_parent))
 
 
 class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -75,7 +127,7 @@ class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 class PersonUpdateView(
     LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView
 ):
-    form_class = PersonForm
+    form_class = PersonUpdateForm
     model = Person
     permission_required = "people.change_person"
     slug_field = "username"
@@ -120,4 +172,31 @@ class RelationshipCreateView(
         person = cleaned_data["person"]
         relative = cleaned_data["relative"]
         people = f"{person.username} and {relative.username}"
+        return self.success_message % dict(people=people)
+
+
+class ParentChildRelationshipCreateView(RelationshipCreateView, UserPassesTestMixin):
+    form_class = ParentChildRelationshipCreationForm
+    permission_required = ()
+    success_url = reverse_lazy("core:dashboard")
+    success_message = "A parent-child relationship between %(people)s has been added."
+
+    def test_func(self):
+        return self.request.user.personal_details is not None
+
+    def get_child(self):
+        return get_object_or_404(Person, username=self.kwargs["username"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["child"] = self.get_child()
+        return context
+
+    def form_valid(self, form):
+        form.instance.relative = self.get_child()
+        form.instance.relation = FAMILIAL_RELATIONSHIPS[0]
+        return super().form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        people = f"{self.object.person} and {self.object.relative}"
         return self.success_message % dict(people=people)

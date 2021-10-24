@@ -40,9 +40,10 @@ class PeopleListTestCase(FunctionalTestCase):
             people_list_page.header.account_dropdown.links, self.account_dropdown_links
         )
 
-        # He can also see a sidebar navigation, with the people link highlighted
+        # He can also see a sidebar navigation, with the current page link highlighted
         self.assertEqual(
-            people_list_page.sidebar.active_links, {"People": self.browser.current_url}
+            people_list_page.sidebar.active_links,
+            {"All people": self.browser.current_url},
         )
 
         # He also sees a list of people and a page navigation

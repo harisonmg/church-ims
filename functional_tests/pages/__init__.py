@@ -13,11 +13,13 @@ from .auth import (
 from .base import BasePage
 from .features import (
     AdultCreationPage,
+    AdultSelfRegistrationPage,
     ChildCreationPage,
     Dashboard,
     HomePage,
     InterpersonalRelationshipCreationPage,
     InterpersonalRelationshipsListPage,
+    ParentChildRelationshipCreationPage,
     PeopleListPage,
     PersonCreationPage,
     PersonDetailPage,

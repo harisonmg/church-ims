@@ -5,6 +5,11 @@ from . import views
 app_name = "people"
 urlpatterns = [
     path(
+        "relationships/add/<str:username>/parent/",
+        views.ParentChildRelationshipCreateView.as_view(),
+        name="parent_child_relationship_create",
+    ),
+    path(
         "relationships/add/",
         views.RelationshipCreateView.as_view(),
         name="relationship_create",
@@ -13,6 +18,11 @@ urlpatterns = [
         "relationships/",
         views.RelationshipsListView.as_view(),
         name="relationships_list",
+    ),
+    path(
+        "register/self/",
+        views.AdultSelfRegisterView.as_view(),
+        name="adult_self_register",
     ),
     path("add/adult/", views.AdultCreateView.as_view(), name="adult_create"),
     path("add/child/", views.ChildCreateView.as_view(), name="child_create"),

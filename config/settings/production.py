@@ -8,6 +8,8 @@ from .base import *
 # Email
 ADMINS = decouple.config("ADMINS", cast=list_of_tuples)
 
+EMAIL_SUBJECT_PREFIX = f"[{SITE_NAME}] "
+
 MANAGERS = ADMINS
 
 SECURE_SSL_REDIRECT = decouple.config("SECURE_SSL_REDIRECT", cast=bool, default=True)

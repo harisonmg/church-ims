@@ -1,3 +1,7 @@
+import logging
+from datetime import datetime
+from pathlib import Path
+
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY, HASH_SESSION_KEY, SESSION_KEY
 from django.contrib.sessions.backends.db import SessionStore
@@ -23,6 +27,8 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         django.test.LiveServerTestCase
     """
 
+    SCREENSHOT = decouple.config("SCREENSHOT", cast=bool, default=False)
+    SCREENSHOTS_DIR = Path(__file__).resolve().parent / "screenshots"
     SITE_NAME = settings.SITE_NAME
 
     @classmethod
@@ -36,10 +42,14 @@ class FunctionalTestCase(StaticLiveServerTestCase):
         cls.browser_options = webdriver.firefox.options.Options()
         cls.browser_options.headless = decouple.config("CI", cast=bool, default=False)
 
+        # logging
+        logging.basicConfig(filename="functional_tests.log", level=logging.INFO)
+
     def setUp(self):
         self.browser = webdriver.Firefox(options=self.browser_options)
 
     def tearDown(self):
+        self.take_screenshot()
         self.browser.quit()
 
     @classmethod
@@ -82,3 +92,19 @@ class FunctionalTestCase(StaticLiveServerTestCase):
             name=settings.SESSION_COOKIE_NAME, value=session.session_key, path="/"
         )
         self.browser.add_cookie(cookie_dict=cookie_dict)
+
+    def take_screenshot(self):
+        if self.SCREENSHOT:
+            filename = self._get_screenshot_filename()
+            logging.info(f"screenshotting to {filename}")
+            self.browser.get_screenshot_as_file(filename)
+
+    def _get_screenshot_filename(self):
+        if not self.SCREENSHOTS_DIR.exists():
+            self.SCREENSHOTS_DIR.mkdir(parents=True)
+
+        classname = self.__class__.__name__
+        method = self._testMethodName
+        timestamp = datetime.now().isoformat().replace(":", ".")
+        file_name = f"{self.SCREENSHOTS_DIR}/{classname}.{method}-{timestamp}.png"
+        return file_name

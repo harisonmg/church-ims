@@ -292,6 +292,27 @@ class AdultForm(PersonForm):
         return super().send_keys(**kwargs)
 
 
+class ChildForm(PersonForm):
+    IS_PARENT_CHECKBOX = (By.CSS_SELECTOR, "input#id_is_parent")
+    IS_PARENT_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_is_parent']")
+
+    @property
+    def _is_parent_checkbox(self):
+        return self.browser.find_element(*self.IS_PARENT_CHECKBOX)
+
+    @property
+    def is_parent_checkbox_label(self):
+        return self.browser.find_element(*self.IS_PARENT_CHECKBOX_LABEL).text
+
+    def send_keys(
+        self, username=None, full_name=None, gender=None, dob=None, is_parent=False
+    ):
+        if is_parent:
+            self._is_parent_checkbox.click()
+        kwargs = dict(username=username, full_name=full_name, gender=gender, dob=dob)
+        return super().send_keys(**kwargs)
+
+
 class InterpersonalRelationshipCreationForm(FormComponent):
     PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
     PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
@@ -339,4 +360,21 @@ class InterpersonalRelationshipCreationForm(FormComponent):
         self._person_username_input.send_keys(person_username)
         self._relative_username_input.send_keys(relative_username)
         self.select_relationship_type(relationship_type)
+        return self.submit()
+
+
+class ParentChildRelationshipCreationForm(FormComponent):
+    PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
+    PARENT_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
+
+    @property
+    def _parent_username_input(self):
+        return self.browser.find_element(*self.PARENT_USERNAME_INPUT)
+
+    @property
+    def parent_username_label(self):
+        return self.browser.find_element(*self.PARENT_USERNAME_LABEL).text
+
+    def send_keys(self, parent_username):
+        self._parent_username_input.send_keys(parent_username)
         return self.submit()

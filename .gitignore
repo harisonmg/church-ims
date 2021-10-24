@@ -133,3 +133,6 @@ dmypy.json
 
 # static files
 staticfiles/
+
+# functional test screenshots
+functional_tests/screenshots/

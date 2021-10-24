@@ -2,6 +2,7 @@ from django.test import SimpleTestCase, TestCase
 from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
+from people.utils import get_personal_details
 
 
 class UserModelTestCase(TestCase):
@@ -27,6 +28,9 @@ class UserModelTestCase(TestCase):
     def test_string_repr(self):
         expected_object_name = self.user.username
         self.assertEqual(str(self.user), expected_object_name)
+
+    def test_personal_details(self):
+        self.assertEqual(self.user.personal_details, get_personal_details(self.user))
 
 
 class UserModelFieldsTestCase(SimpleTestCase):

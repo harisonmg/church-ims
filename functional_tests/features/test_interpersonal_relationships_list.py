@@ -46,10 +46,10 @@ class RelationshipsListTestCase(FunctionalTestCase):
             self.account_dropdown_links,
         )
 
-        # He can also see a sidebar navigation, with the relationships link highlighted
+        # He can also see a sidebar navigation, with the current page link highlighted
         self.assertEqual(
             relationships_list_page.sidebar.active_links,
-            {"Interpersonal relationships": self.browser.current_url},
+            {"All interpersonal relationships": self.browser.current_url},
         )
 
         # He also sees a list of relationships and a page navigation

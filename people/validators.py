@@ -7,6 +7,7 @@ INVALID_FULL_NAME_ERROR = "Ensure you've entered your full name."
 DOB_IN_FUTURE_ERROR = "Date of birth can't be in the future"
 DOB_IN_DISTANT_PAST_ERROR = "Date of birth can't be in the distant past"
 PERSON_DOES_NOT_EXIST_ERROR = "A person with username '%(username)s' does not exist"
+NON_UNIQUE_USERNAME_ERROR = "A person with that username already exists."
 
 
 def validate_full_name(value):
@@ -40,3 +41,13 @@ def validate_person_username(username):
         Person.objects.get(username=username)
     except ObjectDoesNotExist:
         raise ValidationError(PERSON_DOES_NOT_EXIST_ERROR % dict(username=username))
+
+
+def validate_unique_case_insensitive_username(username):
+    try:
+        from .models import Person
+
+        Person.objects.get(username__iexact=username)
+        raise ValidationError(NON_UNIQUE_USERNAME_ERROR)
+    except ObjectDoesNotExist:
+        pass

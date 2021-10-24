@@ -1,12 +1,15 @@
 from datetime import date, timedelta
 from random import randint
-from unittest import TestCase
 
+from django.test import SimpleTestCase, TestCase
+
+from accounts.factories import UserFactory
 from people import utils
 from people.constants import AGE_OF_MAJORITY, MAX_HUMAN_AGE
+from people.factories import AdultFactory
 
 
-class GetAgeTestCase(TestCase):
+class GetAgeTestCase(SimpleTestCase):
     def test_birth_day_minus_one_day(self):
         days_lived = round(365.25 * 1) - 1
         dob = date.today() - timedelta(days=days_lived)
@@ -18,13 +21,13 @@ class GetAgeTestCase(TestCase):
         self.assertEqual(utils.get_age(dob), 1)
 
 
-class GetTodaysAdultDOBTestCase(TestCase):
+class GetTodaysAdultDOBTestCase(SimpleTestCase):
     def test_age(self):
         dob = utils.get_todays_adult_dob()
         self.assertEqual(utils.get_age(dob), AGE_OF_MAJORITY)
 
 
-class GetAgeGroupTestCase(TestCase):
+class GetAgeGroupTestCase(SimpleTestCase):
     def test_negative_age(self):
         with self.assertRaisesRegex(ValueError, utils.NEGATIVE_AGE_ERROR):
             utils.get_age_category(-1)
@@ -96,3 +99,14 @@ class GetAgeGroupTestCase(TestCase):
     def test_max_human_age_exceeded(self):
         with self.assertRaisesRegex(ValueError, utils.MAX_HUMAN_AGE_EXCEEDED_ERROR):
             utils.get_age_category(MAX_HUMAN_AGE + 1)
+
+
+class GetPersonalDetailsTestCase(TestCase):
+    def test_personal_details(self):
+        user = UserFactory()
+        person = AdultFactory(user_account=user)
+        self.assertEqual(utils.get_personal_details(user), person)
+
+    def test_non_existent_personal_details(self):
+        user = UserFactory()
+        self.assertEqual(utils.get_personal_details(user), None)

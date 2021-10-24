@@ -27,11 +27,18 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     dob = models.DateField(verbose_name="date of birth")
     phone_number = PhoneNumberField(null=True)
+    user_account = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="This person's user account.",
+    )
     created_by = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         help_text="The user who created this record.",
+        related_name="people_creators",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)

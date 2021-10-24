@@ -3,7 +3,8 @@ name: Test
 on:
   push:
   pull_request:
-    branches: [ main, prod ]
+    branches:
+      - main
 
 jobs:
   test:
@@ -34,6 +35,9 @@ jobs:
         # Email
         DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
         DJANGO_EMAIL_HOST_PASSWORD: ${{ secrets.DJANGO_EMAIL_HOST_PASSWORD }}
+
+        # Tests
+        SCREENSHOT: ${{ secrets.SCREENSHOT }}
 
     - name: Submit test coverage data to coverage.io
       run: pipenv run coveralls --service=github
