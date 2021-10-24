@@ -2,7 +2,8 @@ name: collectstatic
 
 on:
   pull_request:
-    branches: [main, prod]
+    branches:
+      - main
     types:
       - closed
 
