@@ -17,7 +17,7 @@ class LoginTestCase(FunctionalTestCase):
         self.inactive_user = UserFactory(password=self.password, is_active=False)
 
         # personal details
-        AdultFactory(user_account=self.fully_registered_user)
+        AdultFactory(user=self.fully_registered_user)
 
     @staticmethod
     def get_verified_user(password):

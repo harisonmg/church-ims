@@ -334,7 +334,7 @@ class AdultSelfRegisterViewTestCase(TestCase):
         self.client.force_login(self.user)
         self.client.post(self.url, self.data)
         person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.user_account, self.user)
+        self.assertEqual(person.user, self.user)
         self.assertEqual(person.created_by, self.user)
 
     def test_success_url(self):
@@ -355,7 +355,7 @@ class ChildCreateViewTestCase(TestCase):
         cls.authorized_user = UserFactory()
 
         # POST data
-        cls.parent = AdultFactory(user_account=cls.authorized_user)
+        cls.parent = AdultFactory(user=cls.authorized_user)
         child = ChildFactory.build()
         cls.data = {
             "username": child.username,
@@ -759,7 +759,7 @@ class ParentChildRelationshipCreateViewTestCase(TestCase):
         cls.staff_user = UserFactory(is_staff=True)
 
         # people
-        cls.person = AdultFactory(user_account=cls.authorized_user)
+        cls.person = AdultFactory(user=cls.authorized_user)
         cls.parent = AdultFactory()
         cls.child = ChildFactory()
         cls.url = f"/people/relationships/add/{cls.child.username}/parent/"

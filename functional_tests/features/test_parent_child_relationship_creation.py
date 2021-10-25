@@ -12,7 +12,7 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         self.user = UserFactory()
 
         # relationship
-        self.person = AdultFactory(user_account=self.user)
+        self.person = AdultFactory(user=self.user)
         self.parent = AdultFactory()
         self.child = ChildFactory()
         self.people = f"{self.parent} and {self.child}"

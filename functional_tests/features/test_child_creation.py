@@ -12,7 +12,7 @@ class ChildCreationTestCase(FunctionalTestCase):
         self.user = UserFactory()
 
         # child
-        self.parent = AdultFactory(user_account=self.user)
+        self.parent = AdultFactory(user=self.user)
         self.child = ChildFactory.build()
 
         # auth

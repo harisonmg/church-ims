@@ -53,6 +53,6 @@ def get_personal_details(user):
     from .models import Person
 
     try:
-        return Person.objects.get(user_account=user)
+        return Person.objects.get(user=user)
     except ObjectDoesNotExist:
         return None
