@@ -1,20 +1,28 @@
-from accounts.factories import UserFactory
+from django.test import override_settings
+
+from accounts.factories import UserFactory, VerifiedEmailAddressFactory
 from functional_tests import pages
 from functional_tests.base import FunctionalTestCase
 from people.factories import AdultFactory
 
 
+@override_settings(ACCOUNT_EMAIL_VERIFICATION="mandatory")
 class LoginTestCase(FunctionalTestCase):
     def setUp(self):
         super().setUp()
 
         self.password = self.fake.password()
-        self.fully_registered_user = UserFactory(password=self.password)
-        self.partially_registered_user = UserFactory(password=self.password)
+        self.fully_registered_user = self.get_verified_user(self.password)
+        self.partially_registered_user = self.get_verified_user(self.password)
         self.inactive_user = UserFactory(password=self.password, is_active=False)
 
         # personal details
         AdultFactory(user_account=self.fully_registered_user)
+
+    @staticmethod
+    def get_verified_user(password):
+        email = VerifiedEmailAddressFactory(user__password=password)
+        return email.user
 
     def test_active_user_with_personal_details(self):
         # A user visits the login page
