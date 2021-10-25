@@ -74,6 +74,8 @@ jobs:
       env:
         # Django Core
         DJANGO_SETTINGS_MODULE: config.settings.production
+        SECURE_SSL_REDIRECT: False
+        SECURE_HSTS_SECONDS: 0
 
         # Email
         ADMINS: ${{ secrets.ADMINS }}
