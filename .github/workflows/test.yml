@@ -3,58 +3,92 @@ name: Test
 on:
   push:
   pull_request:
-    branches:
-      - main
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [3.7, 3.8, 3.9]
+    runs-on: ubuntu-latest
+    environment: test
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+        # will assign a random free host port
+        - 5432/tcp
+        # needed because the postgres container does not provide a healthcheck
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9
+
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install --dev
+
+    - name: Authenticate gcloud
+      run: |
+        chmod +x ./scripts/authenticate_gcloud.sh
+        ./scripts/authenticate_gcloud.sh
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: Collect the static files
+      run: |
+        chmod +x ./scripts/collectstatic.sh
+        ./scripts/collectstatic.sh
+      env:
+        ADMINS: ${{ secrets.ADMINS }}
+        ADMIN_URL: ${{ secrets.ADMIN_URL }}
+        DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
+        DJANGO_EMAIL_HOST_PASSWORD: ${{ secrets.DJANGO_EMAIL_HOST_PASSWORD }}
+        GCP_STORAGE_BUCKET_NAME: ${{secrets.GCP_STORAGE_BUCKET_NAME }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+    - name: Set the DATABASE_URL
+      run: |
+        echo "DATABASE_URL=postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME" >> $GITHUB_ENV
+      env:
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_HOST: localhost
+        DB_PORT: ${{ job.services.postgres.ports[5432] }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD }}
+
     - name: Run Tests
       run: |
         pipenv run coverage run manage.py test
       env:
         # Django Core
-        DJANGO_SETTINGS_MODULE: config.settings.local
+        DJANGO_SETTINGS_MODULE: config.settings.production
 
         # Email
+        ADMINS: ${{ secrets.ADMINS }}
         DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
         DJANGO_EMAIL_HOST_PASSWORD: ${{ secrets.DJANGO_EMAIL_HOST_PASSWORD }}
 
-        # Tests
+        # Google Cloud
+        GCP_STORAGE_BUCKET_NAME: ${{secrets.GCP_STORAGE_BUCKET_NAME }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+        # Project specific
+        ADMIN_URL: ${{ secrets.ADMIN_URL }}
         SCREENSHOT: ${{ secrets.SCREENSHOT }}
 
-    - name: Submit test coverage data to coverage.io
+    - name: Submit test coverage data to coveralls.io
       run: pipenv run coveralls --service=github
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
-        COVERALLS_PARALLEL: true
-
-  coveralls:
-    name: Indicate completion to coveralls.io
-    needs: test
-    runs-on: ubuntu-latest
-    container: python:3-slim
-    steps:
-    - name: Finished
-      run: |
-        pip3 install --upgrade coveralls
-        coveralls --finish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
