@@ -2,8 +2,8 @@ name: collectstatic
 
 on:
   push:
-    # branches:
-    #  - main
+    branches:
+     - main
 
 jobs:
   collectstatic:
