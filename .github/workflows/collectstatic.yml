@@ -1,18 +1,14 @@
 name: collectstatic
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
-
   push:
-    branches: [main]
+    # branches:
+    #  - main
 
 jobs:
   collectstatic:
     runs-on: ubuntu-latest
+    environment: collectstatic
 
     steps:
     - uses: actions/checkout@v2
@@ -35,28 +31,15 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-    - name: Collect the static files into STATIC_ROOT (Cloud Storage)
+    - name: Collect the static files
       run: |
-        pipenv run python manage.py collectstatic --no-input
+        chmod +x ./scripts/collectstatic.sh
+        ./scripts/collectstatic.sh
       env:
-        # Django Core
-        DJANGO_SETTINGS_MODULE: config.settings.production
-
-        # Admin
         ADMINS: ${{ secrets.ADMINS }}
         ADMIN_URL: ${{ secrets.ADMIN_URL }}
-
-        # Email
         DJANGO_EMAIL_HOST_USER: ${{ secrets.DJANGO_EMAIL_HOST_USER }}
         DJANGO_EMAIL_HOST_PASSWORD: ${{ secrets.DJANGO_EMAIL_HOST_PASSWORD }}
-
-        # Google Cloud
-        GCP_STORAGE_BUCKET_NAME: ${{secrets.GCP_STORAGE_BUCKET_NAME}}
+        GCP_STORAGE_BUCKET_NAME: ${{secrets.GCP_STORAGE_BUCKET_NAME }}
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-    - name: Submit test coverage data to coverage.io
-      run: pipenv run coveralls --service=github
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
-        COVERALLS_PARALLEL: true
+        DESTINATION_STORAGE_BUCKET_NAMES: ${{ secrets.DESTINATION_STORAGE_BUCKET_NAMES }}
