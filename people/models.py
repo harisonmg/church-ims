@@ -27,7 +27,7 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     dob = models.DateField(verbose_name="date of birth")
     phone_number = PhoneNumberField(null=True)
-    user_account = models.OneToOneField(
+    user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,

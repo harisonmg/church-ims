@@ -211,11 +211,11 @@ class PersonPhoneNumberTestCase(PersonModelFieldsTestCase):
         self.assertEqual(self.field.verbose_name, "phone number")
 
 
-class PersonUserAccountTestCase(PersonModelFieldsTestCase):
+class PersonUserTestCase(PersonModelFieldsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.field = cls.person_meta.get_field("user_account")
+        cls.field = cls.person_meta.get_field("user")
 
     def test_blank(self):
         self.assertFalse(self.field.blank)
@@ -239,7 +239,7 @@ class PersonUserAccountTestCase(PersonModelFieldsTestCase):
         )
 
     def test_verbose_name(self):
-        self.assertEqual(self.field.verbose_name, "user account")
+        self.assertEqual(self.field.verbose_name, "user")
 
 
 class PersonCreatedByTestCase(PersonModelFieldsTestCase):

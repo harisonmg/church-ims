@@ -32,7 +32,7 @@ class LoginRedirectViewTestCase(TestCase):
         cls.partially_registered_user = UserFactory()
 
         # personal details
-        AdultFactory(user_account=cls.fully_registered_user)
+        AdultFactory(user=cls.fully_registered_user)
 
     def test_anonymous_user_response(self):
         response = self.client.get(self.url)
@@ -61,7 +61,7 @@ class DashboardViewTestCase(TestCase):
         cls.partially_registered_user = UserFactory()
 
         # personal details
-        AdultFactory(user_account=cls.fully_registered_user)
+        AdultFactory(user=cls.fully_registered_user)
 
     def test_anonymous_user_response(self):
         response = self.client.get(self.url)

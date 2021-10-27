@@ -9,7 +9,7 @@ class DashboardTestCase(FunctionalTestCase):
         super().setUp()
 
         self.user = UserFactory()
-        self.person = AdultFactory(user_account=self.user)
+        self.person = AdultFactory(user=self.user)
         self.create_pre_authenticated_session(self.user)
 
     def test_navigation(self):

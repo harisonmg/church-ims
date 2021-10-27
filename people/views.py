@@ -12,7 +12,6 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from extra_views import SearchableListMixin
 
-from .constants import FAMILIAL_RELATIONSHIPS
 from .forms import (
     AdultCreationForm,
     ChildCreationForm,
@@ -71,7 +70,7 @@ class AdultSelfRegisterView(AdultCreateView):
     template_name = "people/self_register_form.html"
 
     def form_valid(self, form):
-        form.instance.user_account = self.request.user
+        form.instance.user = self.request.user
         return super().form_valid(form)
 
 
@@ -194,7 +193,7 @@ class ParentChildRelationshipCreateView(RelationshipCreateView, UserPassesTestMi
 
     def form_valid(self, form):
         form.instance.relative = self.get_child()
-        form.instance.relation = FAMILIAL_RELATIONSHIPS[0]
+        form.instance.relation = "PC"
         return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):

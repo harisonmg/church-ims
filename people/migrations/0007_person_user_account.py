@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="person",
-            name="user_account",
+            name="user",
             field=models.OneToOneField(
                 help_text="This person's user account.",
                 null=True,

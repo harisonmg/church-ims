@@ -104,7 +104,7 @@ class GetAgeGroupTestCase(SimpleTestCase):
 class GetPersonalDetailsTestCase(TestCase):
     def test_personal_details(self):
         user = UserFactory()
-        person = AdultFactory(user_account=user)
+        person = AdultFactory(user=user)
         self.assertEqual(utils.get_personal_details(user), person)
 
     def test_non_existent_personal_details(self):

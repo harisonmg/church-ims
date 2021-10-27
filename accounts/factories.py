@@ -1,16 +1,19 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-import factory
+from allauth.account.models import EmailAddress
+from factory import Faker, SelfAttribute, Sequence, SubFactory, post_generation
+from factory.django import DjangoModelFactory
+from factory.fuzzy import FuzzyChoice
 
 
-class GroupFactory(factory.django.DjangoModelFactory):
+class GroupFactory(DjangoModelFactory):
     class Meta:  # noqa
         model = Group
 
-    name = factory.Sequence(lambda n: f"Group {n}")
+    name = Sequence(lambda n: f"Group {n}")
 
-    @factory.post_generation
+    @post_generation
     def permissions(self, create, extracted):
         if not create:
             return
@@ -20,13 +23,13 @@ class GroupFactory(factory.django.DjangoModelFactory):
                 self.permissions.add(permission)
 
 
-class UserFactory(factory.django.DjangoModelFactory):
+class UserFactory(DjangoModelFactory):
     class Meta:  # noqa
         model = get_user_model()
 
-    username = factory.Faker("user_name")
-    email = factory.Faker("email")
-    password = factory.Faker("password")
+    username = Faker("user_name")
+    email = Faker("email")
+    password = Faker("password")
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
@@ -36,7 +39,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         manager = cls._get_manager(model_class)
         return manager.create_user(*args, **kwargs)
 
-    @factory.post_generation
+    @post_generation
     def groups(self, create, extracted):
         if not create:
             return
@@ -45,7 +48,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             for group in extracted:
                 self.groups.add(group)
 
-    @factory.post_generation
+    @post_generation
     def user_permissions(self, create, extracted):
         if not create:
             return
@@ -63,3 +66,17 @@ class AdminUserFactory(UserFactory):
         """
         manager = cls._get_manager(model_class)
         return manager.create_superuser(*args, **kwargs)
+
+
+class EmailAddressFactory(DjangoModelFactory):
+    class Meta:
+        model = EmailAddress
+
+    email = SelfAttribute("user.email")
+    verified = FuzzyChoice(choices=[True, False])
+    primary = FuzzyChoice(choices=[True, False])
+    user = SubFactory(UserFactory)
+
+
+class VerifiedEmailAddressFactory(EmailAddressFactory):
+    verified = True
