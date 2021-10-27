@@ -13,9 +13,7 @@ def update_site_info(apps, schema_editor):
     }
 
     default_site = Site.objects.first()
-    if default_site is not None:
-        default_site.update(**site_data)
-    else:
+    if default_site is None:
         Site.objects.create(**site_data)
 
 
