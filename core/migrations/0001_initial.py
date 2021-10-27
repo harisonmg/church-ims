@@ -18,8 +18,6 @@ def update_site_info(apps, schema_editor):
     else:
         Site.objects.create(**site_data)
 
-    assert Site.objects.first().name == site_data["name"]
-
 
 class Migration(migrations.Migration):
 
