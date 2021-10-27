@@ -6,11 +6,15 @@ from django.db import migrations
 
 def update_site_info(apps, schema_editor):
     Site = apps.get_model("sites", "Site")
+    site_data = {
+        "id": settings.SITE_ID,
+        "domain": "church-ims.herokuapp.com",
+        "name": settings.SITE_NAME,
+    }
+
     default_site = Site.objects.first()
-    if default_site is not None:
-        default_site.domain = "church-ims.herokuapp.com"
-        default_site.name = settings.SITE_NAME
-        default_site.save()
+    if default_site is None:
+        Site.objects.create(**site_data)
 
 
 class Migration(migrations.Migration):
