@@ -6,7 +6,11 @@ from django.test import SimpleTestCase, TestCase
 from accounts.factories import UserFactory
 from people import utils
 from people.constants import AGE_OF_MAJORITY, MAX_HUMAN_AGE
-from people.factories import AdultFactory, PersonFactory
+from people.factories import (
+    AdultFactory,
+    InterpersonalRelationshipFactory,
+    PersonFactory,
+)
 
 
 class GetAgeTestCase(SimpleTestCase):
@@ -161,3 +165,32 @@ class IsDuplicatePersonTestCase(TestCase):
         data.pop("dob")
         person = PersonFactory.build(**data)
         self.assertTrue(utils.is_duplicate_person(person))
+
+
+class IsDuplicateInterpersonalRelationshipTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.relationship = InterpersonalRelationshipFactory()
+        cls.data = {
+            "person": cls.relationship.person,
+            "relative": cls.relationship.relative,
+            "relation": cls.relationship.relation,
+        }
+
+    def test_exact_duplicate(self):
+        relationship = InterpersonalRelationshipFactory.build(**self.data)
+        self.assertTrue(utils.is_duplicate_interpersonal_relationship(relationship))
+
+    def test_different_relation(self):
+        data = self.data.copy()
+        data["relation"] = "S"
+        relationship = InterpersonalRelationshipFactory.build(**data)
+        self.assertTrue(utils.is_duplicate_interpersonal_relationship(relationship))
+
+    def test_not_duplicate(self):
+        data = self.data.copy()
+        data["relative"] = PersonFactory()
+        relationship = InterpersonalRelationshipFactory.build(**data)
+        self.assertFalse(utils.is_duplicate_interpersonal_relationship(relationship))

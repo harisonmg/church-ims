@@ -70,3 +70,11 @@ def is_duplicate_person(person):
         if ratio == 100:
             return True
     return False
+
+
+def is_duplicate_interpersonal_relationship(relationship):
+    from .models import InterpersonalRelationship
+
+    queryset = InterpersonalRelationship.objects.filter(person=relationship.person)
+    queryset = queryset.filter(relative=relationship.relative)
+    return queryset.count() > 0
