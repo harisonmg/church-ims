@@ -6,7 +6,7 @@ from django.test import SimpleTestCase, TestCase
 from accounts.factories import UserFactory
 from people import utils
 from people.constants import AGE_OF_MAJORITY, MAX_HUMAN_AGE
-from people.factories import AdultFactory
+from people.factories import AdultFactory, PersonFactory
 
 
 class GetAgeTestCase(SimpleTestCase):
@@ -110,3 +110,54 @@ class GetPersonalDetailsTestCase(TestCase):
     def test_non_existent_personal_details(self):
         user = UserFactory()
         self.assertEqual(utils.get_personal_details(user), None)
+
+
+class IsDuplicatePersonTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        cls.person = PersonFactory(created_by=cls.user)
+        cls.data = {
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+            "created_by": cls.person.created_by,
+        }
+
+    def test_exact_duplicate(self):
+        person = PersonFactory.build(**self.data)
+        self.assertTrue(utils.is_duplicate_person(person))
+
+    def test_different_creator(self):
+        data = self.data.copy()
+        data["created_by"] = UserFactory()
+        person = PersonFactory.build(**data)
+        self.assertFalse(utils.is_duplicate_person(person))
+
+    def test_different_full_name(self):
+        data = self.data.copy()
+        data.pop("full_name")
+        person = PersonFactory.build(**data)
+        self.assertFalse(utils.is_duplicate_person(person))
+
+    def test_slightly_different_full_name(self):
+        data = self.data.copy()
+        surname = self.person.username.title()
+        data["full_name"] = data["full_name"] + " " + surname
+        person = PersonFactory.build(**data)
+        self.assertTrue(utils.is_duplicate_person(person))
+
+    def test_very_different_full_name(self):
+        data = self.data.copy()
+        surname = self.person.full_name.split()[-1]
+        data["full_name"] = PersonFactory.build().full_name + " " + surname
+        person = PersonFactory.build(**data)
+        self.assertFalse(utils.is_duplicate_person(person))
+
+    def test_different_date_of_birth(self):
+        data = self.data.copy()
+        data.pop("dob")
+        person = PersonFactory.build(**data)
+        self.assertTrue(utils.is_duplicate_person(person))
