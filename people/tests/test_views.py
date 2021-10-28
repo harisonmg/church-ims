@@ -181,6 +181,21 @@ class PersonCreateViewTestCase(TestCase):
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.PersonCreationForm"))
 
+    def test_form_invalid(self):
+        # setup
+        data = self.data.copy()
+        data["created_by"] = self.authorized_user
+        PersonFactory(**data)
+        data["full_name"] = data["full_name"] + " " + data["username"].title()
+        data["username"] = PersonFactory.build().username
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {"__all__": ["This person already exists"]})
+
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
@@ -262,6 +277,21 @@ class AdultCreateViewTestCase(TestCase):
         self.assertEqual(form.__class__.__name__, "AdultCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
+
+    def test_form_invalid(self):
+        # setup
+        data = self.data.copy()
+        data["created_by"] = self.authorized_user
+        AdultFactory(**data)
+        data["full_name"] = data["full_name"] + " " + data["username"].title()
+        data["username"] = AdultFactory.build().username
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {"__all__": ["This person already exists"]})
 
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
@@ -400,6 +430,21 @@ class ChildCreateViewTestCase(TestCase):
         self.assertEqual(form.__class__.__name__, "ChildCreationForm")
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(form, import_string("people.forms.ChildCreationForm"))
+
+    def test_form_invalid(self):
+        # setup
+        data = self.data.copy()
+        data["created_by"] = self.authorized_user
+        ChildFactory(**data)
+        data["full_name"] = data["full_name"] + " " + data["username"].title()
+        data["username"] = ChildFactory.build().username
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {"__all__": ["This person already exists"]})
 
     def test_is_parent_form_valid(self):
         # setup
@@ -805,6 +850,20 @@ class ParentChildRelationshipCreateViewTestCase(TestCase):
         self.assertIsInstance(form, import_string("django.forms.ModelForm"))
         self.assertIsInstance(
             form, import_string("people.forms.ParentChildRelationshipCreationForm")
+        )
+
+    def test_form_invalid(self):
+        # setup
+        data = {"person": self.parent, "relative": self.child, "relation": "PC"}
+        InterpersonalRelationshipFactory(**data)
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, self.data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors, {"__all__": ["This interpersonal relationship already exists"]}
         )
 
     def test_form_valid(self):

@@ -13,6 +13,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from extra_views import SearchableListMixin
 
 from .forms import (
+    DUPLICATE_RELATIONSHIPS_ERROR,
     AdultCreationForm,
     ChildCreationForm,
     InterpersonalRelationshipCreationForm,
@@ -21,6 +22,7 @@ from .forms import (
     PersonUpdateForm,
 )
 from .models import InterpersonalRelationship, Person
+from .utils import is_duplicate_person, is_duplicate_interpersonal_relationship
 
 
 class PeopleListView(
@@ -49,6 +51,9 @@ class PersonCreateView(
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
+        if is_duplicate_person(form.instance):
+            form.add_error(field=None, error="This person already exists")
+            return self.form_invalid(form)
         return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -77,6 +82,7 @@ class AdultSelfRegisterView(AdultCreateView):
 class ChildCreateView(PersonCreateView, UserPassesTestMixin):
     form_class = ChildCreationForm
     permission_required = ()
+    success_url = reverse_lazy("core:dashboard")
 
     def test_func(self):
         return self.request.user.personal_details is not None
@@ -87,13 +93,13 @@ class ChildCreateView(PersonCreateView, UserPassesTestMixin):
         return context
 
     def get_success_url(self, is_parent=False):
-        if is_parent:
-            url = reverse_lazy("core:dashboard")
-        else:
+        if not is_parent:
             url = reverse_lazy(
                 "people:parent_child_relationship_create",
                 kwargs={"username": self.object.username},
             )
+        else:
+            url = super().get_success_url()
         return url
 
     def create_relationship(self):
@@ -108,11 +114,13 @@ class ChildCreateView(PersonCreateView, UserPassesTestMixin):
         messages.info(self.request, message)
 
     def form_valid(self, form):
-        super().form_valid(form)
-        is_parent = form.cleaned_data["is_parent"]
-        if is_parent:
-            self.create_relationship()
-        return HttpResponseRedirect(self.get_success_url(is_parent))
+        response = super().form_valid(form)
+        if form.is_valid():
+            is_parent = form.cleaned_data["is_parent"]
+            if is_parent:
+                self.create_relationship()
+            return HttpResponseRedirect(self.get_success_url(is_parent))
+        return response
 
 
 class PersonDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -194,6 +202,9 @@ class ParentChildRelationshipCreateView(RelationshipCreateView, UserPassesTestMi
     def form_valid(self, form):
         form.instance.relative = self.get_child()
         form.instance.relation = "PC"
+        if is_duplicate_interpersonal_relationship(form.instance):
+            form.add_error(field=None, error=DUPLICATE_RELATIONSHIPS_ERROR)
+            return self.form_invalid(form)
         return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
