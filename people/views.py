@@ -22,7 +22,7 @@ from .forms import (
     PersonUpdateForm,
 )
 from .models import InterpersonalRelationship, Person
-from .utils import is_duplicate_person, is_duplicate_interpersonal_relationship
+from .utils import is_duplicate_interpersonal_relationship, is_duplicate_person
 
 
 class PeopleListView(
