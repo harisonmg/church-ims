@@ -544,6 +544,20 @@ class AdultCreationPhoneNumberTestCase(AdultCreationFormFieldsTestCase):
         )
 
 
+class ChildCreationFormTestCase(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.form = forms.ChildCreationForm()
+
+    def test_fields(self):
+        fields = self.form.fields.keys()
+        self.assertEqual(
+            list(fields), ["username", "full_name", "gender", "dob", "is_parent"]
+        )
+
+
 class ChildCreationFormFieldsTestCase(TestCase):
     @classmethod
     def setUpClass(cls):

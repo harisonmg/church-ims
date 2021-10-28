@@ -3,6 +3,8 @@ from math import ceil
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from thefuzz import fuzz
+
 from . import constants
 
 NEGATIVE_AGE_ERROR = "Age can't be negative!"
@@ -56,3 +58,23 @@ def get_personal_details(user):
         return Person.objects.get(user=user)
     except ObjectDoesNotExist:
         return None
+
+
+def is_duplicate_person(person):
+    from .models import Person
+
+    queryset = Person.objects.filter(created_by=person.created_by)
+    full_names = list(map(lambda p: p.full_name, queryset))
+    for name in full_names:
+        ratio = fuzz.token_set_ratio(person.full_name, name)
+        if ratio == 100:
+            return True
+    return False
+
+
+def is_duplicate_interpersonal_relationship(relationship):
+    from .models import InterpersonalRelationship
+
+    queryset = InterpersonalRelationship.objects.filter(person=relationship.person)
+    queryset = queryset.filter(relative=relationship.relative)
+    return queryset.count() > 0
