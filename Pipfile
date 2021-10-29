@@ -24,6 +24,8 @@ factory-boy = "*"
 selenium = "*"
 coverage = "*"
 coveralls = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [requires]
 
