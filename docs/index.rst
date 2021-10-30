@@ -8,4 +8,12 @@ Welcome to Church IMS documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: User documentation
+
+   user_guide
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer documentation
+
+   developer_guide
