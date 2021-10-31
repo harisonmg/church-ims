@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Person, InterpersonalRelationship
+from .models import InterpersonalRelationship, Person
 
 
 @admin.register(Person)
