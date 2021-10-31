@@ -10,7 +10,7 @@
 1. Fill the form and submit
 
 # Other features
-## Adding a child's records
+## Adding a child's information
 ```{admonition} Note
 You should have added your personal information
 ```
@@ -18,7 +18,7 @@ You should have added your personal information
 1. Fill the form and submit
 1. If you're not the child's parent, fill the form on the page that you'll be redirected to and submit
 
-## Adding an adult's records
+## Adding an adult's information
 ```{admonition} Note
 You should have the following permissions: `Can add person`, `Can view person`
 ```
@@ -27,7 +27,7 @@ You should have the following permissions: `Can add person`, `Can view person`
 
 ## Viewing all people's records
 ```{admonition} Note
-You should have the following permissions: `Can view person`
+You should have the following permission: `Can view person`
 ```
 1. On your navigation menu, click on **All people**
 
@@ -41,7 +41,7 @@ You should have the following permissions: `Can add interpersonal relationship`,
 
 ## Viewing all interpersonal relationships
 ```{admonition} Note
-You should have the following permissions: `Can view interpersonal relationship`
+You should have the following permission: `Can view interpersonal relationship`
 ```
 1. On your navigation menu, click on **All interpersonal relationships**
 
@@ -58,7 +58,7 @@ You should have the following permissions: `Can add temperature record`,
 
 ## Password reset
 ```{admonition} Note
-You should have to have a user account
+You should have a user account
 ```
 1. On the log in page, click on the **I don't remember my password** link 
     that is below the **Log in** button.
