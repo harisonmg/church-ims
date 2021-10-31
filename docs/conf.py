@@ -22,7 +22,7 @@ copyright = "2021, Harison Gachuru"
 author = "Harison Gachuru"
 
 # The full version, including alpha/beta/rc tags
-release = "0.3.0-beta"
+release = "0.3.0"
 
 
 # -- General configuration ---------------------------------------------------
