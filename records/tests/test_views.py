@@ -188,6 +188,22 @@ class TemperatureRecordCreateViewTestCase(TestCase):
             form, import_string("records.forms.TemperatureRecordCreationForm")
         )
 
+    def test_form_invalid(self):
+        # setup
+        data = self.data.copy()
+        data["person"] = self.person
+        TemperatureRecordFactory(**data)
+        self.client.force_login(self.authorized_user)
+
+        # test
+        response = self.client.post(self.url, self.data)
+        form = response.context.get("form")
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors,
+            {"__all__": [f"{self.person}'s temperature record already exists"]},
+        )
+
     def test_form_valid(self):
         self.client.force_login(self.authorized_user)
         self.client.post(self.url, self.data)
