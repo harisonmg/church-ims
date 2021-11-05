@@ -10,6 +10,7 @@ from people.models import Person
 
 from .forms import TemperatureRecordCreationForm
 from .models import TemperatureRecord
+from .utils import is_duplicate_temp_record
 
 
 class TemperatureRecordsListView(
@@ -43,6 +44,12 @@ class TemperatureRecordCreateView(
     def form_valid(self, form):
         form.instance.person = self.get_person()
         form.instance.created_by = self.request.user
+        if is_duplicate_temp_record(form.instance):
+            error_message = "%(person)s's temperature record already exists"
+            form.add_error(
+                field=None, error=error_message % dict(person=form.instance.person)
+            )
+            return self.form_invalid(form)
         return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
