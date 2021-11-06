@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.http.response import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -152,6 +153,60 @@ class PeopleListViewTestCase(TestCase):
         self.assertInHTML(
             "Your search didn't yield any results", response.content.decode()
         )
+
+
+class PersonDetailViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path")
+        self.view_class = views.PersonDetailView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def test_queryset(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "username")
+
+    def test_object_with_existing_person(self):
+        person = PersonFactory()
+        self.view.setup(self.request, username=person.username)
+        obj = self.view.get_object()
+        self.assertEqual(obj, person)
+
+    def test_object_with_non_existent_person(self):
+        self.view.setup(self.request, username="non-existent-person")
+        with self.assertRaises(Http404):
+            self.view.get_object()
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        context_object_name = self.view.get_context_object_name(queryset)
+        self.assertIsNone(context_object_name)
+
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_detail.html", template_names)
+
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.view_person",))
 
 
 class InterpersonalRelationshipsListViewTestCase(TestCase):
