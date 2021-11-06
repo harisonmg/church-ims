@@ -99,7 +99,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
 
     def test_template_name(self):
         self.view.setup(self.request)
-        self.view.get(self.request)
+        self.view.object_list = self.view.get_queryset()
         template_names = self.view.get_template_names()
         self.assertIn("records/temperature_records_list.html", template_names)
 
