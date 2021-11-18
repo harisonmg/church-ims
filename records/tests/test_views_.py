@@ -237,7 +237,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
 
     def test_success_url(self):
         self.view.setup(self.request)
-        self.view.object = TemperatureRecordFactory.build()
+        self.view.object = self.temp_record
         success_url = self.view.get_success_url()
         self.assertEqual(success_url, reverse("people:people_list"))
 
