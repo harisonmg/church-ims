@@ -1,8 +1,14 @@
+from unittest.mock import patch
+
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.core.exceptions import ImproperlyConfigured
+from django.http.response import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
+from people.factories import PersonFactory
 from records import views
 from records.factories import TemperatureRecordFactory
 from records.models import TemperatureRecord
@@ -158,3 +164,161 @@ class TemperatureRecordsListViewTestCase(TestCase):
         self.assertInHTML(
             "Your search didn't yield any results", response.content.decode()
         )
+
+
+class TemperatureRecordCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.person = PersonFactory()
+        cls.user = UserFactory()
+        cls.temp_record = TemperatureRecordFactory.build(person=cls.person)
+        cls.form_data = {
+            "person": cls.person,
+            "body_temperature": cls.temp_record.body_temperature,
+        }
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path")
+        self.view_class = views.TemperatureRecordCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(
+            form_class, import_string("records.forms.TemperatureRecordCreationForm")
+        )
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url(self):
+        self.view.setup(self.request)
+        self.view.object = TemperatureRecordFactory.build()
+        success_url = self.view.get_success_url()
+        self.assertEqual(success_url, reverse("people:people_list"))
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.object = None
+        self.view.setup(self.request, username=self.person.username)
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request, username=self.person.username)
+        self.view.object = self.temp_record
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message,
+            f"A temperature record for {self.person} has been added successfully.",
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request, username=self.person.username)
+        form_class = self.view.get_form_class()
+        form = form_class(self.form_data)
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        TemperatureRecordFactory(**self.form_data)
+        self.request.user = self.user
+        self.view.object = None
+        self.view.setup(self.request, username=self.person.username)
+        form_class = self.view.get_form_class()
+        form = form_class(self.form_data)
+        response = self.view.form_valid(form)
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = f"{self.person}'s temperature record already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request, username=self.person.username)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_person_with_existing_person(self):
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_person()
+        self.assertEqual(obj, self.person)
+
+    def test_person_with_non_existent_person(self):
+        self.view.setup(self.request, username="non-existent-person")
+        with self.assertRaises(Http404):
+            self.view.get_person()
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request, username=self.person.username)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(list(context_data.keys()), ["form", "view", "person"])
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("records/temperature_record_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("records.add_temperaturerecord",))
