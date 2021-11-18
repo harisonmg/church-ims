@@ -179,6 +179,12 @@ class PeopleListViewTestCase(TestCase):
 
 
 class PersonDetailViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.person = PersonFactory()
+
     def setUp(self):
         self.factory = RequestFactory()
         self.request = self.factory.get("dummy_path")
@@ -190,7 +196,7 @@ class PersonDetailViewTestCase(TestCase):
     def test_queryset(self):
         self.view.setup(self.request)
         queryset = self.view.get_queryset()
-        self.assertEqual(list(queryset), [])
+        self.assertEqual(list(queryset), [self.person])
 
     def test_slug_field(self):
         self.view.setup(self.request)
@@ -198,10 +204,9 @@ class PersonDetailViewTestCase(TestCase):
         self.assertEqual(slug_field, "username")
 
     def test_object_with_existing_person(self):
-        person = PersonFactory()
-        self.view.setup(self.request, username=person.username)
+        self.view.setup(self.request, username=self.person.username)
         obj = self.view.get_object()
-        self.assertEqual(obj, person)
+        self.assertEqual(obj, self.person)
 
     def test_object_with_non_existent_person(self):
         self.view.setup(self.request, username="non-existent-person")
@@ -209,14 +214,13 @@ class PersonDetailViewTestCase(TestCase):
             self.view.get_object()
 
     def test_context_object_name(self):
-        self.view.setup(self.request)
-        queryset = self.view.get_queryset()
-        context_object_name = self.view.get_context_object_name(queryset)
-        self.assertIsNone(context_object_name)
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_object()
+        context_object_name = self.view.get_context_object_name(obj)
+        self.assertEqual(context_object_name, "person")
 
     def test_context_data(self):
-        person = PersonFactory()
-        self.view.setup(self.request, username=person.username)
+        self.view.setup(self.request, username=self.person.username)
         obj = self.view.get_object()
         self.view.object = obj
         context_object_name = self.view.get_context_object_name(obj)
