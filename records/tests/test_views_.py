@@ -106,6 +106,22 @@ class TemperatureRecordsListViewTestCase(TestCase):
         context_object_name = self.view.get_context_object_name(queryset)
         self.assertEqual(context_object_name, "temperature_records")
 
+    def test_context_data(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.view.object_list = queryset
+        context_object_name = self.view.get_context_object_name(queryset)
+        context_data = self.view.get_context_data()
+        expected_context_data_keys = [
+            "paginator",
+            "page_obj",
+            "is_paginated",
+            "object_list",
+            context_object_name,
+            "view",
+        ]
+        self.assertEqual(list(context_data.keys()), expected_context_data_keys)
+
     # MultipleObjectTemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
