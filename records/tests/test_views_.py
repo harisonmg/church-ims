@@ -52,6 +52,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
         """
         return thead
 
+    # MultipleObjectMixin
     def test_allow_empty(self):
         self.view.setup(self.request)
         allow_empty = self.view.get_allow_empty()
@@ -62,6 +63,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
         ordering = self.view.get_ordering()
         self.assertIsNone(ordering)
 
+    # SearchableListMixin
     def test_search_fields(self):
         self.view.setup(self.request)
         search_fields = self.view.get_search_fields_with_filters()
@@ -91,6 +93,7 @@ class TemperatureRecordsListViewTestCase(TestCase):
         queryset = self.view.get_queryset()
         self.assertQuerysetEqual(queryset, search_temperature_records(search_term))
 
+    # MultipleObjectMixin
     def test_paginate_by(self):
         self.view.setup(self.request)
         queryset = self.view.get_queryset()
@@ -103,12 +106,14 @@ class TemperatureRecordsListViewTestCase(TestCase):
         context_object_name = self.view.get_context_object_name(queryset)
         self.assertEqual(context_object_name, "temperature_records")
 
+    # MultipleObjectTemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
         self.view.object_list = self.view.get_queryset()
         template_names = self.view.get_template_names()
         self.assertIn("records/temperature_records_list.html", template_names)
 
+    # LoginRequiredMixin
     def test_login_required(self):
         self.request.user = AnonymousUser()
         self.view.setup(self.request)
@@ -116,12 +121,14 @@ class TemperatureRecordsListViewTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response.url)
 
+    # PermissionRequiredMixin
     def test_permission_required(self):
         self.request.user = UserFactory()
         self.view.setup(self.request)
         permission_required = self.view.get_permission_required()
         self.assertEqual(permission_required, ("records.view_temperaturerecord",))
 
+    # template logic
     def test_response_with_no_temperature_records(self):
         # setup
         self.request.user = self.authorized_user

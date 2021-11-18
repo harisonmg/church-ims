@@ -48,6 +48,7 @@ class PeopleListViewTestCase(TestCase):
         """
         return thead
 
+    # MultipleObjectMixin
     def test_allow_empty(self):
         self.view.setup(self.request)
         allow_empty = self.view.get_allow_empty()
@@ -58,6 +59,7 @@ class PeopleListViewTestCase(TestCase):
         ordering = self.view.get_ordering()
         self.assertIsNone(ordering)
 
+    # SearchableListMixin
     def test_search_fields(self):
         self.view.setup(self.request)
         search_fields = self.view.get_search_fields_with_filters()
@@ -84,6 +86,7 @@ class PeopleListViewTestCase(TestCase):
         queryset = self.view.get_queryset()
         self.assertQuerysetEqual(queryset, search_people(search_term))
 
+    # MultipleObjectMixin
     def test_paginate_by(self):
         self.view.setup(self.request)
         queryset = self.view.get_queryset()
@@ -96,12 +99,14 @@ class PeopleListViewTestCase(TestCase):
         context_object_name = self.view.get_context_object_name(queryset)
         self.assertEqual(context_object_name, "people")
 
+    # MultipleObjectTemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
         self.view.object_list = self.view.get_queryset()
         template_names = self.view.get_template_names()
         self.assertIn("people/people_list.html", template_names)
 
+    # LoginRequiredMixin
     def test_login_required(self):
         self.request.user = AnonymousUser()
         self.view.setup(self.request)
@@ -109,12 +114,14 @@ class PeopleListViewTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response.url)
 
+    # PermissionRequiredMixin
     def test_permission_required(self):
         self.request.user = UserFactory()
         self.view.setup(self.request)
         permission_required = self.view.get_permission_required()
         self.assertEqual(permission_required, ("people.view_person",))
 
+    # template logic
     def test_response_with_no_people(self):
         # setup
         self.request.user = self.authorized_user
@@ -163,6 +170,7 @@ class PersonDetailViewTestCase(TestCase):
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
 
+    # SingleObjectMixin
     def test_queryset(self):
         self.view.setup(self.request)
         queryset = self.view.get_queryset()
@@ -190,11 +198,13 @@ class PersonDetailViewTestCase(TestCase):
         context_object_name = self.view.get_context_object_name(queryset)
         self.assertIsNone(context_object_name)
 
+    # SingleObjectTemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
         template_names = self.view.get_template_names()
         self.assertIn("people/person_detail.html", template_names)
 
+    # LoginRequiredMixin
     def test_login_required(self):
         self.request.user = AnonymousUser()
         self.view.setup(self.request)
@@ -202,6 +212,7 @@ class PersonDetailViewTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response.url)
 
+    # PermissionRequiredMixin
     def test_permission_required(self):
         self.request.user = UserFactory()
         self.view.setup(self.request)
@@ -247,6 +258,7 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
         """
         return thead
 
+    # MultipleObjectMixin
     def test_allow_empty(self):
         self.view.setup(self.request)
         allow_empty = self.view.get_allow_empty()
@@ -257,6 +269,7 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
         ordering = self.view.get_ordering()
         self.assertIsNone(ordering)
 
+    # SearchableListMixin
     def test_search_fields(self):
         self.view.setup(self.request)
         search_fields = self.view.get_search_fields_with_filters()
@@ -288,6 +301,7 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
             queryset, search_interpersonal_relationships(search_term)
         )
 
+    # MultipleObjectMixin
     def test_paginate_by(self):
         self.view.setup(self.request)
         queryset = self.view.get_queryset()
@@ -300,12 +314,14 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
         context_object_name = self.view.get_context_object_name(queryset)
         self.assertEqual(context_object_name, "relationships")
 
+    # MultipleObjectTemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
         self.view.object_list = self.view.get_queryset()
         template_names = self.view.get_template_names()
         self.assertIn("people/relationships_list.html", template_names)
 
+    # LoginRequiredMixin
     def test_login_required(self):
         self.request.user = AnonymousUser()
         self.view.setup(self.request)
@@ -313,6 +329,7 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response.url)
 
+    # PermissionRequiredMixin
     def test_permission_required(self):
         self.request.user = UserFactory()
         self.view.setup(self.request)
@@ -321,6 +338,7 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
             permission_required, ("people.view_interpersonalrelationship",)
         )
 
+    # template logic
     def test_response_with_no_relationships(self):
         # setup
         self.request.user = self.authorized_user
