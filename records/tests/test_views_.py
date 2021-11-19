@@ -209,6 +209,15 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
 
+    def get_form(self):
+        # monkey patch the form kwargs to get a form with data
+        # initial data doesn't work since the form's instance will
+        # have null values
+        self.view.get_form_kwargs = lambda: {"data": self.form_data}
+        form = self.view.get_form()
+        form.save(commit=False)
+        return form
+
     # FormMixin
     def test_initial(self):
         self.view.setup(self.request)
@@ -264,8 +273,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
     def test_form_valid_without_duplicate(self, mock_success):
         self.request.user = self.user
         self.view.setup(self.request, username=self.person.username)
-        form_class = self.view.get_form_class()
-        form = form_class(self.form_data)
+        form = self.get_form()
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)
@@ -274,10 +282,9 @@ class TemperatureRecordCreateViewTestCase(TestCase):
     def test_form_valid_with_duplicate(self):
         TemperatureRecordFactory(**self.form_data)
         self.request.user = self.user
-        self.view.object = None
         self.view.setup(self.request, username=self.person.username)
-        form_class = self.view.get_form_class()
-        form = form_class(self.form_data)
+        self.view.object = None
+        form = self.get_form()
         response = self.view.form_valid(form)
         self.assertEqual(response.status_code, 200)
         response.render()
