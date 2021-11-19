@@ -1,7 +1,11 @@
+from unittest.mock import patch
+
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.core.exceptions import ImproperlyConfigured
 from django.http.response import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
 from people import views
@@ -248,6 +252,173 @@ class PersonDetailViewTestCase(TestCase):
         self.view.setup(self.request)
         permission_required = self.view.get_permission_required()
         self.assertEqual(permission_required, ("people.view_person",))
+
+
+class PersonCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        cls.person = PersonFactory.build()
+        cls.form_data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+        }
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path")
+        self.view_class = views.PersonCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def create_duplicate(self):
+        data = self.form_data.copy()
+        data["username"] = PersonFactory.build().username
+        data["created_by"] = self.user
+        PersonFactory(**data)
+
+    def get_form(self):
+        # monkey patch the form kwargs to get a form with data
+        # initial data doesn't work since the form's instance will
+        # have null values
+        self.view.get_form_kwargs = lambda: {"data": self.form_data}
+        form = self.view.get_form()
+        form.save(commit=False)
+        return form
+
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.PersonCreationForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(
+            success_url,
+            reverse(
+                "people:person_detail", kwargs={"username": self.form_data["username"]}
+            ),
+        )
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.object = None
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message, f"{self.person}'s information has been added successfully."
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.get_form()
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        self.create_duplicate()
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.get_form()
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This person already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(list(context_data.keys()), ["form", "view", "action"])
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.add_person",))
 
 
 class InterpersonalRelationshipsListViewTestCase(TestCase):
