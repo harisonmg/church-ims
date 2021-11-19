@@ -204,19 +204,10 @@ class TemperatureRecordCreateViewTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.request = self.factory.get("dummy_path")
+        self.request = self.factory.post("dummy_path", data=self.form_data)
         self.view_class = views.TemperatureRecordCreateView
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
-
-    def get_form(self):
-        # monkey patch the form kwargs to get a form with data
-        # initial data doesn't work since the form's instance will
-        # have null values
-        self.view.get_form_kwargs = lambda: {"data": self.form_data}
-        form = self.view.get_form()
-        form.save(commit=False)
-        return form
 
     # FormMixin
     def test_initial(self):
@@ -241,6 +232,8 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         form_kwargs = {
             "initial": self.view.get_initial(),
             "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
         }
         self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
 
@@ -252,8 +245,8 @@ class TemperatureRecordCreateViewTestCase(TestCase):
 
     def test_form_invalid(self):
         self.request.user = self.user
-        self.view.object = None
         self.view.setup(self.request, username=self.person.username)
+        self.view.object = None
         form = self.view.get_form()
         response = self.view.form_invalid(form)
         self.assertEqual(response.status_code, 200)
@@ -273,7 +266,8 @@ class TemperatureRecordCreateViewTestCase(TestCase):
     def test_form_valid_without_duplicate(self, mock_success):
         self.request.user = self.user
         self.view.setup(self.request, username=self.person.username)
-        form = self.get_form()
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)

@@ -270,7 +270,7 @@ class PersonCreateViewTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.request = self.factory.get("dummy_path")
+        self.request = self.factory.post("dummy_path", data=self.form_data)
         self.view_class = views.PersonCreateView
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
@@ -280,15 +280,6 @@ class PersonCreateViewTestCase(TestCase):
         data["username"] = PersonFactory.build().username
         data["created_by"] = self.user
         PersonFactory(**data)
-
-    def get_form(self):
-        # monkey patch the form kwargs to get a form with data
-        # initial data doesn't work since the form's instance will
-        # have null values
-        self.view.get_form_kwargs = lambda: {"data": self.form_data}
-        form = self.view.get_form()
-        form.save(commit=False)
-        return form
 
     # FormMixin
     def test_initial(self):
@@ -311,6 +302,8 @@ class PersonCreateViewTestCase(TestCase):
         form_kwargs = {
             "initial": self.view.get_initial(),
             "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
         }
         self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
 
@@ -327,8 +320,8 @@ class PersonCreateViewTestCase(TestCase):
 
     def test_form_invalid(self):
         self.request.user = self.user
-        self.view.object = None
         self.view.setup(self.request)
+        self.view.object = None
         form = self.view.get_form()
         response = self.view.form_invalid(form)
         self.assertEqual(response.status_code, 200)
@@ -347,7 +340,8 @@ class PersonCreateViewTestCase(TestCase):
     def test_form_valid_without_duplicate(self, mock_success):
         self.request.user = self.user
         self.view.setup(self.request)
-        form = self.get_form()
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)
@@ -361,7 +355,8 @@ class PersonCreateViewTestCase(TestCase):
         self.request.user = self.user
         self.view.setup(self.request)
         self.view.object = None
-        form = self.get_form()
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
         response = self.view.form_valid(form)
 
         # test
@@ -623,7 +618,7 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.request = self.factory.get("dummy_path")
+        self.request = self.factory.post("dummy_path", data=self.form_data)
         self.view_class = views.RelationshipCreateView
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
@@ -633,15 +628,6 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
         data["person"] = self.person
         data["relative"] = self.relative
         return data
-
-    def get_form(self):
-        # monkey patch the form kwargs to get a form with data
-        # initial data doesn't work since the form's instance will
-        # have null values
-        self.view.get_form_kwargs = lambda: {"data": self.form_data}
-        form = self.view.get_form()
-        form.save(commit=False)
-        return form
 
     # FormMixin
     def test_initial(self):
@@ -667,6 +653,8 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
         form_kwargs = {
             "initial": self.view.get_initial(),
             "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
         }
         self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
 
@@ -678,8 +666,8 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
 
     def test_form_invalid(self):
         self.request.user = self.user
-        self.view.object = None
         self.view.setup(self.request)
+        self.view.object = None
         form = self.view.get_form()
         response = self.view.form_invalid(form)
         self.assertEqual(response.status_code, 200)
@@ -701,7 +689,8 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
     def test_form_valid_without_duplicate(self, mock_success):
         self.request.user = self.user
         self.view.setup(self.request)
-        form = self.get_form()
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)
@@ -715,10 +704,11 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
         self.request.user = self.user
         self.view.setup(self.request)
         self.view.object = None
-        error_message = "The InterpersonalRelationship could not be created "
-        error_message += "because the data didn't validate."
-        with self.assertRaisesRegex(ValueError, error_message):
-            self.get_form()
+        form = self.view.get_form()
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors, {"__all__": ["This interpersonal relationship already exists"]}
+        )
 
     # SingleObjectMixin
     def test_queryset(self):
