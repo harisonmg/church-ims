@@ -280,7 +280,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         self.request.user = self.user
         self.view.setup(self.request, username=self.person.username)
         self.view.object = None
-        form = self.get_form()
+        form = self.view.get_form()
         response = self.view.form_valid(form)
         self.assertEqual(response.status_code, 200)
         response.render()
