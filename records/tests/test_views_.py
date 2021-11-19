@@ -277,6 +277,8 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)
+        temp_record = TemperatureRecord.objects.get(person=self.person)
+        self.assertEqual(temp_record.created_by, self.user)
 
     # ModelFormMixin
     def test_form_valid_with_duplicate(self):

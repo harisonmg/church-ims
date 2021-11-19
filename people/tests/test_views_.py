@@ -351,6 +351,8 @@ class PersonCreateViewTestCase(TestCase):
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
 
     # ModelFormMixin
     def test_form_valid_with_duplicate(self):
@@ -702,6 +704,8 @@ class InterpersonalRelationshipCreateViewTestCase(TestCase):
         response = self.view.form_valid(form)
         self.assertTrue(mock_success.called)
         self.assertEqual(response.status_code, 302)
+        relationship = InterpersonalRelationship.objects.get(person=self.person)
+        self.assertEqual(relationship.created_by, self.user)
 
     # ModelFormMixin
     def test_form_valid_with_duplicate(self):
