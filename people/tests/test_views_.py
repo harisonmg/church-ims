@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.core.exceptions import ImproperlyConfigured
@@ -11,6 +11,7 @@ from accounts.factories import UserFactory
 from people import views
 from people.factories import (
     AdultFactory,
+    ChildFactory,
     InterpersonalRelationshipFactory,
     PersonFactory,
 )
@@ -568,6 +569,7 @@ class AdultCreateViewTestCase(TestCase):
             list(context_data.keys()), ["form", "view", "action", "age_category"]
         )
         self.assertEqual(context_data.get("action"), "add")
+        self.assertEqual(context_data.get("age_category"), "an adult")
 
     # SingleObjectTemplateResponseMixin
     def test_template_name(self):
@@ -732,6 +734,7 @@ class AdultSelfRegisterViewTestCase(TestCase):
             list(context_data.keys()), ["form", "view", "action", "age_category"]
         )
         self.assertEqual(context_data.get("action"), "add")
+        self.assertEqual(context_data.get("age_category"), "an adult")
 
     # SingleObjectTemplateResponseMixin
     def test_template_name(self):
@@ -753,6 +756,239 @@ class AdultSelfRegisterViewTestCase(TestCase):
         self.view.setup(self.request)
         permission_required = self.view.get_permission_required()
         self.assertEqual(permission_required, tuple())
+
+
+class ChildCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        cls.parent = AdultFactory(user=cls.user)
+        cls.person = ChildFactory.build()
+        cls.form_data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+        }
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.build_post_request(self.form_data)
+        self.view_class = views.ChildCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def build_post_request(self, data=None):
+        return self.factory.post("dummy_path", data=data)
+
+    def create_duplicate(self):
+        data = self.form_data.copy()
+        data["username"] = ChildFactory.build().username
+        data["created_by"] = self.user
+        ChildFactory(**data)
+
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.ChildCreationForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url_when_creator_is_the_parent(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url(is_parent=True)
+        self.assertEqual(success_url, reverse("core:dashboard"))
+
+    def test_success_url_when_creator_is_not_the_parent(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(
+            success_url,
+            reverse(
+                "people:parent_child_relationship_create",
+                kwargs={"username": self.person.username},
+            ),
+        )
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message, f"{self.person}'s information has been added successfully."
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_when_creator_is_not_the_parent(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
+        self.assertEqual(person.user, None)
+
+    @patch("django.contrib.messages.info")
+    def test_create_relationship(self, mock_info):
+        # setup
+        child = ChildFactory(**self.form_data)
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = child
+        self.view.create_relationship()
+
+        # test
+        relationship = InterpersonalRelationship.objects.get(relative=child)
+        self.assertEqual(relationship.relation, "PC")
+        self.assertEqual(relationship.person, self.parent)
+        self.assertEqual(relationship.created_by, self.user)
+        self.assertTrue(mock_info.called)
+        message = f"A parent-child relationship between {self.parent} and {child}"
+        message += " has been added."
+        self.assertEqual(mock_info.call_args, call(self.request, message))
+
+    @patch("django.contrib.messages.success")
+    @patch("django.contrib.messages.info")
+    def test_form_valid_when_creator_is_the_parent(self, mock_success, mock_info):
+        # setup
+        data = self.form_data.copy()
+        data["is_parent"] = True
+        self.request = self.build_post_request(data)
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+
+        # test
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
+        self.assertEqual(person.user, None)
+        self.assertTrue(mock_info.called)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        self.create_duplicate()
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This person already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(
+            list(context_data.keys()), ["form", "view", "action", "age_category"]
+        )
+        self.assertEqual(context_data.get("action"), "add")
+        self.assertEqual(context_data.get("age_category"), "a child")
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, tuple())
+
+    # UserPassesTestMixin
+    def test_test_func_false(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        self.assertFalse(self.view.test_func())
+
+    def test_test_func_true(self):
+        user = UserFactory()
+        AdultFactory(user=user)
+        self.request.user = user
+        self.view.setup(self.request)
+        self.assertTrue(self.view.test_func())
 
 
 class PersonUpdateViewTestCase(TestCase):
