@@ -323,6 +323,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         self.view.object = None
         context_data = self.view.get_context_data()
         self.assertEqual(list(context_data.keys()), ["form", "view", "person"])
+        self.assertEqual(context_data.get("person"), self.person)
 
     # SingleObjectTemplateResponseMixin
     def test_template_name(self):
