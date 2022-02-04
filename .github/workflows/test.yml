@@ -10,7 +10,7 @@ jobs:
     environment: test
     services:
       postgres:
-        image: postgres:13
+        image: postgres:14
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
           POSTGRES_USER: ${{ secrets.DB_USER }}
@@ -27,10 +27,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: "3.10"
 
     - name: Install Dependencies
       run: |
@@ -70,7 +70,7 @@ jobs:
 
     - name: Run Tests
       run: |
-        pipenv run coverage run manage.py test
+        pipenv run coverage run manage.py test --shuffle
       env:
         # Django Core
         DJANGO_SETTINGS_MODULE: config.settings.production
