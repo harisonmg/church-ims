@@ -7,3 +7,4 @@ to store and retrieve church records online.
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![Documentation Status](https://readthedocs.org/projects/church-ims/badge/?version=latest)](https://church-ims.readthedocs.io/en/latest/?badge=latest)
+[![Maintainability](https://api.codeclimate.com/v1/badges/669adf02ec70d3484662/maintainability)](https://codeclimate.com/github/harisonmg/church-ims/maintainability)
