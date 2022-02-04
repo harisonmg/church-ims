@@ -754,7 +754,7 @@ class AdultSelfRegisterViewTestCase(TestCase):
         self.request.user = UserFactory()
         self.view.setup(self.request)
         permission_required = self.view.get_permission_required()
-        self.assertEqual(permission_required, tuple())
+        self.assertEqual(permission_required, ())
 
 
 class ChildCreateViewTestCase(TestCase):
@@ -974,7 +974,7 @@ class ChildCreateViewTestCase(TestCase):
         self.request.user = UserFactory()
         self.view.setup(self.request)
         permission_required = self.view.get_permission_required()
-        self.assertEqual(permission_required, tuple())
+        self.assertEqual(permission_required, ())
 
     # UserPassesTestMixin
     def test_test_func_false(self):
