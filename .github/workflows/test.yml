@@ -70,7 +70,7 @@ jobs:
 
     - name: Run Tests
       run: |
-        pipenv run coverage run manage.py test
+        pipenv run coverage run manage.py test --shuffle
       env:
         # Django Core
         DJANGO_SETTINGS_MODULE: config.settings.production
