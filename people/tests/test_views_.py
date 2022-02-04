@@ -172,7 +172,6 @@ class PeopleListViewTestCase(TestCase):
 
     def test_response_with_no_search_results(self):
         # setup
-        PersonFactory.create_batch(10)
         search_term = "does not exist"
         self.request = self.build_get_request({"q": search_term})
         self.request.user = self.authorized_user
@@ -1295,7 +1294,6 @@ class InterpersonalRelationshipsListViewTestCase(TestCase):
 
     def test_response_with_no_search_results(self):
         # setup
-        InterpersonalRelationshipFactory.create_batch(10)
         search_term = "does not exist"
         self.request = self.build_get_request({"q": search_term})
         self.request.user = self.authorized_user
