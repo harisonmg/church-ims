@@ -1,4 +1,6 @@
-from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import PermissionDenied
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from accounts.factories import UserFactory
@@ -6,73 +8,93 @@ from core import views
 from people.factories import AdultFactory
 
 
-class IndexViewTestCase(SimpleTestCase):
+class IndexViewTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.request = self.factory.get("dummy_path/")
-        self.view = views.IndexView
+        self.view_class = views.IndexView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-    def test_response_status_code(self):
-        response = self.view.as_view()(self.request)
+    # TemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("core/index.html", template_names)
+
+    # View
+    def test_response(self):
+        response = self.view_func(self.request)
         self.assertEqual(response.status_code, 200)
-
-    def test_template_used(self):
-        response = self.view.as_view()(self.request)
-        with self.assertTemplateUsed("core/index.html"):
-            response.render()
 
 
 class LoginRedirectViewTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path/")
+        self.view_class = views.LoginRedirectView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-        cls.url = "/login/redirect/"
-        cls.fully_registered_user = UserFactory()
-        cls.partially_registered_user = UserFactory()
-
-        # personal details
-        AdultFactory(user=cls.fully_registered_user)
-
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
-
-    def test_fully_registered_user_response(self):
-        self.client.force_login(self.fully_registered_user)
-        response = self.client.get(self.url)
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        response = self.view_func(self.request)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("core:dashboard"))
+        self.assertIn(reverse("account_login"), response.url)
 
-    def test_partially_registered_user_response(self):
-        self.client.force_login(self.partially_registered_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("people:adult_self_register"))
+    # RedirectView
+    def test_redirect_url_for_user_with_person(self):
+        # setup
+        user = UserFactory()
+        AdultFactory(user=user)
+        self.request.user = user
+        self.view.setup(self.request)
+
+        # test
+        url = self.view.get_redirect_url()
+        self.assertEqual(url, reverse("core:dashboard"))
+
+    def test_redirect_url_for_user_without_person(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        url = self.view.get_redirect_url()
+        self.assertEqual(url, reverse("people:adult_self_register"))
 
 
 class DashboardViewTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path/")
+        self.view_class = views.DashboardView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-        cls.url = "/dashboard/"
-        cls.fully_registered_user = UserFactory()
-        cls.partially_registered_user = UserFactory()
+    # TemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("core/dashboard.html", template_names)
 
-        # personal details
-        AdultFactory(user=cls.fully_registered_user)
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        response = self.view_func(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    # View
+    def test_response_for_user_with_person(self):
+        # setup
+        user = UserFactory()
+        AdultFactory(user=user)
+        self.request.user = user
 
-    def test_fully_registered_user_response(self):
-        self.client.force_login(self.fully_registered_user)
-        response = self.client.get(self.url)
+        # test
+        response = self.view_func(self.request)
         self.assertEqual(response.status_code, 200)
 
-    def test_partially_registered_user_response(self):
-        self.client.force_login(self.partially_registered_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def test_response_for_user_without_person(self):
+        self.request.user = UserFactory()
+        with self.assertRaises(PermissionDenied):
+            self.view_func(self.request)
