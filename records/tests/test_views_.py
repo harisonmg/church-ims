@@ -196,10 +196,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
         cls.person = PersonFactory()
         cls.user = UserFactory()
         cls.temp_record = TemperatureRecordFactory.build(person=cls.person)
-        cls.form_data = {
-            "person": cls.person,
-            "body_temperature": cls.temp_record.body_temperature,
-        }
+        cls.form_data = {"body_temperature": cls.temp_record.body_temperature}
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -275,7 +272,7 @@ class TemperatureRecordCreateViewTestCase(TestCase):
 
     # ModelFormMixin
     def test_form_valid_with_duplicate(self):
-        TemperatureRecordFactory(**self.form_data)
+        TemperatureRecordFactory(person=self.person, **self.form_data)
         self.request.user = self.user
         self.view.setup(self.request, username=self.person.username)
         self.view.object = None
