@@ -16,11 +16,13 @@ class IndexViewTestCase(TestCase):
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
 
+    # TemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
         template_names = self.view.get_template_names()
         self.assertIn("core/index.html", template_names)
 
+    # View
     def test_response(self):
         response = self.view_func(self.request)
         self.assertEqual(response.status_code, 200)
@@ -34,12 +36,14 @@ class LoginRedirectViewTestCase(TestCase):
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
 
+    # LoginRequiredMixin
     def test_login_required(self):
         self.request.user = AnonymousUser()
         response = self.view_func(self.request)
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response.url)
 
+    # RedirectView
     def test_redirect_url_for_user_with_person(self):
         # setup
         user = UserFactory()
@@ -66,17 +70,20 @@ class DashboardViewTestCase(TestCase):
         self.view_func = self.view_class.as_view()
         self.view = self.view_class()
 
+    # TemplateResponseMixin
     def test_template_name(self):
         self.view.setup(self.request)
         template_names = self.view.get_template_names()
         self.assertIn("core/dashboard.html", template_names)
 
+    # LoginRequiredMixin
     def test_login_required(self):
         self.request.user = AnonymousUser()
         response = self.view_func(self.request)
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("account_login"), response.url)
 
+    # View
     def test_response_for_user_with_person(self):
         # setup
         user = UserFactory()
