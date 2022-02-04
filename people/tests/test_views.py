@@ -1,9 +1,14 @@
-from django.contrib.auth.models import Permission
-from django.test import TestCase
+from unittest.mock import call, patch
+
+from django.contrib.auth.models import AnonymousUser, Permission
+from django.core.exceptions import ImproperlyConfigured
+from django.http.response import Http404
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.module_loading import import_string
 
 from accounts.factories import UserFactory
+from people import views
 from people.factories import (
     AdultFactory,
     ChildFactory,
@@ -20,8 +25,26 @@ class PeopleListViewTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.url = "/people/"
-        cls.table_head = """
+        cls.authorized_user = cls.get_authorized_user()
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.build_get_request()
+        self.view_class = views.PeopleListView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def build_get_request(self, data=None):
+        return self.factory.get("dummy_path", data=data)
+
+    @staticmethod
+    def get_authorized_user():
+        view_person = Permission.objects.filter(name="Can view person")
+        return UserFactory(user_permissions=tuple(view_person))
+
+    @property
+    def table_head(self):
+        thead = """
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -32,456 +55,134 @@ class PeopleListViewTestCase(TestCase):
             </tr>
         </thead>
         """
-        # users
-        view_person = Permission.objects.filter(name="Can view person")
-        cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(view_person))
-        cls.staff_user = UserFactory(is_staff=True)
+        return thead
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    # MultipleObjectMixin
+    def test_allow_empty(self):
+        self.view.setup(self.request)
+        allow_empty = self.view.get_allow_empty()
+        self.assertTrue(allow_empty)
 
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def test_ordering(self):
+        self.view.setup(self.request)
+        ordering = self.view.get_ordering()
+        self.assertIsNone(ordering)
 
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+    # SearchableListMixin
+    def test_search_fields(self):
+        self.view.setup(self.request)
+        search_fields = self.view.get_search_fields_with_filters()
+        expected_search_fields = [("username", "icontains"), ("full_name", "icontains")]
+        self.assertEqual(search_fields, expected_search_fields)
 
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def test_search_query(self):
+        search_term = "search query"
+        self.request = self.build_get_request({"q": search_term})
+        self.view.setup(self.request)
+        search_query = self.view.get_search_query()
+        self.assertEqual(search_query, search_term)
 
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/people_list.html")
+    def test_queryset_without_search_query(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertQuerysetEqual(queryset, Person.objects.all())
 
-    def test_context_data_contains_people(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertIn("people", response.context)
+    def test_queryset_with_search_query(self):
+        people = PersonFactory.create_batch(10)
+        search_term = people[0].full_name.split()[0]
+        self.request = self.build_get_request({"q": search_term})
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertQuerysetEqual(queryset, search_people(search_term))
 
-    def test_is_paginated(self):
-        PersonFactory.create_batch(11)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTrue(response.context.get("is_paginated"))
-        self.assertEqual(len(response.context.get("people")), 10)
+    # MultipleObjectMixin
+    def test_paginate_by(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        paginate_by = self.view.get_paginate_by(queryset)
+        self.assertEqual(paginate_by, 10)
 
-    def test_pagination_lists_all_items(self):
-        PersonFactory.create_batch(12)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url + "?page=2")
-        expected_people = list(Person.objects.all())[-2:]
-        people = list(response.context.get("people"))
-        self.assertEqual(people, expected_people)
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        context_object_name = self.view.get_context_object_name(queryset)
+        self.assertEqual(context_object_name, "people")
 
+    def test_context_data(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.view.object_list = queryset
+        context_object_name = self.view.get_context_object_name(queryset)
+        context_data = self.view.get_context_data()
+        expected_context_data_keys = [
+            "paginator",
+            "page_obj",
+            "is_paginated",
+            "object_list",
+            context_object_name,
+            "view",
+        ]
+        self.assertEqual(list(context_data.keys()), expected_context_data_keys)
+
+    # MultipleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        self.view.object_list = self.view.get_queryset()
+        template_names = self.view.get_template_names()
+        self.assertIn("people/people_list.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.view_person",))
+
+    # template logic
     def test_response_with_no_people(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
+        # setup
+        self.request.user = self.authorized_user
+        response = self.view_func(self.request)
+        response.render()
+
+        # test
         with self.assertRaises(AssertionError):
             self.assertInHTML(self.table_head, response.content.decode())
         self.assertInHTML("There are no people yet!", response.content.decode())
 
     def test_response_with_people(self):
-        PersonFactory.create_batch(3)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
+        # setup
+        PersonFactory()
+        self.request.user = self.authorized_user
+        response = self.view_func(self.request)
+        response.render()
+
+        # test
         with self.assertRaises(AssertionError):
             self.assertInHTML("There are no people yet!", response.content.decode())
         self.assertInHTML(self.table_head, response.content.decode())
 
-    def test_search_results(self):
+    def test_response_with_no_search_results(self):
         # setup
-        people = PersonFactory.create_batch(10)
-        search_term = people[0].full_name.split()[0]
-        self.client.force_login(self.authorized_user)
+        search_term = "does not exist"
+        self.request = self.build_get_request({"q": search_term})
+        self.request.user = self.authorized_user
+        response = self.view_func(self.request)
+        response.render()
 
         # test
-        response = self.client.get(f"{self.url}?q={search_term}")
-        search_results = response.context.get("people")
-        self.assertQuerysetEqual(search_results, search_people(search_term))
-
-    def test_response_with_no_search_results(self):
-        PersonFactory.create_batch(10)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url + "?q=Does not exist")
-        self.assertEqual(list(response.context.get("people")), [])
         with self.assertRaises(AssertionError):
             self.assertInHTML(self.table_head, response.content.decode())
         self.assertInHTML(
             "Your search didn't yield any results", response.content.decode()
-        )
-
-
-class PersonCreateViewTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.url = "/people/add/"
-
-        # users
-        create_person = Permission.objects.filter(name="Can add person")
-        view_person = Permission.objects.filter(name="Can view person")
-        permissions = create_person | view_person
-        cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
-        cls.staff_user = UserFactory(is_staff=True)
-
-        # POST data
-        person = PersonFactory.build()
-        cls.data = {
-            "username": person.username,
-            "full_name": person.full_name,
-            "gender": person.gender,
-            "dob": person.dob,
-        }
-
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
-
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/person_form.html")
-
-    def test_context_data_contains_action(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("action"), "add")
-
-    def test_form_class(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "PersonCreationForm")
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonCreationForm"))
-
-    def test_form_invalid(self):
-        # setup
-        data = self.data.copy()
-        data["created_by"] = self.authorized_user
-        PersonFactory(**data)
-        data["full_name"] = data["full_name"] + " " + data["username"].title()
-        data["username"] = PersonFactory.build().username
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.post(self.url, data)
-        form = response.context.get("form")
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {"__all__": ["This person already exists"]})
-
-    def test_form_valid(self):
-        self.client.force_login(self.authorized_user)
-        self.client.post(self.url, self.data)
-        person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.created_by, self.authorized_user)
-
-    def test_success_url(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(
-            response,
-            reverse("people:person_detail", kwargs={"username": self.data["username"]}),
-        )
-
-
-class AdultCreateViewTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.url = "/people/add/adult/"
-
-        # users
-        create_person = Permission.objects.filter(name="Can add person")
-        view_person = Permission.objects.filter(name="Can view person")
-        permissions = create_person | view_person
-        cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
-        cls.staff_user = UserFactory(is_staff=True)
-
-        # POST data
-        person = AdultFactory.build()
-        cls.data = {
-            "username": person.username,
-            "full_name": person.full_name,
-            "gender": person.gender,
-            "dob": person.dob,
-            "phone_number": person.phone_number,
-        }
-
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
-
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/person_form.html")
-
-    def test_context_data_contains_action(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("action"), "add")
-
-    def test_context_data_contains_age_category(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("age_category"), "an adult")
-
-    def test_form_class(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "AdultCreationForm")
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
-
-    def test_form_invalid(self):
-        # setup
-        data = self.data.copy()
-        data["created_by"] = self.authorized_user
-        AdultFactory(**data)
-        data["full_name"] = data["full_name"] + " " + data["username"].title()
-        data["username"] = AdultFactory.build().username
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.post(self.url, data)
-        form = response.context.get("form")
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {"__all__": ["This person already exists"]})
-
-    def test_form_valid(self):
-        self.client.force_login(self.authorized_user)
-        self.client.post(self.url, self.data)
-        person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.created_by, self.authorized_user)
-
-    def test_success_url(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(
-            response,
-            reverse("people:person_detail", kwargs={"username": self.data["username"]}),
-        )
-
-
-class AdultSelfRegisterViewTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.url = "/people/register/self/"
-
-        # users
-        cls.user = UserFactory()
-
-        # POST data
-        person = AdultFactory.build()
-        cls.data = {
-            "username": person.username,
-            "full_name": person.full_name,
-            "gender": person.gender,
-            "dob": person.dob,
-            "phone_number": person.phone_number,
-        }
-
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
-
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_template_used(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/self_register_form.html")
-
-    def test_context_data_contains_action(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("action"), "add")
-
-    def test_context_data_contains_age_category(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("age_category"), "an adult")
-
-    def test_form_class(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "AdultCreationForm")
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.AdultCreationForm"))
-
-    def test_form_valid(self):
-        self.client.force_login(self.user)
-        self.client.post(self.url, self.data)
-        person = Person.objects.get(username=self.data["username"])
-        self.assertEqual(person.user, self.user)
-        self.assertEqual(person.created_by, self.user)
-
-    def test_success_url(self):
-        self.client.force_login(self.user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, reverse("core:dashboard"))
-
-
-class ChildCreateViewTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.url = "/people/add/child/"
-
-        # users
-        cls.user = UserFactory()
-        cls.authorized_user = UserFactory()
-
-        # POST data
-        cls.parent = AdultFactory(user=cls.authorized_user)
-        child = ChildFactory.build()
-        cls.data = {
-            "username": child.username,
-            "full_name": child.full_name,
-            "gender": child.gender,
-            "dob": child.dob,
-        }
-
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
-
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/person_form.html")
-
-    def test_context_data_contains_action(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("action"), "add")
-
-    def test_context_data_contains_age_category(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("age_category"), "a child")
-
-    def test_form_class(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "ChildCreationForm")
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.ChildCreationForm"))
-
-    def test_form_invalid(self):
-        # setup
-        data = self.data.copy()
-        data["created_by"] = self.authorized_user
-        ChildFactory(**data)
-        data["full_name"] = data["full_name"] + " " + data["username"].title()
-        data["username"] = ChildFactory.build().username
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.post(self.url, data)
-        form = response.context.get("form")
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {"__all__": ["This person already exists"]})
-
-    def test_is_parent_form_valid(self):
-        # setup
-        data = self.data.copy()
-        data["is_parent"] = True
-        self.client.force_login(self.authorized_user)
-
-        # test
-        self.client.post(self.url, self.data)
-        child = Person.objects.get(username=self.data["username"])
-        self.assertEqual(child.created_by, self.authorized_user)
-
-    def test_not_parent_form_valid(self):
-        self.client.force_login(self.authorized_user)
-        self.client.post(self.url, self.data)
-        child = Person.objects.get(username=self.data["username"])
-        self.assertEqual(child.created_by, self.authorized_user)
-
-    def test_is_parent_success_url(self):
-        # setup
-        data = self.data.copy()
-        data["is_parent"] = True
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.post(self.url, data)
-        self.assertRedirects(response, reverse("core:dashboard"))
-
-    def test_not_parent_success_url(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(
-            response,
-            reverse(
-                "people:parent_child_relationship_create",
-                kwargs={"username": self.data["username"]},
-            ),
         )
 
 
@@ -491,42 +192,802 @@ class PersonDetailViewTestCase(TestCase):
         super().setUpClass()
 
         cls.person = PersonFactory()
-        cls.url = cls.person.get_absolute_url()
 
-        # users
-        view_person = Permission.objects.filter(name="Can view person")
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get("dummy_path")
+        self.view_class = views.PersonDetailView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertEqual(list(queryset), [self.person])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "username")
+
+    def test_object_with_existing_person(self):
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_object()
+        self.assertEqual(obj, self.person)
+
+    def test_object_with_non_existent_person(self):
+        self.view.setup(self.request, username="non-existent-person")
+        with self.assertRaises(Http404):
+            self.view.get_object()
+
+    def test_context_object_name(self):
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_object()
+        context_object_name = self.view.get_context_object_name(obj)
+        self.assertEqual(context_object_name, "person")
+
+    def test_context_data(self):
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_object()
+        self.view.object = obj
+        context_object_name = self.view.get_context_object_name(obj)
+        context_data = self.view.get_context_data()
+        expected_context_data_keys = ["object", context_object_name, "view"]
+        self.assertEqual(list(context_data.keys()), expected_context_data_keys)
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_detail.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.view_person",))
+
+
+class PersonCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(view_person))
-        cls.staff_user = UserFactory(is_staff=True)
+        cls.person = PersonFactory.build()
+        cls.form_data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+        }
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.post("dummy_path", data=self.form_data)
+        self.view_class = views.PersonCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def create_duplicate(self):
+        data = self.form_data.copy()
+        data["username"] = PersonFactory.build().username
+        data["created_by"] = self.user
+        PersonFactory(**data)
 
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.PersonCreationForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(
+            success_url,
+            reverse(
+                "people:person_detail", kwargs={"username": self.form_data["username"]}
+            ),
+        )
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
         self.assertEqual(response.status_code, 200)
 
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message, f"{self.person}'s information has been added successfully."
+        )
 
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/person_detail.html")
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
 
-    def test_context_data_contains_person(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("person"), self.person)
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        self.create_duplicate()
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This person already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(list(context_data.keys()), ["form", "view", "action"])
+        self.assertEqual(context_data.get("action"), "add")
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.add_person",))
+
+
+class AdultCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        cls.person = AdultFactory.build()
+        cls.form_data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+            "phone_number": cls.person.phone_number,
+        }
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.post("dummy_path", data=self.form_data)
+        self.view_class = views.AdultCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def create_duplicate(self):
+        data = self.form_data.copy()
+        data["username"] = AdultFactory.build().username
+        data["created_by"] = self.user
+        AdultFactory(**data)
+
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.AdultCreationForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(
+            success_url,
+            reverse(
+                "people:person_detail", kwargs={"username": self.form_data["username"]}
+            ),
+        )
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message, f"{self.person}'s information has been added successfully."
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        self.create_duplicate()
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This person already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(
+            list(context_data.keys()), ["form", "view", "action", "age_category"]
+        )
+        self.assertEqual(context_data.get("action"), "add")
+        self.assertEqual(context_data.get("age_category"), "an adult")
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.add_person",))
+
+
+class AdultSelfRegisterViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        cls.person = AdultFactory.build()
+        cls.form_data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+            "phone_number": cls.person.phone_number,
+        }
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.post("dummy_path", data=self.form_data)
+        self.view_class = views.AdultSelfRegisterView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def create_duplicate(self):
+        data = self.form_data.copy()
+        data["username"] = AdultFactory.build().username
+        data["created_by"] = self.user
+        AdultFactory(**data)
+
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.AdultCreationForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(success_url, reverse("core:dashboard"))
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message, f"{self.person}'s information has been added successfully."
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
+        self.assertEqual(person.user, self.user)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        self.create_duplicate()
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This person already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(
+            list(context_data.keys()), ["form", "view", "action", "age_category"]
+        )
+        self.assertEqual(context_data.get("action"), "add")
+        self.assertEqual(context_data.get("age_category"), "an adult")
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/self_register_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ())
+
+
+class ChildCreateViewTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        cls.parent = AdultFactory(user=cls.user)
+        cls.person = ChildFactory.build()
+        cls.form_data = {
+            "username": cls.person.username,
+            "full_name": cls.person.full_name,
+            "gender": cls.person.gender,
+            "dob": cls.person.dob,
+        }
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.build_post_request(self.form_data)
+        self.view_class = views.ChildCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def build_post_request(self, data=None):
+        return self.factory.post("dummy_path", data=data)
+
+    def create_duplicate(self):
+        data = self.form_data.copy()
+        data["username"] = ChildFactory.build().username
+        data["created_by"] = self.user
+        ChildFactory(**data)
+
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
+
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
+
+    def test_form_class(self):
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.ChildCreationForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
+
+    def test_success_url_when_creator_is_the_parent(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url(is_parent=True)
+        self.assertEqual(success_url, reverse("core:dashboard"))
+
+    def test_success_url_when_creator_is_not_the_parent(self):
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(
+            success_url,
+            reverse(
+                "people:parent_child_relationship_create",
+                kwargs={"username": self.person.username},
+            ),
+        )
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message, f"{self.person}'s information has been added successfully."
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_when_creator_is_not_the_parent(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
+        self.assertEqual(person.user, None)
+
+    @patch("django.contrib.messages.info")
+    def test_create_relationship(self, mock_info):
+        # setup
+        child = ChildFactory(**self.form_data)
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = child
+        self.view.create_relationship()
+
+        # test
+        relationship = InterpersonalRelationship.objects.get(relative=child)
+        self.assertEqual(relationship.relation, "PC")
+        self.assertEqual(relationship.person, self.parent)
+        self.assertEqual(relationship.created_by, self.user)
+        self.assertTrue(mock_info.called)
+        message = f"A parent-child relationship between {self.parent} and {child}"
+        message += " has been added."
+        self.assertEqual(mock_info.call_args, call(self.request, message))
+
+    @patch("django.contrib.messages.success")
+    @patch("django.contrib.messages.info")
+    def test_form_valid_when_creator_is_the_parent(self, mock_success, mock_info):
+        # setup
+        data = self.form_data.copy()
+        data["is_parent"] = True
+        self.request = self.build_post_request(data)
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+
+        # test
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        person = Person.objects.get(username=self.form_data["username"])
+        self.assertEqual(person.created_by, self.user)
+        self.assertEqual(person.user, None)
+        self.assertTrue(mock_info.called)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        self.create_duplicate()
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This person already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(
+            list(context_data.keys()), ["form", "view", "action", "age_category"]
+        )
+        self.assertEqual(context_data.get("action"), "add")
+        self.assertEqual(context_data.get("age_category"), "a child")
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ())
+
+    # UserPassesTestMixin
+    def test_test_func_false(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        self.assertFalse(self.view.test_func())
+
+    def test_test_func_true(self):
+        user = UserFactory()
+        AdultFactory(user=user)
+        self.request.user = user
+        self.view.setup(self.request)
+        self.assertTrue(self.view.test_func())
 
 
 class PersonUpdateViewTestCase(TestCase):
@@ -534,80 +995,167 @@ class PersonUpdateViewTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.person = PersonFactory()
-        cls.url = cls.person.get_absolute_url() + "update/"
-
-        # users
-        update_person = Permission.objects.filter(name="Can change person")
-        view_person = Permission.objects.filter(name="Can view person")
-        permissions = update_person | view_person
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
-        cls.staff_user = UserFactory(is_staff=True)
-
-        # POST data
-        cls.data = {
+        cls.person = PersonFactory()
+        cls.form_data = {
             "username": cls.person.username,
-            "full_name": cls.person.full_name + " " + cls.person.username.title(),
+            "full_name": cls.person.full_name,
             "gender": cls.person.gender,
             "dob": cls.person.dob,
         }
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.post("dummy_path", data=self.form_data)
+        self.view_class = views.PersonUpdateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
 
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/person_form.html")
-
-    def test_context_data_contains_person(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("person"), self.person)
-
-    def test_context_data_contains_action(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("action"), "update")
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
 
     def test_form_class(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "PersonUpdateForm")
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(form, import_string("people.forms.PersonUpdateForm"))
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
+        self.assertEqual(form_class, import_string("people.forms.PersonUpdateForm"))
+
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
 
     def test_success_url(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, self.person.get_absolute_url())
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_url = self.view.get_success_url()
+        self.assertEqual(
+            success_url,
+            reverse(
+                "people:person_detail", kwargs={"username": self.form_data["username"]}
+            ),
+        )
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.person
+        success_message = self.view.get_success_message(self.form_data)
+        self.assertEqual(
+            success_message,
+            f"{self.person}'s information has been updated successfully.",
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request, username=self.person.username)
+        self.view.object = self.view.get_object()
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertEqual(list(queryset), [self.person])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "username")
+
+    def test_object(self):
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_object()
+        self.assertEqual(obj, self.person)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request, username=self.person.username)
+        obj = self.view.get_object()
+        context_object_name = self.view.get_context_object_name(obj)
+        self.assertEqual(context_object_name, "person")
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(list(context_data.keys()), ["form", "view", "action"])
+        self.assertEqual(context_data.get("action"), "update")
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/person_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.change_person",))
 
 
-class RelationshipsListViewTestCase(TestCase):
+class InterpersonalRelationshipsListViewTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.url = "/people/relationships/"
-        cls.table_head = """
+        cls.authorized_user = cls.get_authorized_user()
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.build_get_request()
+        self.view_class = views.RelationshipsListView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
+
+    def build_get_request(self, data=None):
+        return self.factory.get("dummy_path", data=data)
+
+    @staticmethod
+    def get_authorized_user():
+        view_relationship = Permission.objects.filter(
+            name="Can view interpersonal relationship"
+        )
+        return UserFactory(user_permissions=tuple(view_relationship))
+
+    @property
+    def table_head(self):
+        thead = """
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -617,61 +1165,112 @@ class RelationshipsListViewTestCase(TestCase):
             </tr>
         </thead>
         """
-        # users
-        view_relationships = Permission.objects.filter(
-            name="Can view interpersonal relationship"
+        return thead
+
+    # MultipleObjectMixin
+    def test_allow_empty(self):
+        self.view.setup(self.request)
+        allow_empty = self.view.get_allow_empty()
+        self.assertTrue(allow_empty)
+
+    def test_ordering(self):
+        self.view.setup(self.request)
+        ordering = self.view.get_ordering()
+        self.assertIsNone(ordering)
+
+    # SearchableListMixin
+    def test_search_fields(self):
+        self.view.setup(self.request)
+        search_fields = self.view.get_search_fields_with_filters()
+        expected_search_fields = [
+            ("person__username", "icontains"),
+            ("relative__username", "icontains"),
+        ]
+        self.assertEqual(search_fields, expected_search_fields)
+
+    def test_search_query(self):
+        search_term = "search query"
+        self.request = self.build_get_request({"q": search_term})
+        self.view.setup(self.request)
+        search_query = self.view.get_search_query()
+        self.assertEqual(search_query, search_term)
+
+    def test_queryset_without_search_query(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertQuerysetEqual(queryset, InterpersonalRelationship.objects.all())
+
+    def test_queryset_with_search_query(self):
+        relationships = InterpersonalRelationshipFactory.create_batch(10)
+        search_term = relationships[0].person.full_name.split()[0]
+        self.request = self.build_get_request({"q": search_term})
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.assertQuerysetEqual(
+            queryset, search_interpersonal_relationships(search_term)
         )
-        cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(view_relationships))
-        cls.staff_user = UserFactory(is_staff=True)
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    # MultipleObjectMixin
+    def test_paginate_by(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        paginate_by = self.view.get_paginate_by(queryset)
+        self.assertEqual(paginate_by, 10)
 
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        context_object_name = self.view.get_context_object_name(queryset)
+        self.assertEqual(context_object_name, "relationships")
 
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+    def test_context_data(self):
+        self.view.setup(self.request)
+        queryset = self.view.get_queryset()
+        self.view.object_list = queryset
+        context_object_name = self.view.get_context_object_name(queryset)
+        context_data = self.view.get_context_data()
+        expected_context_data_keys = [
+            "paginator",
+            "page_obj",
+            "is_paginated",
+            "object_list",
+            context_object_name,
+            "view",
+        ]
+        self.assertEqual(list(context_data.keys()), expected_context_data_keys)
 
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    # MultipleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        self.view.object_list = self.view.get_queryset()
+        template_names = self.view.get_template_names()
+        self.assertIn("people/relationships_list.html", template_names)
 
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/relationships_list.html")
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
 
-    def test_context_data_contains_relationships(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertIn("relationships", response.context)
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(
+            permission_required, ("people.view_interpersonalrelationship",)
+        )
 
-    def test_is_paginated(self):
-        InterpersonalRelationshipFactory.create_batch(11)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTrue(response.context.get("is_paginated"))
-        self.assertEqual(len(response.context.get("relationships")), 10)
-
-    def test_pagination_lists_all_items(self):
-        InterpersonalRelationshipFactory.create_batch(12)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url + "?page=2")
-        expected_relationships = list(InterpersonalRelationship.objects.all())[-2:]
-        people = list(response.context.get("relationships"))
-        self.assertEqual(people, expected_relationships)
-
+    # template logic
     def test_response_with_no_relationships(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
+        # setup
+        self.request.user = self.authorized_user
+        response = self.view_func(self.request)
+        response.render()
+
+        # test
         with self.assertRaises(AssertionError):
             self.assertInHTML(self.table_head, response.content.decode())
         self.assertInHTML(
@@ -679,9 +1278,13 @@ class RelationshipsListViewTestCase(TestCase):
         )
 
     def test_response_with_relationships(self):
-        InterpersonalRelationshipFactory.create_batch(3)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
+        # setup
+        InterpersonalRelationshipFactory()
+        self.request.user = self.authorized_user
+        response = self.view_func(self.request)
+        response.render()
+
+        # test
         with self.assertRaises(AssertionError):
             self.assertInHTML(
                 "There are no interpersonal relationships yet!",
@@ -689,24 +1292,15 @@ class RelationshipsListViewTestCase(TestCase):
             )
         self.assertInHTML(self.table_head, response.content.decode())
 
-    def test_search_results(self):
+    def test_response_with_no_search_results(self):
         # setup
-        relationships = InterpersonalRelationshipFactory.create_batch(10)
-        search_term = relationships[0].person.username
-        self.client.force_login(self.authorized_user)
+        search_term = "does not exist"
+        self.request = self.build_get_request({"q": search_term})
+        self.request.user = self.authorized_user
+        response = self.view_func(self.request)
+        response.render()
 
         # test
-        response = self.client.get(f"{self.url}?q={search_term}")
-        search_results = response.context.get("relationships")
-        self.assertQuerysetEqual(
-            search_results, search_interpersonal_relationships(search_term)
-        )
-
-    def test_response_with_no_search_results(self):
-        InterpersonalRelationshipFactory.create_batch(10)
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url + "?q=Does not exist")
-        self.assertEqual(list(response.context.get("relationships")), [])
         with self.assertRaises(AssertionError):
             self.assertInHTML(self.table_head, response.content.decode())
         self.assertInHTML(
@@ -714,83 +1308,168 @@ class RelationshipsListViewTestCase(TestCase):
         )
 
 
-class RelationshipCreateViewTestCase(TestCase):
+class InterpersonalRelationshipCreateViewTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.url = "/people/relationships/add/"
-
-        # users
-        create_relationship = Permission.objects.filter(
-            name="Can add interpersonal relationship"
-        )
-        view_relationship = Permission.objects.filter(
-            name="Can view interpersonal relationship"
-        )
-        permissions = create_relationship | view_relationship
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory(user_permissions=tuple(permissions))
-        cls.staff_user = UserFactory(is_staff=True)
-
-        # POST data
         cls.person = PersonFactory()
         cls.relative = PersonFactory()
-        cls.relation = InterpersonalRelationshipFactory.build().relation
-        cls.data = {
+        cls.relationship = InterpersonalRelationshipFactory.build(
+            person=cls.person, relative=cls.relative
+        )
+        cls.form_data = {
             "person": cls.person.username,
             "relative": cls.relative.username,
-            "relation": cls.relation,
+            "relation": cls.relationship.relation,
         }
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.post("dummy_path", data=self.form_data)
+        self.view_class = views.RelationshipCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def get_data(self):
+        data = self.form_data.copy()
+        data["person"] = self.person
+        data["relative"] = self.relative
+        return data
 
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
 
-    def test_staff_user_response(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/relationship_form.html")
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
 
     def test_form_class(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
         self.assertEqual(
-            form.__class__.__name__, "InterpersonalRelationshipCreationForm"
-        )
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(
-            form, import_string("people.forms.InterpersonalRelationshipCreationForm")
+            form_class,
+            import_string("people.forms.InterpersonalRelationshipCreationForm"),
         )
 
-    def test_form_valid(self):
-        self.client.force_login(self.authorized_user)
-        self.client.post(self.url, self.data)
-        relationship = InterpersonalRelationship.objects.get(
-            person__username=self.data["person"]
-        )
-        self.assertEqual(relationship.created_by, self.authorized_user)
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
 
     def test_success_url(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, reverse("people:relationships_list"))
+        self.view.setup(self.request)
+        self.view.object = self.relationship
+        success_url = self.view.get_success_url()
+        self.assertEqual(success_url, reverse("people:relationships_list"))
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.relationship
+        data = self.get_data()
+        success_message = self.view.get_success_message(data)
+        people = f"{self.person} and {self.relative}"
+        self.assertEqual(
+            success_message,
+            f"The relationship between {people} has been added successfully.",
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        relationship = InterpersonalRelationship.objects.get(person=self.person)
+        self.assertEqual(relationship.created_by, self.user)
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        data = self.get_data()
+        InterpersonalRelationshipFactory(**data)
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors, {"__all__": ["This interpersonal relationship already exists"]}
+        )
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(list(context_data.keys()), ["form", "view"])
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/relationship_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ("people.add_interpersonalrelationship",))
 
 
 class ParentChildRelationshipCreateViewTestCase(TestCase):
@@ -798,81 +1477,183 @@ class ParentChildRelationshipCreateViewTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # users
         cls.user = UserFactory()
-        cls.authorized_user = UserFactory()
-        cls.staff_user = UserFactory(is_staff=True)
-
-        # people
-        cls.person = AdultFactory(user=cls.authorized_user)
+        cls.person = AdultFactory(user=cls.user)
         cls.parent = AdultFactory()
         cls.child = ChildFactory()
-        cls.url = f"/people/relationships/add/{cls.child.username}/parent/"
+        cls.form_data = {"person": cls.parent.username}
+        cls.relationship_data = {
+            "person": cls.parent,
+            "relative": cls.child,
+            "relation": "PC",
+        }
+        cls.relationship = InterpersonalRelationshipFactory.build(
+            **cls.relationship_data
+        )
 
-        # POST data
-        cls.data = {"person": cls.parent.username}
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.post("dummy_path", data=self.form_data)
+        self.view_class = views.ParentChildRelationshipCreateView
+        self.view_func = self.view_class.as_view()
+        self.view = self.view_class()
 
-    def test_anonymous_user_response(self):
-        response = self.client.get(self.url)
-        self.assertRedirects(response, f"/accounts/login/?next={self.url}")
+    # FormMixin
+    def test_initial(self):
+        self.view.setup(self.request)
+        initial = self.view.get_initial()
+        self.assertEqual(initial, {})
 
-    def test_authenticated_user_response(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_authorized_user_response(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_template_used(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "people/relationship_form.html")
-
-    def test_response_with_nonexistent_child(self):
-        self.client.force_login(self.authorized_user)
-        url = self.url.replace(self.child.username, "nonexistent-child")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-
-    def test_context_data_contains_child(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        self.assertEqual(response.context.get("child"), self.child)
+    def test_prefix(self):
+        self.view.setup(self.request)
+        prefix = self.view.get_prefix()
+        self.assertIsNone(prefix)
 
     def test_form_class(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.get(self.url)
-        form = response.context.get("form")
-        self.assertEqual(form.__class__.__name__, "ParentChildRelationshipCreationForm")
-        self.assertIsInstance(form, import_string("django.forms.ModelForm"))
-        self.assertIsInstance(
-            form, import_string("people.forms.ParentChildRelationshipCreationForm")
-        )
-
-    def test_form_invalid(self):
-        # setup
-        data = {"person": self.parent, "relative": self.child, "relation": "PC"}
-        InterpersonalRelationshipFactory(**data)
-        self.client.force_login(self.authorized_user)
-
-        # test
-        response = self.client.post(self.url, self.data)
-        form = response.context.get("form")
-        self.assertFalse(form.is_valid())
+        self.view.setup(self.request)
+        form_class = self.view.get_form_class()
         self.assertEqual(
-            form.errors, {"__all__": ["This interpersonal relationship already exists"]}
+            form_class,
+            import_string("people.forms.ParentChildRelationshipCreationForm"),
         )
 
-    def test_form_valid(self):
-        self.client.force_login(self.authorized_user)
-        self.client.post(self.url, self.data)
-        relationship = InterpersonalRelationship.objects.get(relative=self.child)
-        self.assertEqual(relationship.created_by, self.authorized_user)
+    def test_form_kwargs(self):
+        self.view.setup(self.request)
+        form_kwargs = {
+            "initial": self.view.get_initial(),
+            "prefix": self.view.get_prefix(),
+            "data": self.request.POST,
+            "files": self.request.FILES,
+        }
+        self.assertEqual(self.view.get_form_kwargs(), form_kwargs)
 
     def test_success_url(self):
-        self.client.force_login(self.authorized_user)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, reverse("core:dashboard"))
+        self.view.setup(self.request)
+        self.view.object = self.relationship
+        success_url = self.view.get_success_url()
+        self.assertEqual(success_url, reverse("core:dashboard"))
+
+    def test_form_invalid(self):
+        self.request.user = self.user
+        self.view.setup(self.request, username=self.child.username)
+        self.view.object = None
+        form = self.view.get_form()
+        response = self.view.form_invalid(form)
+        self.assertEqual(response.status_code, 200)
+
+    # SuccessMessageMixin
+    def test_success_message(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.view.object = self.relationship
+        data = self.form_data.copy()
+        success_message = self.view.get_success_message(data)
+        people = f"{self.parent} and {self.child}"
+        self.assertEqual(
+            success_message,
+            f"A parent-child relationship between {people} has been added.",
+        )
+
+    @patch("django.contrib.messages.success")
+    def test_form_valid_without_duplicate(self, mock_success):
+        self.request.user = self.user
+        self.view.setup(self.request, username=self.child.username)
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+        self.assertTrue(mock_success.called)
+        self.assertEqual(response.status_code, 302)
+        relationship = InterpersonalRelationship.objects.get(person=self.parent)
+        self.assertEqual(relationship.created_by, self.user)
+        self.assertEqual(relationship.relation, "PC")
+
+    # ModelFormMixin
+    def test_form_valid_with_duplicate(self):
+        # setup
+        InterpersonalRelationshipFactory(**self.relationship_data)
+        self.request.user = self.user
+        self.view.setup(self.request, username=self.child.username)
+        self.view.object = None
+        form = self.view.get_form()
+        self.assertTrue(form.is_valid())
+        response = self.view.form_valid(form)
+
+        # test
+        self.assertEqual(response.status_code, 200)
+        response.render()
+        error_message = "This interpersonal relationship already exists"
+        self.assertInHTML(error_message, str(response.content))
+
+    # SingleObjectMixin
+    def test_queryset(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            self.assertEqual(list(queryset), [])
+
+    def test_slug_field(self):
+        self.view.setup(self.request)
+        slug_field = self.view.get_slug_field()
+        self.assertEqual(slug_field, "slug")
+
+    def test_object(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            obj = self.view.get_object()
+            self.assertIsNone(obj)
+
+    def test_child_with_existing_person(self):
+        self.view.setup(self.request, username=self.child.username)
+        obj = self.view.get_child()
+        self.assertEqual(obj, self.child)
+
+    def test_child_with_non_existent_person(self):
+        self.view.setup(self.request, username="non-existent-person")
+        with self.assertRaises(Http404):
+            self.view.get_child()
+
+    def test_context_object_name(self):
+        self.view.setup(self.request)
+        with self.assertRaises(ImproperlyConfigured):
+            queryset = self.view.get_queryset()
+            context_object_name = self.view.get_context_object_name(queryset)
+            self.assertIsNone(context_object_name)
+
+    def test_context_data(self):
+        self.view.setup(self.request, username=self.child.username)
+        self.view.object = None
+        context_data = self.view.get_context_data()
+        self.assertEqual(list(context_data.keys()), ["form", "view", "child"])
+        self.assertEqual(context_data.get("child"), self.child)
+
+    # SingleObjectTemplateResponseMixin
+    def test_template_name(self):
+        self.view.setup(self.request)
+        template_names = self.view.get_template_names()
+        self.assertIn("people/relationship_form.html", template_names)
+
+    # LoginRequiredMixin
+    def test_login_required(self):
+        self.request.user = AnonymousUser()
+        self.view.setup(self.request)
+        response = self.view.dispatch(self.request)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("account_login"), response.url)
+
+    # PermissionRequiredMixin
+    def test_permission_required(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        permission_required = self.view.get_permission_required()
+        self.assertEqual(permission_required, ())
+
+    # UserPassesTestMixin
+    def test_test_func_false(self):
+        self.request.user = UserFactory()
+        self.view.setup(self.request)
+        self.assertFalse(self.view.test_func())
+
+    def test_test_func_true(self):
+        self.request.user = self.user
+        self.view.setup(self.request)
+        self.assertTrue(self.view.test_func())
