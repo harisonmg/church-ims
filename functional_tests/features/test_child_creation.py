@@ -45,14 +45,13 @@ class ChildCreationTestCase(FunctionalTestCase):
         )
         self.assertEqual(child_creation_page.form.submit_button_label, "Add")
 
-        # He enters the child's username and full name and submits the form
-        child_creation_page.add_person(
-            self.child.username,
-            self.child.full_name,
-            self.child.get_gender_display(),
-            str(self.child.dob),
-            True,
-        )
+        # He enters the child's details and submits the form
+        child_creation_page.form.enter_username(self.child.username)
+        child_creation_page.form.enter_full_name(self.child.full_name)
+        child_creation_page.form.select_gender(self.child.get_gender_display())
+        child_creation_page.form.enter_dob(str(self.child.dob))
+        child_creation_page.form.click_is_parent_checkbox()
+        child_creation_page.form.submit()
 
         # The child's information was added successfully and he is redirected
         # to the his dashboard
@@ -89,13 +88,12 @@ class ChildCreationTestCase(FunctionalTestCase):
         )
         self.assertEqual(child_creation_page.form.submit_button_label, "Add")
 
-        # He enters the child's username and full name and submits the form
-        child_creation_page.add_person(
-            self.child.username,
-            self.child.full_name,
-            self.child.get_gender_display(),
-            str(self.child.dob),
-        )
+        # He enters the child's details and submits the form
+        child_creation_page.form.enter_username(self.child.username)
+        child_creation_page.form.enter_full_name(self.child.full_name)
+        child_creation_page.form.select_gender(self.child.get_gender_display())
+        child_creation_page.form.enter_dob(str(self.child.dob))
+        child_creation_page.form.submit()
 
         # The child's information was added successfully and he is redirected
         # to the parent-child relationship creation page

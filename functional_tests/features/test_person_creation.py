@@ -42,13 +42,12 @@ class PersonCreationTestCase(FunctionalTestCase):
         )
         self.assertEqual(person_creation_page.form.submit_button_label, "Add")
 
-        # He enters the person's username and full name and submits the form
-        person_creation_page.add_person(
-            self.person.username,
-            self.person.full_name,
-            self.person.get_gender_display(),
-            str(self.person.dob),
-        )
+        # He enters the person's details and submits the form
+        person_creation_page.form.enter_username(self.person.username)
+        person_creation_page.form.enter_full_name(self.person.full_name)
+        person_creation_page.form.select_gender(self.person.get_gender_display())
+        person_creation_page.form.enter_dob(str(self.person.dob))
+        person_creation_page.form.submit()
 
         # The person's information was added successfully and he is redirected
         # to the person's detail page

@@ -43,8 +43,9 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         )
         self.assertEqual(relationship_creation_page.form.submit_button_label, "Add")
 
-        # He enters the required information and submits the form
-        relationship_creation_page.add_parent(self.parent.username)
+        # He enters the parent's username and submits the form
+        relationship_creation_page.form.enter_parent_username(self.parent.username)
+        relationship_creation_page.form.submit()
 
         # The relationship was added successfully and he is redirected to his dashboard
         dashboard = pages.Dashboard(self)

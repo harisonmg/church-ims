@@ -66,11 +66,10 @@ class RelationshipCreationTestCase(FunctionalTestCase):
         self.assertEqual(relationship_creation_page.form.submit_button_label, "Add")
 
         # He enters the required information and submits the form
-        relationship_creation_page.add_relationship(
-            self.person.username,
-            self.relative.username,
-            self.relationship_type,
-        )
+        relationship_creation_page.form.enter_person_username(self.person.username)
+        relationship_creation_page.form.enter_relative_username(self.relative.username)
+        relationship_creation_page.form.select_relationship_type(self.relationship_type)
+        relationship_creation_page.form.submit()
 
         # The relationship was added successfully and he is redirected to the
         # relationships list page
