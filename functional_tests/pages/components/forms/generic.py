@@ -34,6 +34,8 @@ class SearchForm(SubmitFormComponent):
     def search_input_aria_label(self):
         return self._search_input.get_attribute("aria-label")
 
-    def search(self, search_term):
-        self._search_input.send_keys(search_term)
-        return self.submit()
+    def clear_search_query_input(self):
+        self._search_input.clear()
+
+    def enter_search_query(self, query):
+        self._search_input.send_keys(query)

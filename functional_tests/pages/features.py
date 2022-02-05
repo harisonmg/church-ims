@@ -35,9 +35,9 @@ class PeopleListPage(BasePage):
     def table(self):
         return components.PeopleTable(self.browser)
 
-    def search(self, search_term):
-        self.form.search(search_term=search_term)
-        return self
+    def search(self, query):
+        self.form.enter_search_query(query=query)
+        return self.form.submit()
 
 
 class TemperatureRecordsListPage(BasePage):
@@ -51,9 +51,9 @@ class TemperatureRecordsListPage(BasePage):
     def table(self):
         return components.Table(self.browser)
 
-    def search(self, search_term):
-        self.form.search(search_term=search_term)
-        return self
+    def search(self, query):
+        self.form.enter_search_query(query=query)
+        return self.form.submit()
 
 
 class TemperatureRecordCreationPage(BasePage):
@@ -183,9 +183,9 @@ class InterpersonalRelationshipsListPage(BasePage):
     def table(self):
         return components.Table(self.browser)
 
-    def search(self, search_term):
-        self.form.search(search_term=search_term)
-        return self
+    def search(self, query):
+        self.form.enter_search_query(query=query)
+        return self.form.submit()
 
 
 class InterpersonalRelationshipCreationPage(BasePage):
