@@ -21,10 +21,6 @@ class TemperatureRecordCreationForm(SubmitFormComponent):
     def enter_body_temperature(self, body_temperature):
         self._body_temperature_input.send_keys(body_temperature)
 
-    def send_keys(self, temperature):
-        self._body_temperature_input.send_keys(temperature)
-        return self.submit()
-
 
 class PersonForm(SubmitFormComponent):
     USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_username")
@@ -97,23 +93,6 @@ class PersonForm(SubmitFormComponent):
     def enter_dob(self, dob):
         self._date_of_birth_input.send_keys(dob)
 
-    def send_keys(self, username=None, full_name=None, gender=None, dob=None):
-        if username is not None:
-            self._username_input.clear()
-            self._username_input.send_keys(username)
-
-        if full_name is not None:
-            self._full_name_input.clear()
-            self._full_name_input.send_keys(full_name)
-
-        if gender is not None:
-            self.select_gender(gender)
-
-        if dob is not None:
-            self._date_of_birth_input.clear()
-            self._date_of_birth_input.send_keys(dob)
-        return self.submit()
-
 
 class AdultForm(PersonForm):
     PHONE_NUMBER_INPUT = (By.CSS_SELECTOR, "input#id_phone_number")
@@ -133,16 +112,6 @@ class AdultForm(PersonForm):
     def enter_phone_number(self, phone_number):
         self._phone_number_input.send_keys(phone_number)
 
-    def send_keys(
-        self, username=None, full_name=None, gender=None, dob=None, phone_number=None
-    ):
-        if phone_number is not None:
-            self._phone_number_input.clear()
-            self._phone_number_input.send_keys(phone_number)
-
-        kwargs = dict(username=username, full_name=full_name, gender=gender, dob=dob)
-        return super().send_keys(**kwargs)
-
 
 class ChildForm(PersonForm):
     IS_PARENT_CHECKBOX = (By.CSS_SELECTOR, "input#id_is_parent")
@@ -158,14 +127,6 @@ class ChildForm(PersonForm):
 
     def click_is_parent_checkbox(self):
         self._is_parent_checkbox.click()
-
-    def send_keys(
-        self, username=None, full_name=None, gender=None, dob=None, is_parent=False
-    ):
-        if is_parent:
-            self._is_parent_checkbox.click()
-        kwargs = dict(username=username, full_name=full_name, gender=gender, dob=dob)
-        return super().send_keys(**kwargs)
 
 
 class InterpersonalRelationshipCreationForm(SubmitFormComponent):
@@ -223,12 +184,6 @@ class InterpersonalRelationshipCreationForm(SubmitFormComponent):
     def enter_relative_username(self, username):
         self._relative_username_input.send_keys(username)
 
-    def send_keys(self, person_username, relative_username, relationship_type):
-        self._person_username_input.send_keys(person_username)
-        self._relative_username_input.send_keys(relative_username)
-        self.select_relationship_type(relationship_type)
-        return self.submit()
-
 
 class ParentChildRelationshipCreationForm(SubmitFormComponent):
     PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
@@ -247,7 +202,3 @@ class ParentChildRelationshipCreationForm(SubmitFormComponent):
 
     def enter_parent_username(self, username):
         self._parent_username_input.send_keys(username)
-
-    def send_keys(self, parent_username):
-        self._parent_username_input.send_keys(parent_username)
-        return self.submit()
