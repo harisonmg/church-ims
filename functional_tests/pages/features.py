@@ -35,10 +35,6 @@ class PeopleListPage(BasePage):
     def table(self):
         return components.PeopleTable(self.browser)
 
-    def search(self, query):
-        self.form.enter_search_query(query=query)
-        return self.form.submit()
-
 
 class TemperatureRecordsListPage(BasePage):
     PATH = "/records/temperature/"
@@ -50,10 +46,6 @@ class TemperatureRecordsListPage(BasePage):
     @property
     def table(self):
         return components.Table(self.browser)
-
-    def search(self, query):
-        self.form.enter_search_query(query=query)
-        return self.form.submit()
 
 
 class TemperatureRecordCreationPage(BasePage):
@@ -182,10 +174,6 @@ class InterpersonalRelationshipsListPage(BasePage):
     @property
     def table(self):
         return components.Table(self.browser)
-
-    def search(self, query):
-        self.form.enter_search_query(query=query)
-        return self.form.submit()
 
 
 class InterpersonalRelationshipCreationPage(BasePage):
