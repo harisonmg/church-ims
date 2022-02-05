@@ -53,14 +53,12 @@ def get_age_category(age):
         age_category = "adult"
 
     elif age < SENIOR_CITIZEN[0]:
-        age_category ="middle-aged"
+        age_category = "middle-aged"
 
     elif age <= SENIOR_CITIZEN[1]:
         age_category = "senior citizen"
 
     return age_category
-
-    
 
 
 def get_personal_details(user):
