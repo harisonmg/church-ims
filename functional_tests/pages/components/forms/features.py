@@ -15,6 +15,12 @@ class TemperatureRecordCreationForm(SubmitFormComponent):
     def body_temperature_label(self):
         return self.browser.find_element(*self.BODY_TEMPERATURE_LABEL).text
 
+    def clear_body_temperature_input(self):
+        self._body_temperature_input.clear()
+
+    def enter_body_temperature(self, body_temperature):
+        self._body_temperature_input.send_keys(body_temperature)
+
     def send_keys(self, temperature):
         self._body_temperature_input.send_keys(temperature)
         return self.submit()
@@ -73,6 +79,24 @@ class PersonForm(SubmitFormComponent):
     def date_of_birth_label(self):
         return self.browser.find_element(*self.DATE_OF_BIRTH_LABEL).text
 
+    def clear_username_input(self):
+        self._username_input.clear()
+
+    def enter_username(self, username):
+        self._username_input.send_keys(username)
+
+    def clear_full_name_input(self):
+        self._full_name_input.clear()
+
+    def enter_full_name(self, full_name):
+        self._full_name_input.send_keys(full_name)
+
+    def clear_dob_input(self):
+        self._date_of_birth_input.clear()
+
+    def enter_dob(self, dob):
+        self._date_of_birth_input.send_keys(dob)
+
     def send_keys(self, username=None, full_name=None, gender=None, dob=None):
         if username is not None:
             self._username_input.clear()
@@ -103,6 +127,12 @@ class AdultForm(PersonForm):
     def phone_number_label(self):
         return self.browser.find_element(*self.PHONE_NUMBER_LABEL).text
 
+    def clear_phone_number_input(self):
+        self._phone_number_input.clear()
+
+    def enter_phone_number(self, phone_number):
+        self._phone_number_input.send_keys(phone_number)
+
     def send_keys(
         self, username=None, full_name=None, gender=None, dob=None, phone_number=None
     ):
@@ -125,6 +155,9 @@ class ChildForm(PersonForm):
     @property
     def is_parent_checkbox_label(self):
         return self.browser.find_element(*self.IS_PARENT_CHECKBOX_LABEL).text
+
+    def click_is_parent_checkbox(self):
+        self._is_parent_checkbox.click()
 
     def send_keys(
         self, username=None, full_name=None, gender=None, dob=None, is_parent=False
@@ -178,6 +211,18 @@ class InterpersonalRelationshipCreationForm(SubmitFormComponent):
         if element is not None:
             element.click()
 
+    def clear_person_username_input(self):
+        self._person_username_input.clear()
+
+    def enter_person_username(self, username):
+        self._person_username_input.send_keys(username)
+
+    def clear_relative_username_input(self):
+        self._relative_username_input.clear()
+
+    def enter_relative_username(self, username):
+        self._relative_username_input.send_keys(username)
+
     def send_keys(self, person_username, relative_username, relationship_type):
         self._person_username_input.send_keys(person_username)
         self._relative_username_input.send_keys(relative_username)
@@ -196,6 +241,12 @@ class ParentChildRelationshipCreationForm(SubmitFormComponent):
     @property
     def parent_username_label(self):
         return self.browser.find_element(*self.PARENT_USERNAME_LABEL).text
+
+    def clear_parent_username_input(self):
+        self._parent_username_input.clear()
+
+    def enter_parent_username(self, username):
+        self._parent_username_input.send_keys(username)
 
     def send_keys(self, parent_username):
         self._parent_username_input.send_keys(parent_username)
