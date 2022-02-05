@@ -1,7 +1,13 @@
 from selenium.webdriver.common.by import By
 
-from . import components
 from .base import BasePage
+from .components.forms.auth import (
+    LoginForm,
+    PasswordResetForm,
+    PasswordResetRequestForm,
+    SignupForm,
+)
+from .components.forms.generic import SubmitFormComponent
 
 
 class LoginPage(BasePage):
@@ -9,11 +15,7 @@ class LoginPage(BasePage):
 
     @property
     def form(self):
-        return components.LoginForm(self.browser)
-
-    def login(self, email, password, remember=False):
-        self.form.send_keys(email=email, password=password, remember=remember)
-        return self
+        return LoginForm(self.browser)
 
 
 class LogoutPage(BasePage):
@@ -21,7 +23,7 @@ class LogoutPage(BasePage):
 
     @property
     def form(self):
-        return components.FormComponent(self.browser)
+        return SubmitFormComponent(self.browser)
 
     def logout(self):
         self.form.submit()
@@ -37,11 +39,7 @@ class PasswordResetRequestPage(BasePage):
 
     @property
     def form(self):
-        return components.PasswordResetRequestForm(self.browser)
-
-    def request_password_reset(self, email):
-        self.form.send_keys(email=email)
-        return self
+        return PasswordResetRequestForm(self.browser)
 
 
 class PasswordResetRequestDonePage(BasePage):
@@ -59,11 +57,7 @@ class PasswordResetPage(BasePage):
 
     @property
     def form(self):
-        return components.PasswordResetForm(self.browser)
-
-    def set_password(self, password1, password2):
-        self.form.send_keys(password1=password1, password2=password2)
-        return self
+        return PasswordResetForm(self.browser)
 
 
 class PasswordResetDonePage(BasePage):
@@ -81,11 +75,7 @@ class SignupPage(BasePage):
 
     @property
     def form(self):
-        return components.SignupForm(self.browser)
-
-    def signup(self, email, password1, password2):
-        self.form.send_keys(email=email, password1=password1, password2=password2)
-        return self
+        return SignupForm(self.browser)
 
 
 class EmailVerificationRequiredPage(BasePage):
@@ -103,7 +93,7 @@ class EmailConfirmationPage(BasePage):
 
     @property
     def form(self):
-        return components.FormComponent(self.browser)
+        return SubmitFormComponent(self.browser)
 
     def confirm_email(self):
         self.form.submit()

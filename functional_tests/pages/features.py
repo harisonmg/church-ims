@@ -1,7 +1,16 @@
 from selenium.webdriver.common.by import By
 
-from . import components
 from .base import BasePage
+from .components.forms.features import (
+    AdultForm,
+    ChildForm,
+    InterpersonalRelationshipCreationForm,
+    ParentChildRelationshipCreationForm,
+    PersonForm,
+    TemperatureRecordCreationForm,
+)
+from .components.forms.generic import SearchForm
+from .components.tables import PeopleTable, Table
 
 
 class HomePage(BasePage):
@@ -29,15 +38,11 @@ class PeopleListPage(BasePage):
 
     @property
     def form(self):
-        return components.SearchForm(self.browser)
+        return SearchForm(self.browser)
 
     @property
     def table(self):
-        return components.PeopleTable(self.browser)
-
-    def search(self, search_term):
-        self.form.search(search_term=search_term)
-        return self
+        return PeopleTable(self.browser)
 
 
 class TemperatureRecordsListPage(BasePage):
@@ -45,15 +50,11 @@ class TemperatureRecordsListPage(BasePage):
 
     @property
     def form(self):
-        return components.SearchForm(self.browser)
+        return SearchForm(self.browser)
 
     @property
     def table(self):
-        return components.Table(self.browser)
-
-    def search(self, search_term):
-        self.form.search(search_term=search_term)
-        return self
+        return Table(self.browser)
 
 
 class TemperatureRecordCreationPage(BasePage):
@@ -67,11 +68,7 @@ class TemperatureRecordCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.TemperatureRecordCreationForm(self.browser)
-
-    def add_temperature(self, temperature):
-        self.form.send_keys(temperature=temperature)
-        return self
+        return TemperatureRecordCreationForm(self.browser)
 
 
 class PersonCreationPage(BasePage):
@@ -79,13 +76,7 @@ class PersonCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.PersonForm(self.browser)
-
-    def add_person(self, username, full_name, gender, dob):
-        self.form.send_keys(
-            username=username, full_name=full_name, gender=gender, dob=dob
-        )
-        return self
+        return PersonForm(self.browser)
 
 
 class AdultCreationPage(PersonCreationPage):
@@ -93,17 +84,7 @@ class AdultCreationPage(PersonCreationPage):
 
     @property
     def form(self):
-        return components.AdultForm(self.browser)
-
-    def add_person(self, username, full_name, gender, dob, phone_number):
-        self.form.send_keys(
-            username=username,
-            full_name=full_name,
-            gender=gender,
-            dob=dob,
-            phone_number=phone_number,
-        )
-        return self
+        return AdultForm(self.browser)
 
 
 class AdultSelfRegistrationPage(AdultCreationPage):
@@ -115,17 +96,7 @@ class ChildCreationPage(PersonCreationPage):
 
     @property
     def form(self):
-        return components.ChildForm(self.browser)
-
-    def add_person(self, username, full_name, gender, dob, is_parent=False):
-        self.form.send_keys(
-            username=username,
-            full_name=full_name,
-            gender=gender,
-            dob=dob,
-            is_parent=is_parent,
-        )
-        return self
+        return ChildForm(self.browser)
 
 
 class PersonDetailPage(BasePage):
@@ -148,7 +119,7 @@ class PersonDetailPage(BasePage):
         element = self._update_link_element
         return {element.text: element.get_attribute("href")}
 
-    def update_person(self):
+    def update_personal_info(self):
         self._update_link_element.click()
 
 
@@ -163,13 +134,7 @@ class PersonUpdatePage(BasePage):
 
     @property
     def form(self):
-        return components.PersonForm(self.browser)
-
-    def update_person(self, username=None, full_name=None, gender=None, dob=None):
-        self.form.send_keys(
-            username=username, full_name=full_name, gender=gender, dob=dob
-        )
-        return self
+        return PersonForm(self.browser)
 
 
 class InterpersonalRelationshipsListPage(BasePage):
@@ -177,15 +142,11 @@ class InterpersonalRelationshipsListPage(BasePage):
 
     @property
     def form(self):
-        return components.SearchForm(self.browser)
+        return SearchForm(self.browser)
 
     @property
     def table(self):
-        return components.Table(self.browser)
-
-    def search(self, search_term):
-        self.form.search(search_term=search_term)
-        return self
+        return Table(self.browser)
 
 
 class InterpersonalRelationshipCreationPage(BasePage):
@@ -193,15 +154,7 @@ class InterpersonalRelationshipCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.InterpersonalRelationshipCreationForm(self.browser)
-
-    def add_relationship(self, person_username, relative_username, relationship_type):
-        self.form.send_keys(
-            person_username=person_username,
-            relative_username=relative_username,
-            relationship_type=relationship_type,
-        )
-        return self
+        return InterpersonalRelationshipCreationForm(self.browser)
 
 
 class ParentChildRelationshipCreationPage(BasePage):
@@ -215,8 +168,4 @@ class ParentChildRelationshipCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.ParentChildRelationshipCreationForm(self.browser)
-
-    def add_parent(self, parent_username):
-        self.form.send_keys(parent_username=parent_username)
-        return self
+        return ParentChildRelationshipCreationForm(self.browser)

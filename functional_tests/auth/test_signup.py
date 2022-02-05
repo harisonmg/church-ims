@@ -38,7 +38,10 @@ class SignupTestCase(FunctionalTestCase):
         )
 
         # She enters her email and password and submits the form
-        signup_page.signup(self.user_email, self.password, self.password)
+        signup_page.form.enter_email(self.user_email)
+        signup_page.form.enter_password(self.password)
+        signup_page.form.enter_password2(self.password)
+        signup_page.form.submit()
 
         # The sign up was successful and she is redirected to the email
         # verification page

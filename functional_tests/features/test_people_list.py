@@ -113,7 +113,8 @@ class PeopleListTestCase(FunctionalTestCase):
 
         # He decides to search for a person that exists
         search_term = self.people[20].full_name
-        people_list_page.search(search_term)
+        people_list_page.form.enter_search_query(search_term)
+        people_list_page.form.submit()
 
         search_results = search_people(search_term)
         self.assertEqual(len(people_list_page.table.data), len(search_results))
@@ -121,7 +122,8 @@ class PeopleListTestCase(FunctionalTestCase):
         self.assertEqual(people_list_page.table.columns, PEOPLE_LIST_COLUMNS)
 
         # He decides to search for a person that doesn't exist
-        people_list_page.search("Does not exist")
+        people_list_page.form.enter_search_query("Does not exist")
+        people_list_page.form.submit()
 
         self.assertEqual(
             people_list_page.main_text[0], "Your search didn't yield any results"

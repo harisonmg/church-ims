@@ -18,9 +18,7 @@ class PersonUpdateTestCase(FunctionalTestCase):
 
         # person
         self.person = PersonFactory()
-        self.data = {
-            "full_name": self.person.full_name + " " + self.person.username.title()
-        }
+        self.username = PersonFactory.build().username
 
         # auth
         self.create_pre_authenticated_session(self.user)
@@ -43,14 +41,16 @@ class PersonUpdateTestCase(FunctionalTestCase):
         self.assertEqual(person_update_page.form.full_name_label, "Full name*")
         self.assertEqual(person_update_page.form.submit_button_label, "Update")
 
-        # He enters the person's full name and submits the form
-        person_update_page.update_person(**self.data)
+        # He updates the person's username and submits the form
+        person_update_page.form.clear_username_input()
+        person_update_page.form.enter_username(self.username)
+        person_update_page.form.submit()
 
         # The person's information was added successfully and he is redirected
         # to the person's detail page
-        person_detail_page = pages.PersonDetailPage(self, self.person.username)
+        person_detail_page = pages.PersonDetailPage(self, self.username)
         self.assertEqual(self.browser.current_url, person_detail_page.url)
         self.assertEqual(
             person_detail_page.messages[0],
-            f"{self.person.username}'s information has been updated successfully.",
+            f"{self.username}'s information has been updated successfully.",
         )

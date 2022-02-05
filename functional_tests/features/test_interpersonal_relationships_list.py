@@ -135,7 +135,8 @@ class RelationshipsListTestCase(FunctionalTestCase):
 
         # He decides to search for a relationship that exists
         search_term = self.relationships[20].person.username
-        relationships_list_page.search(search_term)
+        relationships_list_page.form.enter_search_query(search_term)
+        relationships_list_page.form.submit()
 
         search_results = search_interpersonal_relationships(search_term)
         self.assertEqual(len(relationships_list_page.table.data), len(search_results))
@@ -146,7 +147,8 @@ class RelationshipsListTestCase(FunctionalTestCase):
         )
 
         # He decides to search for a relationship that doesn't exist
-        relationships_list_page.search("Does not exist")
+        relationships_list_page.form.enter_search_query("Does not exist")
+        relationships_list_page.form.submit()
 
         self.assertEqual(
             relationships_list_page.main_text[0], "Your search didn't yield any results"

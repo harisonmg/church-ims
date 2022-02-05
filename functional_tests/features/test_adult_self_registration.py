@@ -42,14 +42,13 @@ class AdultRegistrationTestCase(FunctionalTestCase):
         )
         self.assertEqual(adult_registration_page.form.submit_button_label, "Add")
 
-        # He enters the his details and submits the form
-        adult_registration_page.add_person(
-            self.person.username,
-            self.person.full_name,
-            self.person.get_gender_display(),
-            str(self.person.dob),
-            str(self.person.phone_number),
-        )
+        # He enters his details and submits the form
+        adult_registration_page.form.enter_username(self.person.username)
+        adult_registration_page.form.enter_full_name(self.person.full_name)
+        adult_registration_page.form.select_gender(self.person.get_gender_display())
+        adult_registration_page.form.enter_dob(str(self.person.dob))
+        adult_registration_page.form.enter_phone_number(str(self.person.phone_number))
+        adult_registration_page.form.submit()
 
         # His information was added successfully and is redirected
         # to his dashboard

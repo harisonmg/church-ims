@@ -38,7 +38,8 @@ class PasswordResetTestCase(FunctionalTestCase):
         )
 
         # She enters her email and submits the form
-        password_reset_request_page.request_password_reset(self.user.email)
+        password_reset_request_page.form.enter_email(self.user.email)
+        password_reset_request_page.form.submit()
 
         # She is redirected to the password reset request done page
         # and receives an email with instructions for resetting her password
@@ -85,7 +86,9 @@ class PasswordResetTestCase(FunctionalTestCase):
         )
 
         # She enters a new password and submits the form
-        password_reset_page.set_password(self.password, self.password)
+        password_reset_page.form.enter_password(self.password)
+        password_reset_page.form.enter_password2(self.password)
+        password_reset_page.form.submit()
 
         # The password reset is successful and she is redirected
         # to the password reset done page
