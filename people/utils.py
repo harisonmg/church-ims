@@ -47,6 +47,8 @@ def get_age_category(age):
         return "middle-aged"
     elif age <= SENIOR_CITIZEN[1]:
         return "senior citizen"
+    if age > SENIOR_CITIZEN[1]:
+        raise ValueError(MAX_HUMAN_AGE_EXCEEDED_ERROR)
 
 
 def get_personal_details(user):
