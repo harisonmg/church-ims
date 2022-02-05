@@ -37,15 +37,15 @@ def get_age_category(age):
         raise ValueError(NEGATIVE_AGE_ERROR)
     if age < TEENAGER[0]:
         return "child"
-    elif age < YOUNG_ADULT[0]:
+    if age < YOUNG_ADULT[0]:
         return "teenager"
-    elif age < ADULT[0]:
+    if age < ADULT[0]:
         return "young adult"
-    elif age < MIDDLE_AGED[0]:
+    if age < MIDDLE_AGED[0]:
         return "adult"
-    elif age < SENIOR_CITIZEN[0]:
+    if age < SENIOR_CITIZEN[0]:
         return "middle-aged"
-    elif age <= SENIOR_CITIZEN[1]:
+    if age <= SENIOR_CITIZEN[1]:
         return "senior citizen"
     if age > SENIOR_CITIZEN[1]:
         raise ValueError(MAX_HUMAN_AGE_EXCEEDED_ERROR)
