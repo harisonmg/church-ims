@@ -35,7 +35,7 @@ def get_todays_adult_dob():
 def get_age_category(age):
     if age < CHILD[0]:
         raise ValueError(NEGATIVE_AGE_ERROR)
-    elif age < TEENAGER[0]:
+    if age < TEENAGER[0]:
         return "child"
     elif age < YOUNG_ADULT[0]:
         return "teenager"
@@ -47,8 +47,6 @@ def get_age_category(age):
         return "middle-aged"
     elif age <= SENIOR_CITIZEN[1]:
         return "senior citizen"
-    else:
-        raise ValueError(MAX_HUMAN_AGE_EXCEEDED_ERROR)
 
 
 def get_personal_details(user):
