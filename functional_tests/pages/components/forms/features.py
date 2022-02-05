@@ -111,9 +111,14 @@ class ChildForm(PersonForm):
         self._is_parent_checkbox.click()
 
 
-class InterpersonalRelationshipCreationForm(SubmitFormComponent):
+class PersonUsernameComponent:
     PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
     PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
+
+
+class InterpersonalRelationshipCreationForm(
+    PersonUsernameComponent, SubmitFormComponent
+):
     RELATIVE_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_relative")
     RELATIVE_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_relative']")
     RELATIONSHIP_TYPE_OPTION = (By.CSS_SELECTOR, "select#id_relation option")
@@ -167,17 +172,14 @@ class InterpersonalRelationshipCreationForm(SubmitFormComponent):
             element.click()
 
 
-class ParentChildRelationshipCreationForm(SubmitFormComponent):
-    PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
-    PARENT_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
-
+class ParentChildRelationshipCreationForm(PersonUsernameComponent, SubmitFormComponent):
     @property
     def _parent_username_input(self):
-        return self.browser.find_element(*self.PARENT_USERNAME_INPUT)
+        return self.browser.find_element(*self.PERSON_USERNAME_INPUT)
 
     @property
     def parent_username_label(self):
-        return self.browser.find_element(*self.PARENT_USERNAME_LABEL).text
+        return self.browser.find_element(*self.PERSON_USERNAME_LABEL).text
 
     def clear_parent_username_input(self):
         self._parent_username_input.clear()
