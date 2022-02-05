@@ -61,10 +61,6 @@ class TemperatureRecordCreationPage(BasePage):
     def form(self):
         return components.TemperatureRecordCreationForm(self.browser)
 
-    def add_temperature(self, temperature):
-        self.form.send_keys(temperature=temperature)
-        return self
-
 
 class PersonCreationPage(BasePage):
     PATH = "/people/add/"
@@ -73,12 +69,6 @@ class PersonCreationPage(BasePage):
     def form(self):
         return components.PersonForm(self.browser)
 
-    def add_person(self, username, full_name, gender, dob):
-        self.form.send_keys(
-            username=username, full_name=full_name, gender=gender, dob=dob
-        )
-        return self
-
 
 class AdultCreationPage(PersonCreationPage):
     PATH = "/people/add/adult/"
@@ -86,16 +76,6 @@ class AdultCreationPage(PersonCreationPage):
     @property
     def form(self):
         return components.AdultForm(self.browser)
-
-    def add_person(self, username, full_name, gender, dob, phone_number):
-        self.form.send_keys(
-            username=username,
-            full_name=full_name,
-            gender=gender,
-            dob=dob,
-            phone_number=phone_number,
-        )
-        return self
 
 
 class AdultSelfRegistrationPage(AdultCreationPage):
@@ -108,16 +88,6 @@ class ChildCreationPage(PersonCreationPage):
     @property
     def form(self):
         return components.ChildForm(self.browser)
-
-    def add_person(self, username, full_name, gender, dob, is_parent=False):
-        self.form.send_keys(
-            username=username,
-            full_name=full_name,
-            gender=gender,
-            dob=dob,
-            is_parent=is_parent,
-        )
-        return self
 
 
 class PersonDetailPage(BasePage):
@@ -157,12 +127,6 @@ class PersonUpdatePage(BasePage):
     def form(self):
         return components.PersonForm(self.browser)
 
-    def update_person(self, username=None, full_name=None, gender=None, dob=None):
-        self.form.send_keys(
-            username=username, full_name=full_name, gender=gender, dob=dob
-        )
-        return self
-
 
 class InterpersonalRelationshipsListPage(BasePage):
     PATH = "/people/relationships/"
@@ -183,14 +147,6 @@ class InterpersonalRelationshipCreationPage(BasePage):
     def form(self):
         return components.InterpersonalRelationshipCreationForm(self.browser)
 
-    def add_relationship(self, person_username, relative_username, relationship_type):
-        self.form.send_keys(
-            person_username=person_username,
-            relative_username=relative_username,
-            relationship_type=relationship_type,
-        )
-        return self
-
 
 class ParentChildRelationshipCreationPage(BasePage):
     def __init__(self, test, child_username):
@@ -204,7 +160,3 @@ class ParentChildRelationshipCreationPage(BasePage):
     @property
     def form(self):
         return components.ParentChildRelationshipCreationForm(self.browser)
-
-    def add_parent(self, parent_username):
-        self.form.send_keys(parent_username=parent_username)
-        return self
