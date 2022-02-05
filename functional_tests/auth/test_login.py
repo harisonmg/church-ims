@@ -49,8 +49,12 @@ class LoginTestCase(FunctionalTestCase):
             {"I don't remember my password": pages.PasswordResetRequestPage(self).url},
         )
 
-        # He enters his email and password and submits the form
-        login_page.login(self.fully_registered_user.email, self.password, True)
+        # He enters his email, password, checks the 'remember me' checkbox
+        # and submits the form
+        login_page.form.enter_email(self.fully_registered_user.email)
+        login_page.form.enter_password(self.password)
+        login_page.form.click_remember_checkbox()
+        login_page.form.submit()
 
         # The login was successful and he is redirected to his dashboard
         dashboard = pages.Dashboard(self)
@@ -66,7 +70,9 @@ class LoginTestCase(FunctionalTestCase):
         login_page.visit()
 
         # He enters his email and password and submits the form
-        login_page.login(self.partially_registered_user.email, self.password)
+        login_page.form.enter_email(self.partially_registered_user.email)
+        login_page.form.enter_password(self.password)
+        login_page.form.submit()
 
         # The login was successful and he is redirected to the adult
         # self registration page
@@ -83,7 +89,9 @@ class LoginTestCase(FunctionalTestCase):
         login_page.visit()
 
         # He enters his email and password and submits the form
-        login_page.login(self.inactive_user.email, self.password)
+        login_page.form.enter_email(self.inactive_user.email)
+        login_page.form.enter_password(self.password)
+        login_page.form.submit()
 
         # He is redirected to the account inactive page
         account_inactive_page = pages.AccountInactivePage(self)

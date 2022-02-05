@@ -25,7 +25,7 @@ class LogoutTestCase(FunctionalTestCase):
             logout_page.header.account_dropdown.links, self.account_dropdown_links
         )
 
-        # He sees a logout confirmation button and ascertains that he wants to log out
+        # He is prompted to confirm that he wants to log out
         self.assertEqual(logout_page.main_text[0], "Are you sure you want to log out?")
         self.assertEqual(logout_page.form.submit_button_label, "Log out")
         logout_page.logout()
