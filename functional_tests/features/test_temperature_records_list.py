@@ -129,7 +129,8 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
 
         # He decides to search temperature records for a person that exists
         search_term = self.temperature_records[20].person.full_name
-        temp_records_list_page.search(search_term)
+        temp_records_list_page.form.enter_search_query(search_term)
+        temp_records_list_page.form.submit()
 
         search_results = search_temperature_records(search_term)
         self.assertEqual(len(temp_records_list_page.table.data), len(search_results))
@@ -139,7 +140,8 @@ class TemperatureRecordsListTestCase(FunctionalTestCase):
         )
 
         # He decides to search temperature records for a person that doesn't exist
-        temp_records_list_page.search("Does not exist")
+        temp_records_list_page.form.enter_search_query("Does not exist")
+        temp_records_list_page.form.submit()
 
         self.assertEqual(
             temp_records_list_page.main_text[0], "Your search didn't yield any results"
