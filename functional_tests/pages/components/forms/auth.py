@@ -24,11 +24,6 @@ class EmailComponent(BaseComponent):
         self._email_input.send_keys(email)
 
 
-class UsernameOrEmailComponent(EmailComponent):
-    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
-    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
-
-
 class PasswordComponent(BaseComponent):
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
     PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password']")
@@ -70,7 +65,9 @@ class PasswordConfirmationComponent(PasswordComponent):
 
 
 # forms
-class LoginForm(UsernameOrEmailComponent, PasswordComponent, SubmitFormComponent):
+class LoginForm(EmailComponent, PasswordComponent, SubmitFormComponent):
+    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
+    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
     REMEMBER_CHECKBOX = (By.CSS_SELECTOR, "input#id_remember")
     REMEMBER_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_remember']")
     SIGN_UP_LINK = (By.ID, "signup")
