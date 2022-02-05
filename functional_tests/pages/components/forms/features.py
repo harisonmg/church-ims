@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 
-from .generic import FormComponent
+from .generic import SubmitFormComponent
 
 
-class TemperatureRecordCreationForm(FormComponent):
+class TemperatureRecordCreationForm(SubmitFormComponent):
     BODY_TEMPERATURE_INPUT = (By.CSS_SELECTOR, "input#id_body_temperature")
     BODY_TEMPERATURE_LABEL = (By.CSS_SELECTOR, "label[for='id_body_temperature']")
 
@@ -20,7 +20,7 @@ class TemperatureRecordCreationForm(FormComponent):
         return self.submit()
 
 
-class PersonForm(FormComponent):
+class PersonForm(SubmitFormComponent):
     USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_username")
     USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_username']")
     FULL_NAME_INPUT = (By.CSS_SELECTOR, "input#id_full_name")
@@ -135,7 +135,7 @@ class ChildForm(PersonForm):
         return super().send_keys(**kwargs)
 
 
-class InterpersonalRelationshipCreationForm(FormComponent):
+class InterpersonalRelationshipCreationForm(SubmitFormComponent):
     PERSON_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
     PERSON_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
     RELATIVE_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_relative")
@@ -185,7 +185,7 @@ class InterpersonalRelationshipCreationForm(FormComponent):
         return self.submit()
 
 
-class ParentChildRelationshipCreationForm(FormComponent):
+class ParentChildRelationshipCreationForm(SubmitFormComponent):
     PARENT_USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_person")
     PARENT_USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_person']")
 

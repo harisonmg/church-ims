@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from ..base import BaseComponent
 
 
-class FormComponent(BaseComponent):
+class SubmitFormComponent(BaseComponent):
     SUBMIT_BUTTON = (By.CSS_SELECTOR, "button[type='submit']")
 
     @property
@@ -19,7 +19,7 @@ class FormComponent(BaseComponent):
         return self
 
 
-class SearchForm(FormComponent):
+class SearchForm(SubmitFormComponent):
     SEARCH_INPUT = (By.CSS_SELECTOR, "input[type='search']")
 
     @property

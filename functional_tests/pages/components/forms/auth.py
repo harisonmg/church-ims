@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 
-from .generic import FormComponent
+from .generic import SubmitFormComponent
 
 
-class LoginForm(FormComponent):
+class LoginForm(SubmitFormComponent):
     EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
@@ -55,7 +55,7 @@ class LoginForm(FormComponent):
         return self.submit()
 
 
-class PasswordResetRequestForm(FormComponent):
+class PasswordResetRequestForm(SubmitFormComponent):
     EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
 
@@ -72,7 +72,7 @@ class PasswordResetRequestForm(FormComponent):
         return self.submit()
 
 
-class PasswordResetForm(FormComponent):
+class PasswordResetForm(SubmitFormComponent):
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
     PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
     PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
@@ -100,7 +100,7 @@ class PasswordResetForm(FormComponent):
         return self.submit()
 
 
-class SignupForm(FormComponent):
+class SignupForm(SubmitFormComponent):
     EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
     EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
     PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")

@@ -21,7 +21,7 @@ class LogoutPage(BasePage):
 
     @property
     def form(self):
-        return components.FormComponent(self.browser)
+        return components.SubmitFormComponent(self.browser)
 
     def logout(self):
         self.form.submit()
@@ -103,7 +103,7 @@ class EmailConfirmationPage(BasePage):
 
     @property
     def form(self):
-        return components.FormComponent(self.browser)
+        return components.SubmitFormComponent(self.browser)
 
     def confirm_email(self):
         self.form.submit()
