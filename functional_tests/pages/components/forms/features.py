@@ -3,25 +3,7 @@ from selenium.webdriver.common.by import By
 from .generic import SubmitFormComponent
 
 
-class TemperatureRecordCreationForm(SubmitFormComponent):
-    BODY_TEMPERATURE_INPUT = (By.CSS_SELECTOR, "input#id_body_temperature")
-    BODY_TEMPERATURE_LABEL = (By.CSS_SELECTOR, "label[for='id_body_temperature']")
-
-    @property
-    def _body_temperature_input(self):
-        return self.browser.find_element(*self.BODY_TEMPERATURE_INPUT)
-
-    @property
-    def body_temperature_label(self):
-        return self.browser.find_element(*self.BODY_TEMPERATURE_LABEL).text
-
-    def clear_body_temperature_input(self):
-        self._body_temperature_input.clear()
-
-    def enter_body_temperature(self, body_temperature):
-        self._body_temperature_input.send_keys(body_temperature)
-
-
+# people
 class PersonForm(SubmitFormComponent):
     USERNAME_INPUT = (By.CSS_SELECTOR, "input#id_username")
     USERNAME_LABEL = (By.CSS_SELECTOR, "label[for='id_username']")
@@ -62,11 +44,6 @@ class PersonForm(SubmitFormComponent):
     def gender_options(self):
         return list(self._gender_options.keys())
 
-    def select_gender(self, option):
-        element = self._gender_options.get(option)
-        if element is not None:
-            element.click()
-
     @property
     def _date_of_birth_input(self):
         return self.browser.find_element(*self.DATE_OF_BIRTH_INPUT)
@@ -86,6 +63,11 @@ class PersonForm(SubmitFormComponent):
 
     def enter_full_name(self, full_name):
         self._full_name_input.send_keys(full_name)
+
+    def select_gender(self, option):
+        element = self._gender_options.get(option)
+        if element is not None:
+            element.click()
 
     def clear_dob_input(self):
         self._date_of_birth_input.clear()
@@ -167,11 +149,6 @@ class InterpersonalRelationshipCreationForm(SubmitFormComponent):
     def relationship_type_options(self):
         return list(self._relationship_type_options.keys())
 
-    def select_relationship_type(self, option):
-        element = self._relationship_type_options.get(option)
-        if element is not None:
-            element.click()
-
     def clear_person_username_input(self):
         self._person_username_input.clear()
 
@@ -183,6 +160,11 @@ class InterpersonalRelationshipCreationForm(SubmitFormComponent):
 
     def enter_relative_username(self, username):
         self._relative_username_input.send_keys(username)
+
+    def select_relationship_type(self, option):
+        element = self._relationship_type_options.get(option)
+        if element is not None:
+            element.click()
 
 
 class ParentChildRelationshipCreationForm(SubmitFormComponent):
@@ -202,3 +184,23 @@ class ParentChildRelationshipCreationForm(SubmitFormComponent):
 
     def enter_parent_username(self, username):
         self._parent_username_input.send_keys(username)
+
+
+# records
+class TemperatureRecordCreationForm(SubmitFormComponent):
+    BODY_TEMPERATURE_INPUT = (By.CSS_SELECTOR, "input#id_body_temperature")
+    BODY_TEMPERATURE_LABEL = (By.CSS_SELECTOR, "label[for='id_body_temperature']")
+
+    @property
+    def _body_temperature_input(self):
+        return self.browser.find_element(*self.BODY_TEMPERATURE_INPUT)
+
+    @property
+    def body_temperature_label(self):
+        return self.browser.find_element(*self.BODY_TEMPERATURE_LABEL).text
+
+    def clear_body_temperature_input(self):
+        self._body_temperature_input.clear()
+
+    def enter_body_temperature(self, body_temperature):
+        self._body_temperature_input.send_keys(body_temperature)
