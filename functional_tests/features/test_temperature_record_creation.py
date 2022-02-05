@@ -45,7 +45,8 @@ class TemperatureRecordCreationTestCase(FunctionalTestCase):
 
         # He looks up a person's information to add their temperature record
         search_term = self.people[15].full_name
-        people_list_page.search(search_term)
+        people_list_page.form.enter_search_query(search_term)
+        people_list_page.form.submit()
 
         search_results = search_people(search_term)
         self.assertEqual(len(people_list_page.table.data), len(search_results))
