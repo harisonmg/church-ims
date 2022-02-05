@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 
-from . import components
+from .components.base import Messages
+from .components.navigation import Footer, Header, Pagination, Sidebar
 
 
 class BasePage:
@@ -29,7 +30,7 @@ class BasePage:
 
     @property
     def header(self):
-        return components.Header(self.browser)
+        return Header(self.browser)
 
     @property
     def _main_paragraphs(self):
@@ -41,19 +42,19 @@ class BasePage:
 
     @property
     def messages(self):
-        return components.Messages(self.browser).messages
+        return Messages(self.browser).messages
 
     @property
     def sidebar(self):
-        return components.Sidebar(self.browser)
+        return Sidebar(self.browser)
 
     @property
     def pagination(self):
-        return components.Pagination(self.browser)
+        return Pagination(self.browser)
 
     @property
     def footer(self):
-        return components.Footer(self.browser)
+        return Footer(self.browser)
 
     def visit(self):
         self.browser.get(self.url)

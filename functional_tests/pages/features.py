@@ -1,7 +1,16 @@
 from selenium.webdriver.common.by import By
 
-from . import components
 from .base import BasePage
+from .components.forms.features import (
+    AdultForm,
+    ChildForm,
+    InterpersonalRelationshipCreationForm,
+    ParentChildRelationshipCreationForm,
+    PersonForm,
+    TemperatureRecordCreationForm,
+)
+from .components.forms.generic import SearchForm
+from .components.tables import PeopleTable, Table
 
 
 class HomePage(BasePage):
@@ -29,11 +38,11 @@ class PeopleListPage(BasePage):
 
     @property
     def form(self):
-        return components.SearchForm(self.browser)
+        return SearchForm(self.browser)
 
     @property
     def table(self):
-        return components.PeopleTable(self.browser)
+        return PeopleTable(self.browser)
 
 
 class TemperatureRecordsListPage(BasePage):
@@ -41,11 +50,11 @@ class TemperatureRecordsListPage(BasePage):
 
     @property
     def form(self):
-        return components.SearchForm(self.browser)
+        return SearchForm(self.browser)
 
     @property
     def table(self):
-        return components.Table(self.browser)
+        return Table(self.browser)
 
 
 class TemperatureRecordCreationPage(BasePage):
@@ -59,7 +68,7 @@ class TemperatureRecordCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.TemperatureRecordCreationForm(self.browser)
+        return TemperatureRecordCreationForm(self.browser)
 
 
 class PersonCreationPage(BasePage):
@@ -67,7 +76,7 @@ class PersonCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.PersonForm(self.browser)
+        return PersonForm(self.browser)
 
 
 class AdultCreationPage(PersonCreationPage):
@@ -75,7 +84,7 @@ class AdultCreationPage(PersonCreationPage):
 
     @property
     def form(self):
-        return components.AdultForm(self.browser)
+        return AdultForm(self.browser)
 
 
 class AdultSelfRegistrationPage(AdultCreationPage):
@@ -87,7 +96,7 @@ class ChildCreationPage(PersonCreationPage):
 
     @property
     def form(self):
-        return components.ChildForm(self.browser)
+        return ChildForm(self.browser)
 
 
 class PersonDetailPage(BasePage):
@@ -125,7 +134,7 @@ class PersonUpdatePage(BasePage):
 
     @property
     def form(self):
-        return components.PersonForm(self.browser)
+        return PersonForm(self.browser)
 
 
 class InterpersonalRelationshipsListPage(BasePage):
@@ -133,11 +142,11 @@ class InterpersonalRelationshipsListPage(BasePage):
 
     @property
     def form(self):
-        return components.SearchForm(self.browser)
+        return SearchForm(self.browser)
 
     @property
     def table(self):
-        return components.Table(self.browser)
+        return Table(self.browser)
 
 
 class InterpersonalRelationshipCreationPage(BasePage):
@@ -145,7 +154,7 @@ class InterpersonalRelationshipCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.InterpersonalRelationshipCreationForm(self.browser)
+        return InterpersonalRelationshipCreationForm(self.browser)
 
 
 class ParentChildRelationshipCreationPage(BasePage):
@@ -159,4 +168,4 @@ class ParentChildRelationshipCreationPage(BasePage):
 
     @property
     def form(self):
-        return components.ParentChildRelationshipCreationForm(self.browser)
+        return ParentChildRelationshipCreationForm(self.browser)

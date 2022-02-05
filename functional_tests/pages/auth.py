@@ -1,7 +1,13 @@
 from selenium.webdriver.common.by import By
 
-from . import components
 from .base import BasePage
+from .components.forms.auth import (
+    LoginForm,
+    PasswordResetForm,
+    PasswordResetRequestForm,
+    SignupForm,
+)
+from .components.forms.generic import SubmitFormComponent
 
 
 class LoginPage(BasePage):
@@ -9,7 +15,7 @@ class LoginPage(BasePage):
 
     @property
     def form(self):
-        return components.LoginForm(self.browser)
+        return LoginForm(self.browser)
 
 
 class LogoutPage(BasePage):
@@ -17,7 +23,7 @@ class LogoutPage(BasePage):
 
     @property
     def form(self):
-        return components.SubmitFormComponent(self.browser)
+        return SubmitFormComponent(self.browser)
 
     def logout(self):
         self.form.submit()
@@ -33,7 +39,7 @@ class PasswordResetRequestPage(BasePage):
 
     @property
     def form(self):
-        return components.PasswordResetRequestForm(self.browser)
+        return PasswordResetRequestForm(self.browser)
 
 
 class PasswordResetRequestDonePage(BasePage):
@@ -51,7 +57,7 @@ class PasswordResetPage(BasePage):
 
     @property
     def form(self):
-        return components.PasswordResetForm(self.browser)
+        return PasswordResetForm(self.browser)
 
 
 class PasswordResetDonePage(BasePage):
@@ -69,7 +75,7 @@ class SignupPage(BasePage):
 
     @property
     def form(self):
-        return components.SignupForm(self.browser)
+        return SignupForm(self.browser)
 
 
 class EmailVerificationRequiredPage(BasePage):
@@ -87,7 +93,7 @@ class EmailConfirmationPage(BasePage):
 
     @property
     def form(self):
-        return components.SubmitFormComponent(self.browser)
+        return SubmitFormComponent(self.browser)
 
     def confirm_email(self):
         self.form.submit()
