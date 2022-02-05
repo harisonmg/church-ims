@@ -1,17 +1,13 @@
 from selenium.webdriver.common.by import By
 
+from ..base import BaseComponent
 from .generic import SubmitFormComponent
 
 
-class LoginForm(SubmitFormComponent):
-    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
-    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
-    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
-    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password']")
-    REMEMBER_CHECKBOX = (By.CSS_SELECTOR, "input#id_remember")
-    REMEMBER_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_remember']")
-    SIGN_UP_LINK = (By.ID, "signup")
-    PASSWORD_RESET_LINK = (By.ID, "reset_password")
+# generic components
+class EmailComponent(BaseComponent):
+    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
+    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
 
     @property
     def _email_input(self):
@@ -21,6 +17,16 @@ class LoginForm(SubmitFormComponent):
     def email_label(self):
         return self.browser.find_element(*self.EMAIL_LABEL).text
 
+
+class UsernameOrEmailComponent(EmailComponent):
+    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_login")
+    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_login']")
+
+
+class PasswordComponent(BaseComponent):
+    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password")
+    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password']")
+
     @property
     def _password_input(self):
         return self.browser.find_element(*self.PASSWORD_INPUT)
@@ -28,6 +34,29 @@ class LoginForm(SubmitFormComponent):
     @property
     def password_label(self):
         return self.browser.find_element(*self.PASSWORD_LABEL).text
+
+
+class PasswordConfirmationComponent(PasswordComponent):
+    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
+    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
+    PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
+    PASSWORD_CONFIRMATION_LABEL = (By.CSS_SELECTOR, "label[for='id_password2']")
+
+    @property
+    def _password_confirmation_input(self):
+        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_INPUT)
+
+    @property
+    def password_confirmation_label(self):
+        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_LABEL).text
+
+
+# forms
+class LoginForm(UsernameOrEmailComponent, PasswordComponent, SubmitFormComponent):
+    REMEMBER_CHECKBOX = (By.CSS_SELECTOR, "input#id_remember")
+    REMEMBER_CHECKBOX_LABEL = (By.CSS_SELECTOR, "label[for='id_remember']")
+    SIGN_UP_LINK = (By.ID, "signup")
+    PASSWORD_RESET_LINK = (By.ID, "reset_password")
 
     @property
     def _remember_checkbox(self):
@@ -55,83 +84,21 @@ class LoginForm(SubmitFormComponent):
         return self.submit()
 
 
-class PasswordResetRequestForm(SubmitFormComponent):
-    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
-    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
-
-    @property
-    def _email_input(self):
-        return self.browser.find_element(*self.EMAIL_INPUT)
-
-    @property
-    def email_label(self):
-        return self.browser.find_element(*self.EMAIL_LABEL).text
-
+class PasswordResetRequestForm(EmailComponent, SubmitFormComponent):
     def send_keys(self, email):
         self._email_input.send_keys(email)
         return self.submit()
 
 
-class PasswordResetForm(SubmitFormComponent):
-    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
-    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
-    PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
-    PASSWORD_CONFIRMATION_LABEL = (By.CSS_SELECTOR, "label[for='id_password2']")
-
-    @property
-    def _password_input(self):
-        return self.browser.find_element(*self.PASSWORD_INPUT)
-
-    @property
-    def password_label(self):
-        return self.browser.find_element(*self.PASSWORD_LABEL).text
-
-    @property
-    def _password_confirmation_input(self):
-        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_INPUT)
-
-    @property
-    def password_confirmation_label(self):
-        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_LABEL).text
-
+class PasswordResetForm(PasswordConfirmationComponent, SubmitFormComponent):
     def send_keys(self, password1, password2):
         self._password_input.send_keys(password1)
         self._password_confirmation_input.send_keys(password2)
         return self.submit()
 
 
-class SignupForm(SubmitFormComponent):
-    EMAIL_INPUT = (By.CSS_SELECTOR, "input#id_email")
-    EMAIL_LABEL = (By.CSS_SELECTOR, "label[for='id_email']")
-    PASSWORD_INPUT = (By.CSS_SELECTOR, "input#id_password1")
-    PASSWORD_LABEL = (By.CSS_SELECTOR, "label[for='id_password1']")
-    PASSWORD_CONFIRMATION_INPUT = (By.CSS_SELECTOR, "input#id_password2")
-    PASSWORD_CONFIRMATION_LABEL = (By.CSS_SELECTOR, "label[for='id_password2']")
+class SignupForm(EmailComponent, PasswordConfirmationComponent, SubmitFormComponent):
     LOGIN_LINK = (By.ID, "login")
-
-    @property
-    def _email_input(self):
-        return self.browser.find_element(*self.EMAIL_INPUT)
-
-    @property
-    def email_label(self):
-        return self.browser.find_element(*self.EMAIL_LABEL).text
-
-    @property
-    def _password_input(self):
-        return self.browser.find_element(*self.PASSWORD_INPUT)
-
-    @property
-    def password_label(self):
-        return self.browser.find_element(*self.PASSWORD_LABEL).text
-
-    @property
-    def _password_confirmation_input(self):
-        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_INPUT)
-
-    @property
-    def password_confirmation_label(self):
-        return self.browser.find_element(*self.PASSWORD_CONFIRMATION_LABEL).text
 
     @property
     def login_link(self):
