@@ -97,25 +97,13 @@ class LoginForm(UsernameOrEmailComponent, PasswordComponent, SubmitFormComponent
     def click_remember_checkbox(self):
         self._remember_checkbox.click()
 
-    def send_keys(self, email, password, remember=False):
-        self._email_input.send_keys(email)
-        self._password_input.send_keys(password)
-        if remember:
-            self._remember_checkbox.click()
-        return self.submit()
-
 
 class PasswordResetRequestForm(EmailComponent, SubmitFormComponent):
-    def send_keys(self, email):
-        self._email_input.send_keys(email)
-        return self.submit()
+    pass
 
 
 class PasswordResetForm(PasswordConfirmationComponent, SubmitFormComponent):
-    def send_keys(self, password1, password2):
-        self._password_input.send_keys(password1)
-        self._password_confirmation_input.send_keys(password2)
-        return self.submit()
+    pass
 
 
 class SignupForm(EmailComponent, PasswordConfirmationComponent, SubmitFormComponent):
@@ -125,9 +113,3 @@ class SignupForm(EmailComponent, PasswordConfirmationComponent, SubmitFormCompon
     def login_link(self):
         element = self.browser.find_element(*self.LOGIN_LINK)
         return {element.text: element.get_attribute("href")}
-
-    def send_keys(self, email, password1, password2):
-        self._email_input.send_keys(email)
-        self._password_input.send_keys(password1)
-        self._password_confirmation_input.send_keys(password2)
-        return self.submit()
