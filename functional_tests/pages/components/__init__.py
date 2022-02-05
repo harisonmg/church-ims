@@ -1,18 +1,17 @@
 from .base import Messages
-from .forms.auth import (
-    LoginForm,
-    PasswordResetForm,
-    PasswordResetRequestForm,
-    SignupForm,
-)
-from .forms.features import (
+from .forms import (
     AdultForm,
     ChildForm,
     InterpersonalRelationshipCreationForm,
+    LoginForm,
     ParentChildRelationshipCreationForm,
+    PasswordResetForm,
+    PasswordResetRequestForm,
     PersonForm,
+    SearchForm,
+    SignupForm,
+    SubmitFormComponent,
     TemperatureRecordCreationForm,
 )
-from .forms.generic import SearchForm, SubmitFormComponent
 from .navigation import Footer, Header, Pagination, Sidebar
 from .tables import PeopleTable, Table
