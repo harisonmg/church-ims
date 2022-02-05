@@ -110,7 +110,7 @@ class PersonDetailPage(BasePage):
         element = self._update_link_element
         return {element.text: element.get_attribute("href")}
 
-    def update_person(self):
+    def update_personal_info(self):
         self._update_link_element.click()
 
 
