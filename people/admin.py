@@ -5,7 +5,7 @@ from .models import InterpersonalRelationship, Person
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ["username", "age_category", "created_by", "created_at"]
+    list_display = ["username", "dob", "created_by", "created_at"]
     list_display_links = None
     list_filter = ["created_at", "last_modified"]
     ordering = ["username"]
