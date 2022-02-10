@@ -5,7 +5,7 @@ from .models import User
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin):
     list_display = ["email", "person", "is_staff", "date_joined"]
     list_filter = [
         "is_staff",
