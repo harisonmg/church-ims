@@ -19,8 +19,8 @@ class HomePageTestCase(FunctionalTestCase):
         self.assertEqual(home_page.login_link, {"Log in": pages.LoginPage(self).url})
 
         # There is also some site information in the footer
-        self.assertEqual(home_page.footer.text, "Made with 💙 by Harison Gachuru")
-        self.assertEqual(
-            home_page.footer.links,
-            {"Harison Gachuru": "https://harisonmg.netlify.app/"},
+        self.assertEqual(home_page.footer.text, "Made with 💙 by contributors")
+        contributors_link = (
+            "https://github.com/harisonmg/church-ims/graphs/contributors"
         )
+        self.assertEqual(home_page.footer.links, {"contributors": contributors_link})
